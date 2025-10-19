@@ -36,7 +36,7 @@ function App() {
         { path: "/cart", element: <ProtectedRoutes><Cart /></ProtectedRoutes> },
         { path: "/categories", element: <ProtectedRoutes><Categories /></ProtectedRoutes> },
         { path: "/wishlist", element: <ProtectedRoutes><Wishlist /></ProtectedRoutes> },
-        { path: "/details", element: <ProtectedRoutes><Details /></ProtectedRoutes> },
+        { path: "/details/:id", element: <ProtectedRoutes><Details /></ProtectedRoutes> },
         { path: "/allOrders", element: <ProtectedRoutes><AllOrders /></ProtectedRoutes> },
         { path: "/register", element: <UnProtectedRoutes><Register /></UnProtectedRoutes> },
 { path: "/login", element: <UnProtectedRoutes><Login /></UnProtectedRoutes> },
