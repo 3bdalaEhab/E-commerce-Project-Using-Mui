@@ -1,16 +1,17 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import React from "react";
+import React, { useContext, useState } from "react";
 import { useParams } from "react-router-dom";
 import {
   Box,
   Typography,
-  CircularProgress,
   Button,
   Rating,
   Divider,
   Chip,
   useTheme,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import { motion } from "framer-motion";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
@@ -20,10 +21,12 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import Loading from "../../components/Loading/Loading";
+import { CartContext } from "../../Context/CartContext";
 
 export default function Details() {
   const { id } = useParams();
   const theme = useTheme();
+  const { addToCart } = useContext(CartContext);
 
   // 🧩 جلب بيانات المنتج
   const getDetails = async () => {
@@ -38,10 +41,40 @@ export default function Details() {
     queryFn: getDetails,
   });
 
-  if (isLoading)
-    return (
-      <Loading/>
-    );
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
+
+  // 🛒 دالة إضافة المنتج مع توستر
+  async function addCart() {
+    try {
+      const data = await addToCart(id);
+
+      if (data?.status === "success") {
+        setSnackbar({
+          open: true,
+          message: data.message || "Product added successfully to your cart",
+          severity: "success",
+        });
+      } else {
+        setSnackbar({
+          open: true,
+          message: data?.message || "Failed to add product to your cart",
+          severity: "error",
+        });
+      }
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        message: "Server error. Please try again later.",
+        severity: "error",
+      });
+    }
+  }
+
+  if (isLoading) return <Loading />;
 
   if (isError)
     return (
@@ -54,10 +87,8 @@ export default function Details() {
 
   const allImages = [data.imageCover, ...(data.images || [])];
 
-  // 🧱 تصميم رئيسي داخل بوكس واحد
   return (
     <Box
-    
       component={motion.div}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -72,7 +103,6 @@ export default function Details() {
         background: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
       }}
     >
-      {/* الكارت */}
       <Box
         component={motion.div}
         initial={{ scale: 0.95, opacity: 0 }}
@@ -120,7 +150,7 @@ export default function Details() {
                     maxHeight: "450px",
                     objectFit: "cover",
                     borderRadius: "12px",
-                    cursor:"grab"
+                    cursor: "grab",
                   }}
                   whileHover={{ scale: 1.03 }}
                   transition={{ duration: 0.4 }}
@@ -231,19 +261,41 @@ export default function Details() {
                 fontSize: "1rem",
                 textTransform: "none",
                 borderRadius: "12px",
-                background:
-                  "linear-gradient(90deg, #1976d2 0%, #42a5f5 100%)",
+                background: "linear-gradient(90deg, #1976d2 0%, #42a5f5 100%)",
                 boxShadow: "0 6px 20px rgba(25,118,210,0.3)",
                 "&:hover": {
                   background:
                     "linear-gradient(90deg, #1565c0 0%, #1e88e5 100%)",
                 },
               }}
-              onClick={() => alert(`${data.title} added to cart!`)}
+              onClick={addCart}
             >
               Add to Cart
             </Button>
           </Box>
+
+          {/* 🧈 Snackbar في النص تحت */}
+          <Snackbar
+            open={snackbar.open}
+            autoHideDuration={3000}
+            onClose={() => setSnackbar({ ...snackbar, open: false })}
+            anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+          >
+            <Alert
+              onClose={() => setSnackbar({ ...snackbar, open: false })}
+              severity={snackbar.severity}
+              sx={{
+                width: "100%",
+                fontSize: "1rem",
+                fontWeight: "bold",
+                backgroundColor:
+                  snackbar.severity === "success" ? "#43a047" : "#e53935",
+                color: "white",
+              }}
+            >
+              {snackbar.message}
+            </Alert>
+          </Snackbar>
         </Box>
       </Box>
     </Box>

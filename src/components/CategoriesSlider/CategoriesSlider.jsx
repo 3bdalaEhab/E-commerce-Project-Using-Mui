@@ -183,7 +183,6 @@ export default function CategoriesSlider() {
             ease: "easeOut",
             delay: i * 0.3,                      
           }}
-          whileHover={{ scale: 1.05 }}            
         />
       ))}
     </Box>

@@ -15,6 +15,7 @@ import { useContext, useEffect } from "react";
 import { tokenContext } from "./Context/tokenContext";
 import UnProtectedRoutes from "./components/DirectingUsers/UnProtectedRoutes";
 import ProtectedRoutes from "./components/DirectingUsers/protectedRoutes";
+import Checkout from "./pages/Checkout/Checkout";
 
 
 function App() {
@@ -37,7 +38,8 @@ function App() {
         { path: "/categories", element: <ProtectedRoutes><Categories /></ProtectedRoutes> },
         { path: "/wishlist", element: <ProtectedRoutes><Wishlist /></ProtectedRoutes> },
         { path: "/details/:id", element: <ProtectedRoutes><Details /></ProtectedRoutes> },
-        { path: "/allOrders", element: <ProtectedRoutes><AllOrders /></ProtectedRoutes> },
+        { path: "/allorders", element: <ProtectedRoutes><AllOrders /></ProtectedRoutes> },
+        { path: "/Checkout/:sessionId", element: <ProtectedRoutes><Checkout/></ProtectedRoutes> },
         { path: "/register", element: <UnProtectedRoutes><Register /></UnProtectedRoutes> },
 { path: "/login", element: <UnProtectedRoutes><Login /></UnProtectedRoutes> },
         { path: "*", element: <NotFound /> },

@@ -75,7 +75,7 @@ export default function Register() {
       };
 
       const { data: res } = await axios.post(
-        "https://linked-posts.routemisr.com/users/signup",
+        "https://ecommerce.routemisr.com/api/v1/auth/signup",
         payload
       );
 

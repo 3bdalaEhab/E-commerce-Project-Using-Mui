@@ -14,12 +14,12 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { Email, Lock, Visibility, VisibilityOff } from "@mui/icons-material";
-import { useNavigate } from "react-router-dom";
+import { data, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { tokenContext } from "../../Context/tokenContext"; // ✅ استدعاء الكونتكست
+import { tokenContext } from "../../Context/tokenContext";
 
 export default function Login() {
-  const { setUserToken } = useContext(tokenContext); // ✅ هنا
+  const { setUserToken } = useContext(tokenContext);
   const {
     register,
     handleSubmit,
@@ -33,20 +33,27 @@ export default function Login() {
 
   const togglePassword = () => setShowPassword((s) => !s);
 
+  // دالة الإغلاق البسيطة للـ Snackbar
+  const handleSnackClose = () => {
+    setSnack((s) => ({ ...s, open: false }));
+  };
+
   const onSubmit = async (formData) => {
     setLoading(true);
+    let receivedToken = null; 
+
     try {
       const { data } = await axios.post(
-        "https://linked-posts.routemisr.com/users/signin",
+        "https://ecommerce.routemisr.com/api/v1/auth/signin",
         {
           email: formData.email.trim(),
           password: formData.password,
         }
+        
       );
 
       if (data.token) {
-        localStorage.setItem("userToken", data.token);
-        setUserToken(data.token); // ✅ حدث الكونتكست فورًا
+        receivedToken = data.token; 
       }
 
       setSnack({
@@ -54,8 +61,18 @@ export default function Login() {
         message: "✅ Logged in successfully!",
         severity: "success",
       });
-      setTimeout(() => navigate("/"), 1000);
+
+      // 💡 الحل القصير: تأخير التحديث والانتقال لمدة 1200 ميلي ثانية
+      setTimeout(() => {
+        if (receivedToken) {
+          localStorage.setItem("userToken", receivedToken);
+          setUserToken(receivedToken); 
+          navigate("/");
+        }
+      }, 1000); // ✅ المدة الجديدة
+
     } catch (err) {
+      // هنا لا يتغير شيء، الخطأ يعمل بشكل صحيح
       const msg =
         err.response?.data?.message ||
         err.response?.data?.error ||
@@ -216,8 +233,8 @@ export default function Login() {
 
       <Snackbar
         open={snack.open}
-        autoHideDuration={4000}
-        onClose={() => setSnack((s) => ({ ...s, open: false }))}
+        autoHideDuration={1000} // ✅ مدة ظهور الـ Snackbar (1.2 ثانية)
+        onClose={handleSnackClose} 
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       >
         <Alert severity={snack.severity}>{snack.message}</Alert>
