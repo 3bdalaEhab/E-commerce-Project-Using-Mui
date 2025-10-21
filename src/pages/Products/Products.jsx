@@ -15,11 +15,12 @@ import {
   Button,
   Alert,
 } from "@mui/material";
-import {  Star, ThumbUp } from "@mui/icons-material";
+import { Star, Favorite } from "@mui/icons-material";
 import Loading from "../../components/Loading/Loading";
 import { useNavigate } from "react-router-dom";
 import CategoriesSlider from "../../components/CategoriesSlider/CategoriesSlider";
 import { CartContext } from "../../Context/CartContext";
+import { WishlistContext } from "../../Context/WishlistContext";
 
 const cardVariants = {
   hidden: { opacity: 0, x: -50 },
@@ -39,20 +40,16 @@ const cardVariants = {
 
 export default function Products() {
   const navigate = useNavigate();
-const [snackbar, setSnackbar] = useState({
+  const { addToCart } = useContext(CartContext);
+  const { addToWishlist } = useContext(WishlistContext);
+
+  const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
     severity: "success",
   });
 
-
-
-  const { addToCart } = useContext(CartContext);
-
-
-
-
-async function addCart(productId) {
+  const addCart = async (productId) => {
     try {
       const data = await addToCart(productId);
 
@@ -76,17 +73,7 @@ async function addCart(productId) {
         severity: "error",
       });
     }
-  }
-
-
-
-
-
-
-
-
-
-
+  };
 
   const getProducts = async () => {
     const { data } = await axios.get(
@@ -100,8 +87,6 @@ async function addCart(productId) {
     queryFn: getProducts,
   });
 
-  const [likes, setLikes] = useState({});
-
   if (isLoading) return <Loading />;
 
   if (isError)
@@ -110,10 +95,6 @@ async function addCart(productId) {
         <Typography color="error">Error: {error.message}</Typography>
       </Box>
     );
-
-  const handleLike = (id) => {
-    setLikes((prev) => ({ ...prev, [id]: !prev[id] }));
-  };
 
   return (
     <>
@@ -197,11 +178,10 @@ async function addCart(productId) {
 
                     <Box sx={{ display: "flex", alignItems: "center" }}>
                       <Star sx={{ color: "#eebe22ff", fontSize: "30px" }} />
-                      <Typography variant="h6">
-                        {product.ratingsAverage}
-                      </Typography>
+                      <Typography variant="h6">{product.ratingsAverage}</Typography>
                     </Box>
                   </Box>
+
                   <Box
                     sx={{
                       display: "flex",
@@ -233,7 +213,7 @@ async function addCart(productId) {
                       }}
                       onClick={(e) => {
                         e.stopPropagation();
-                        addCart(product._id)
+                        addCart(product._id);
                       }}
                     >
                       Add To Cart
@@ -241,8 +221,8 @@ async function addCart(productId) {
                   </Box>
                 </CardContent>
 
+                {/* Wishlist Icon */}
                 <IconButton
-                  color={likes[product._id] ? "primary" : "default"}
                   sx={{
                     position: "absolute",
                     top: 10,
@@ -250,12 +230,25 @@ async function addCart(productId) {
                     background: "white",
                     boxShadow: "0 2px 6px rgba(0, 0, 0, 0.1)",
                   }}
-                  onClick={(e) => {
-                    handleLike(product._id);
+                  onClick={async (e) => {
                     e.stopPropagation();
+                    try {
+                      await addToWishlist(product._id);
+                      setSnackbar({
+                        open: true,
+                        message: "Added to wishlist",
+                        severity: "success",
+                      });
+                    } catch (error) {
+                      setSnackbar({
+                        open: true,
+                        message: "Failed to add to wishlist",
+                        severity: "error",
+                      });
+                    }
                   }}
                 >
-                  <ThumbUp />
+                  <Favorite />
                 </IconButton>
               </Card>
             </motion.div>
@@ -263,7 +256,7 @@ async function addCart(productId) {
         </Box>
       </Box>
 
-          {/* Snackbar / Alert */}
+      {/* Snackbar / Alert */}
       <Snackbar
         open={snackbar.open}
         autoHideDuration={3000}
