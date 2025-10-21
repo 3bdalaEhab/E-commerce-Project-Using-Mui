@@ -22,6 +22,7 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import Loading from "../../components/Loading/Loading";
 import { CartContext } from "../../Context/CartContext";
+import PageMeta from "../../components/PageMeta/PageMeta";
 
 export default function Details() {
   const { id } = useParams();
@@ -87,7 +88,13 @@ export default function Details() {
 
   const allImages = [data.imageCover, ...(data.images || [])];
 
-  return (
+  return (<>
+     <PageMeta
+     key={"Product Details"}
+        title="Product Details"
+        description="Detailed information about the selected product"
+      />
+
     <Box
       component={motion.div}
       initial={{ opacity: 0 }}
@@ -103,6 +110,7 @@ export default function Details() {
         background: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
       }}
     >
+    
       <Box
         component={motion.div}
         initial={{ scale: 0.95, opacity: 0 }}
@@ -299,5 +307,5 @@ export default function Details() {
         </Box>
       </Box>
     </Box>
-  );
+  </>  );
 }

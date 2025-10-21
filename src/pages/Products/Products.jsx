@@ -3,7 +3,6 @@ import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-
 import {
   Box,
   Card,
@@ -18,10 +17,11 @@ import {
 import { Star, Favorite } from "@mui/icons-material";
 import Loading from "../../components/Loading/Loading";
 import { useNavigate } from "react-router-dom";
-import CategoriesSlider from "../../components/CategoriesSlider/CategoriesSlider";
 import { CartContext } from "../../Context/CartContext";
 import { WishlistContext } from "../../Context/WishlistContext";
+import PageMeta from "../../components/PageMeta/PageMeta";
 
+// 🔹 Framer Motion variants for card animations
 const cardVariants = {
   hidden: { opacity: 0, x: -50 },
   visible: (delay) => ({
@@ -40,15 +40,19 @@ const cardVariants = {
 
 export default function Products() {
   const navigate = useNavigate();
+
+  // 🔹 Access cart and wishlist functions from context
   const { addToCart } = useContext(CartContext);
   const { addToWishlist } = useContext(WishlistContext);
 
+  // 🔹 State for snackbar notifications
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
     severity: "success",
   });
 
+  // 🔹 Add product to cart and show snackbar feedback
   const addCart = async (productId) => {
     try {
       const data = await addToCart(productId);
@@ -75,6 +79,7 @@ export default function Products() {
     }
   };
 
+  // 🔹 Fetch products from API
   const getProducts = async () => {
     const { data } = await axios.get(
       "https://ecommerce.routemisr.com/api/v1/products"
@@ -82,13 +87,16 @@ export default function Products() {
     return data.data;
   };
 
+  // 🔹 Use React Query to fetch products
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["products"],
     queryFn: getProducts,
   });
 
+  // 🔄 Loading state: show loader while fetching
   if (isLoading) return <Loading />;
 
+  // ❌ Error state: display error message
   if (isError)
     return (
       <Box sx={{ p: 4 }}>
@@ -98,12 +106,13 @@ export default function Products() {
 
   return (
     <>
-      <CategoriesSlider />
+
       <Box sx={{ p: 4, backgroundColor: "#fafafa" }}>
         <Typography color="primary" variant="h4" fontWeight="bold" mb={3}>
           Products
         </Typography>
 
+        {/* 🔹 Products grid */}
         <Box
           sx={{
             display: "grid",
@@ -119,7 +128,7 @@ export default function Products() {
               initial="hidden"
               whileInView="visible"
               whileHover="hover"
-              custom={(index % 4) * 0.1}
+              custom={(index % 4) * 0.1} // stagger animation
               viewport={{ once: true, amount: 0.3 }}
               style={{ display: "flex", flexDirection: "column" }}
             >
@@ -137,6 +146,7 @@ export default function Products() {
                 }}
                 onClick={() => navigate("/details/" + product._id)}
               >
+                {/* 🔹 Product image */}
                 <CardMedia
                   component="img"
                   image={product.imageCover}
@@ -149,6 +159,8 @@ export default function Products() {
                     borderTopRightRadius: 12,
                   }}
                 />
+
+                {/* 🔹 Product content */}
                 <CardContent
                   sx={{
                     flex: 1,
@@ -166,6 +178,7 @@ export default function Products() {
                     </Typography>
                   </Box>
 
+                  {/* 🔹 Price and rating */}
                   <Box
                     sx={{
                       display: "flex",
@@ -182,6 +195,7 @@ export default function Products() {
                     </Box>
                   </Box>
 
+                  {/* 🔹 Add to cart button */}
                   <Box
                     sx={{
                       display: "flex",
@@ -212,7 +226,7 @@ export default function Products() {
                         },
                       }}
                       onClick={(e) => {
-                        e.stopPropagation();
+                        e.stopPropagation(); // prevent navigating to details
                         addCart(product._id);
                       }}
                     >
@@ -221,7 +235,7 @@ export default function Products() {
                   </Box>
                 </CardContent>
 
-                {/* Wishlist Icon */}
+                {/* 🔹 Wishlist Icon */}
                 <IconButton
                   sx={{
                     position: "absolute",
@@ -231,7 +245,7 @@ export default function Products() {
                     boxShadow: "0 2px 6px rgba(0, 0, 0, 0.1)",
                   }}
                   onClick={async (e) => {
-                    e.stopPropagation();
+                    e.stopPropagation(); // prevent navigating to details
                     try {
                       await addToWishlist(product._id);
                       setSnackbar({
@@ -256,7 +270,7 @@ export default function Products() {
         </Box>
       </Box>
 
-      {/* Snackbar / Alert */}
+      {/* 🔹 Snackbar / Alert notifications */}
       <Snackbar
         open={snackbar.open}
         autoHideDuration={3000}

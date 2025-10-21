@@ -23,6 +23,7 @@ import Loading from "../../components/Loading/Loading";
 import ShoppingCartCheckoutIcon from "@mui/icons-material/ShoppingCartCheckout";
 import RemoveShoppingCartIcon from "@mui/icons-material/RemoveShoppingCart";
 import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
+import PageMeta from "../../components/PageMeta/PageMeta";
 
 export default function Cart() {
   const { getCart, removeSpecificItem, removeAllItems, updateItem } =
@@ -95,17 +96,30 @@ export default function Cart() {
 
   useEffect(() => {
     fetchCart();
+    
   }, []);
 
   if (loading)
     return (
+
       <Typography variant="h5" textAlign="center" color="primary" mt={10}>
+         <PageMeta
+     key={"My Cart"}
+        title="My Cart"
+        description="Review the products in your shopping cart"
+      />
         <Loading />
       </Typography>
     );
 
   if (!cart || cart.products.length === 0)
-    return (
+    return (<>
+     <PageMeta
+     key={"My Cart"}
+        title="My Cart"
+        description="Review the products in your shopping cart"
+      />
+  
       <Box
         component={motion.div}
         initial={{ opacity: 0, y: 30 }}
@@ -123,6 +137,7 @@ export default function Cart() {
           px: 2,
         }}
       >
+  
         <RemoveShoppingCartIcon
           sx={{ fontSize: 90, color: "primary.main", mb: 2 }}
         />
@@ -169,10 +184,11 @@ export default function Cart() {
           </Button>
         </Link>
       </Box>
-    );
+    </>  );
 
   return (
     <>
+    
       <Box
         sx={{
           minHeight: "100vh",

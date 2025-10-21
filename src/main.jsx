@@ -15,7 +15,7 @@ createRoot(document.getElementById("root")).render(
       <WishlistProvider>
         <TokenContextProvider>
           <CartContextProvider>
-            <App />
+              <App />
           </CartContextProvider>
         </TokenContextProvider>
       </WishlistProvider>

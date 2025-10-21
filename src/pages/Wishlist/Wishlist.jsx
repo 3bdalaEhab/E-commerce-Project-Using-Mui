@@ -16,19 +16,21 @@ import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import Loading from "../../components/Loading/Loading";
+import { Helmet } from "react-helmet";
+import PageMeta from "../../components/PageMeta/PageMeta";
 
 export default function Wishlist() {
-  const { wishlist , removeFromWishlist, loading ,getWishlist} = useContext(WishlistContext);
+  // 🔹 Access wishlist state and functions from Context
+  const { wishlist, removeFromWishlist, loading, getWishlist } = useContext(WishlistContext);
+
+  // 🔹 Fetch wishlist data when the component mounts
   useEffect(() => {
-    getWishlist()
-  
-  }, [])
-  
+    getWishlist();
+  }, []);
 
-    let navigate = useNavigate()
+  let navigate = useNavigate();
 
-
-  // 🔄 حالة التحميل
+  // 🔄 Loading state: show loader while fetching data
   if (loading) {
     return (
       <Box
@@ -44,9 +46,11 @@ export default function Wishlist() {
     );
   }
 
-  // 🟥 حالة الفارغة
+  // 🟥 Empty wishlist state: show message when no items exist
   if (!wishlist.length) {
-    return (
+    return (<>
+              <PageMeta  title={"My Wishlist"} description={"See all your favorite products in wishlist"}/>
+
       <Box
         component={motion.div}
         initial={{ opacity: 0, y: 30 }}
@@ -110,11 +114,15 @@ export default function Wishlist() {
           </Button>
         </Link>
       </Box>
-    );
+    </>);
   }
+  
 
-  // ✅ حالة وجود منتجات
-  return (
+
+  // ✅ Wishlist with items: display all products
+  return (<>
+              <PageMeta  title={"My Wishlist"} description={"See all your favorite products in wishlist"}/>
+
     <Container sx={{ py: 5 }}>
       <Typography
         variant="h4"
@@ -133,10 +141,11 @@ export default function Wishlist() {
       <Grid container spacing={3} justifyContent="center" alignItems="center">
         {wishlist.map((item, index) => (
           <Grid item key={item._id}>
+            {/* 🔹 Each card navigates to product details page */}
             <Card
-            onClick={()=>{
-              navigate(`/details/${item._id}`)
-            }}
+              onClick={() => {
+                navigate(`/details/${item._id}`);
+              }}
               component={motion.div}
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
@@ -155,6 +164,7 @@ export default function Wishlist() {
                 justifyContent: "space-between",
               }}
             >
+              {/* 🔹 Product image */}
               <CardMedia
                 component="img"
                 height="220"
@@ -163,22 +173,29 @@ export default function Wishlist() {
                 sx={{ objectFit: "cover" }}
               />
               <CardContent sx={{ textAlign: "center", flexGrow: 1 }}>
+                {/* 🔹 Product title */}
                 <Typography
                   variant="h6"
                   fontWeight="bold"
                   color="primary.dark"
                   mb={1}
                 >
-                  {item.title ? item.title.split(" ").slice(0, 3).join(" ") : "No Title"}
+                  {item.title
+                    ? item.title.split(" ").slice(0, 3).join(" ")
+                    : "No Title"}
                 </Typography>
+                {/* 🔹 Product price */}
                 <Typography variant="body2" color="text.secondary" mb={2}>
                   Price: ${item.price}
                 </Typography>
+                {/* 🔹 Remove from wishlist button */}
                 <Button
                   variant="outlined"
                   color="error"
                   startIcon={<DeleteOutlineIcon />}
-                  onClick={() => removeFromWishlist(item._id)}
+                  onClick={(e) => {removeFromWishlist(item._id)
+                    e.stopPropagation();
+                  }}
                   sx={{
                     textTransform: "none",
                     borderRadius: 2,
@@ -193,5 +210,5 @@ export default function Wishlist() {
         ))}
       </Grid>
     </Container>
-  );
+</>  );
 }

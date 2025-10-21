@@ -26,6 +26,7 @@ import {
   Wc,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
+import PageMeta from "../../components/PageMeta/PageMeta";
 
 // ✅ Transition Animation for Snackbar
 function SlideTransition(props) {
@@ -114,6 +115,10 @@ export default function Register() {
         py: { xs: 2, sm: 4 },
       }}
     >
+       <PageMeta
+        title="Register"
+        description="Create a new account to start shopping with us."
+      />
       <MotionPaper
         component="form"
         onSubmit={handleSubmit(onSubmit)}

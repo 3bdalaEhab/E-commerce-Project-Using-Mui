@@ -17,6 +17,7 @@ import { Email, Lock, Visibility, VisibilityOff } from "@mui/icons-material";
 import { data, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { tokenContext } from "../../Context/tokenContext";
+import PageMeta from "../../components/PageMeta/PageMeta";
 
 export default function Login() {
   const { setUserToken } = useContext(tokenContext);
@@ -58,7 +59,7 @@ export default function Login() {
 
       setSnack({
         open: true,
-        message: "✅ Logged in successfully!",
+        message: "Logged in successfully!",
         severity: "success",
       });
 
@@ -94,6 +95,10 @@ export default function Login() {
         p: 2,
       }}
     >
+        <PageMeta
+        title="Login"
+        description="Access your account by logging in with your credentials."
+      />
       <motion.div
         initial={{ opacity: 0, y: 40, scale: 0.95 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}

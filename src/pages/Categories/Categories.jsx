@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import { motion } from "framer-motion";
 import Loading from "../../components/Loading/Loading";
+import PageMeta from "../../components/PageMeta/PageMeta";
 
 export default function Categories() {
   // 🔹 Fetch all categories from the API
@@ -32,6 +33,11 @@ export default function Categories() {
   if (isLoading)
     return (
       <Box sx={{ textAlign: "center", mt: 5 }}>
+          <PageMeta
+            key={"Categories"}
+        title="Categories"
+        description="Browse products by categories and find what you need easily."
+      />
         <Loading />
       </Box>
     );
@@ -46,6 +52,11 @@ export default function Categories() {
 
   return (
     <Container sx={{ py: 5 }}>
+        <PageMeta
+      
+        title="Categories"
+        description="Browse products by categories and find what you need easily."
+      />
       {/* 🔹 Page title with animation */}
       <motion.div
         initial={{ opacity: 0, y: 40 }}

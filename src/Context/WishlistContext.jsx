@@ -1,32 +1,35 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
 
-// 🔹 إنشاء الـ Context
+// 🔹 Create the Wishlist Context
 export const WishlistContext = createContext();
 
-// 🔹 المزوّد (Provider)
+// 🔹 Provider component to wrap around the app
 export function WishlistProvider({ children }) {
+  // 🔹 State for wishlist items
   const [wishlist, setWishlist] = useState([]);
+  // 🔹 State for loading indicator
   const [loading, setLoading] = useState(false);
+  // 🔹 Get user token from localStorage
   const token = localStorage.getItem("userToken");
 
-  // 🔹 جلب قائمة المفضلة من API
+  // 🔹 Fetch wishlist from the API
   const getWishlist = async () => {
     try {
-      setLoading(true);
+      setLoading(true); // start loading
       const { data } = await axios.get(
         "https://ecommerce.routemisr.com/api/v1/wishlist",
         { headers: { token } }
       );
-      setWishlist(data.data);
+      setWishlist(data.data); // update state with fetched data
     } catch (error) {
       console.error("Error fetching wishlist:", error);
     } finally {
-      setLoading(false);
+      setLoading(false); // stop loading
     }
   };
 
-  // 🔹 إضافة منتج للمفضلة
+  // 🔹 Add a product to the wishlist
   const addToWishlist = async (productId) => {
     try {
       const { data } = await axios.post(
@@ -34,26 +37,27 @@ export function WishlistProvider({ children }) {
         { productId },
         { headers: { token } }
       );
-      setWishlist(data.data);
+      setWishlist(data.data); // update wishlist with new data
     } catch (error) {
       console.error("Error adding to wishlist:", error);
     }
   };
 
-  // 🔹 حذف منتج من المفضلة
+  // 🔹 Remove a product from the wishlist
   const removeFromWishlist = async (productId) => {
     try {
       await axios.delete(
         `https://ecommerce.routemisr.com/api/v1/wishlist/${productId}`,
         { headers: { token } }
       );
+      // update local state after deletion
       setWishlist((prev) => prev.filter((item) => item._id !== productId));
     } catch (error) {
       console.error("Error removing from wishlist:", error);
     }
   };
 
-  // 🔹 تحميل البيانات أول مرة
+  // 🔹 Fetch wishlist when the component mounts
   useEffect(() => {
     getWishlist();
   }, []);
@@ -73,5 +77,5 @@ export function WishlistProvider({ children }) {
   );
 }
 
-// 🔹 Hook مختصر للاستخدام في أي مكوّن
+// 🔹 Custom hook to use the Wishlist Context easily in any component
 export const useWishlist = () => useContext(WishlistContext);

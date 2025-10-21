@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { useForm, Controller } from "react-hook-form";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
+import PageMeta from "../../components/PageMeta/PageMeta";
 
 export default function Checkout() {
 
@@ -45,7 +46,12 @@ export default function Checkout() {
     }
   };
 
-  return (
+  return (<>
+        <PageMeta
+        key={"Checkout"}
+        title="Checkout"
+        description="Complete your order and payment securely"
+      />
     <Box sx={{ minHeight: "100vh", display: "flex", justifyContent: "center", alignItems: "center", p: 2 }}>
       <motion.div
         initial="hidden"
@@ -57,6 +63,7 @@ export default function Checkout() {
         transition={{ duration: 0.5 }}
         style={{ maxWidth: 500, width: "100%", background: "#fff", padding: 32, borderRadius: 24,boxShadow: "0 10px 35px rgba(0,0,0,0.15)" }}
       >
+    
         <Typography variant="h4" fontWeight="bold" mb={3} textAlign="center">🛒 Checkout</Typography>
 
         {/* Details Field */}
@@ -164,5 +171,5 @@ export default function Checkout() {
         </Snackbar>
       </motion.div>
     </Box>
-  );
+</>  );
 }

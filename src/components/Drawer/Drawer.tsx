@@ -65,11 +65,11 @@ const DrawerAppBar: React.FC<DrawerAppBarProps> = (props) => {
   const navItems: NavItem[] = userToken
     ? [
       { name: "Home", path: "/", icon: <Home /> },
-      { name: "products", path: "/products", icon: <ProductionQuantityLimitsTwoTone /> },
+      { name: "Categories", path: "/categories", icon: <Category /> },
+      { name: "Wishlist", path: "/wishlist", icon: <Favorite /> },
+      // { name: "products", path: "/products", icon: <ProductionQuantityLimitsTwoTone /> },
       { name: "Cart", path: "/cart", icon: <ShoppingCart /> },
       { name: "All Orders", path: "/allOrders", icon: <ListAlt /> },
-      { name: "Wishlist", path: "/wishlist", icon: <Favorite /> },
-      { name: "Categories", path: "/categories", icon: <Category /> },
       { name: "LogOut", path: "", icon: <Logout /> },
     ]
     : [
