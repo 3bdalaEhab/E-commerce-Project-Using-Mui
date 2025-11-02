@@ -24,13 +24,13 @@ import {
   Login,
   AppRegistration,
   Logout,
-  ProductionQuantityLimitsSharp,
-  ProductionQuantityLimitsTwoTone,
 } from "@mui/icons-material";
 
 import { Link, useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { tokenContext } from "../../Context/tokenContext";
+import { CartContext } from "../../Context/CartContext";
+import { WishlistContext } from "../../Context/WishlistContext";
 
 const drawerWidth = 240;
 
@@ -40,48 +40,62 @@ interface DrawerAppBarProps {
 
 interface NavItem {
   name: string;
-  path: string;
+  path?: string;
   icon: React.ReactNode;
+  numItem?: number;
+  numWishItem?: number;
 }
 
 const DrawerAppBar: React.FC<DrawerAppBarProps> = (props) => {
   const { window } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
-  const navigate = useNavigate();
-  const { userToken, setUserToken } = useContext(tokenContext);
   const [open, setOpen] = React.useState(false);
-    const handleClose = () => setOpen(false);
+  const navigate = useNavigate();
 
-  // Handle user logout
-  function logOut() {
-    localStorage.removeItem("userToken");
-    setUserToken(null);
-    setOpen(true); // show the snackbar
-    setTimeout(() => {
-      navigate("/login");
-    }, 1500);
-  }
-  // Navigation items depending on login state
-  const navItems: NavItem[] = userToken
-    ? [
-      { name: "Home", path: "/", icon: <Home /> },
-      { name: "Categories", path: "/categories", icon: <Category /> },
-      { name: "Wishlist", path: "/wishlist", icon: <Favorite /> },
-      // { name: "products", path: "/products", icon: <ProductionQuantityLimitsTwoTone /> },
-      { name: "Cart", path: "/cart", icon: <ShoppingCart /> },
-      { name: "All Orders", path: "/allOrders", icon: <ListAlt /> },
-      { name: "LogOut", path: "", icon: <Logout /> },
-    ]
-    : [
-      { name: "Login", path: "/login", icon: <Login /> },
-      { name: "Register", path: "/register", icon: <AppRegistration /> },
-    ];
+  const { userToken, setUserToken } = useContext(tokenContext);
+  const { numOfCartItems } = useContext(CartContext);
+  const { numWishItemList } = useContext(WishlistContext);
 
   const handleDrawerToggle = () => setMobileOpen((prev) => !prev);
+  const handleClose = () => setOpen(false);
 
-  // Drawer (mobile view)
+  function logOut() {
+    try {
+      localStorage.removeItem("userToken");
+    } catch (err) {
+      console.error("Failed to remove token:", err);
+    }
+    setUserToken(null);
+    setOpen(true);
+    setTimeout(() => navigate("/login"), 1500);
+  }
+
+  const navItems: NavItem[] = userToken
+    ? [
+        { name: "Home", path: "/", icon: <Home /> },
+        { name: "Categories", path: "/categories", icon: <Category /> },
+        {
+          name: "Wishlist",
+          path: "/wishlist",
+          icon: <Favorite />,
+          numWishItem: numWishItemList,
+        },
+        {
+          name: "Cart",
+          path: "/cart",
+          icon: <ShoppingCart />,
+          numItem: numOfCartItems,
+        },
+        { name: "All Orders", path: "/allOrders", icon: <ListAlt /> },
+        { name: "LogOut", icon: <Logout /> },
+      ]
+    : [
+        { name: "Login", path: "/login", icon: <Login /> },
+        { name: "Register", path: "/register", icon: <AppRegistration /> },
+      ];
+
   const drawer = (
-    <Box onClick={handleDrawerToggle}  sx={{ textAlign: "center" }}>
+    <Box onClick={handleDrawerToggle} sx={{ textAlign: "center" }}>
       <Typography variant="h6" sx={{ my: 2 }}>
         MUI App
       </Typography>
@@ -95,12 +109,55 @@ const DrawerAppBar: React.FC<DrawerAppBarProps> = (props) => {
                 <ListItemText primary={item.name} />
               </ListItemButton>
             ) : (
-              <ListItemButton
-                component={Link}
-                to={item.path}
-                sx={{ textAlign: "center" }}
-              >
-                <ListItemIcon sx={{ minWidth: "40px" }}>{item.icon}</ListItemIcon>
+              <ListItemButton component={Link} to={item.path || "#"} sx={{ textAlign: "center" }}>
+                <ListItemIcon
+                  sx={{
+                    minWidth: "40px",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 0.5,
+                  }}
+                >
+                  {item.icon}
+                  {item.name === "Cart" && (
+                    <Box
+                      sx={{
+                        ml: 0.5,
+                        bgcolor: "green",
+                        color: "white",
+                        borderRadius: "50%",
+                        width: 22,
+                        height: 22,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: "0.75rem",
+                        fontWeight: 700,
+                      }}
+                    >
+                      {item.numItem > 9 ? "9+" : item.numItem ?? 0}
+                    </Box>
+                  )}
+                  {item.name === "Wishlist" && (
+                    <Box
+                      sx={{
+                        ml: 0.5,
+                        bgcolor: "red",
+                        color: "white",
+                        borderRadius: "50%",
+                        width: 22,
+                        height: 22,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: "0.75rem",
+                        fontWeight: 700,
+                      }}
+                    >
+                      {item.numWishItem > 9 ? "9+" : item.numWishItem ?? 0}
+                    </Box>
+                  )}
+                </ListItemIcon>
                 <ListItemText primary={item.name} />
               </ListItemButton>
             )}
@@ -115,10 +172,9 @@ const DrawerAppBar: React.FC<DrawerAppBarProps> = (props) => {
   return (
     <Box sx={{ display: "flex", height: 65 }}>
       <CssBaseline />
-      {/* Top Navigation Bar */}
+
       <AppBar component="nav">
         <Toolbar>
-          {/* Menu button for mobile view */}
           <IconButton
             color="inherit"
             aria-label="open drawer"
@@ -129,32 +185,61 @@ const DrawerAppBar: React.FC<DrawerAppBarProps> = (props) => {
             <MenuIcon sx={{ mt: 1 }} />
           </IconButton>
 
-          {/* App Title */}
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             MUI App
           </Typography>
 
-          {/* Navigation buttons (desktop view) */}
-          <Box sx={{ display: { xs: "none", md: "flex" } }}>
+          <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center", gap: 2 }}>
             {navItems.map((item) =>
               item.name === "LogOut" ? (
-                <Button
-                  key={item.name}
-                  onClick={logOut}
-                  sx={{ color: "#fff" }}
-                  startIcon={item.icon}
-                >
+                <Button key={item.name} onClick={logOut} sx={{ color: "#fff" }} startIcon={item.icon}>
                   {item.name}
                 </Button>
               ) : (
                 <Button
                   key={item.name}
                   component={Link}
-                  to={item.path}
-                  sx={{ color: "#fff" }}
+                  to={item.path || "#"}
+                  sx={{ color: "#fff", position: "relative" }}
                   startIcon={item.icon}
                 >
                   {item.name}
+                  {item.name === "Cart" && (
+                    <Box
+                      sx={{
+                        ml: 0.5,
+                        color: "white",
+                        borderRadius: "50%",
+                        width: 22,
+                        height: 22,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: "0.75rem",
+                        fontWeight: 700,
+                      }}
+                    >
+                      {item.numItem > 9 ? "9+" : item.numItem ?? 0}
+                    </Box>
+                  )}
+                  {item.name === "Wishlist" && (
+                    <Box
+                      sx={{
+                        ml: 0.5,
+                        color: "white",
+                        borderRadius: "50%",
+                        width: 22,
+                        height: 22,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: "0.75rem",
+                        fontWeight: 700,
+                      }}
+                    >
+                      {item.numWishItem > 9 ? "9+" : item.numWishItem ?? 0}
+                    </Box>
+                  )}
                 </Button>
               )
             )}
@@ -162,7 +247,6 @@ const DrawerAppBar: React.FC<DrawerAppBarProps> = (props) => {
         </Toolbar>
       </AppBar>
 
-      {/* Drawer (for small screens) */}
       <Box component="nav">
         <Drawer
           container={container}
@@ -175,7 +259,7 @@ const DrawerAppBar: React.FC<DrawerAppBarProps> = (props) => {
             "& .MuiDrawer-paper": {
               boxSizing: "border-box",
               width: drawerWidth,
-              height: "100vh", // keep full height
+              height: "100vh",
             },
           }}
         >
@@ -183,21 +267,16 @@ const DrawerAppBar: React.FC<DrawerAppBarProps> = (props) => {
         </Drawer>
       </Box>
 
-      {/* Content area */}
-      <Box component="main" sx={{ p: 3 }}>
-        <Toolbar />
-      </Box>
       <Snackbar
         open={open}
         autoHideDuration={1500}
         onClose={handleClose}
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       >
-        <Alert onClose={handleClose}>
+        <Alert severity="success" onClose={handleClose}>
           Logged out successfully 👋
         </Alert>
       </Snackbar>
-      
     </Box>
   );
 };

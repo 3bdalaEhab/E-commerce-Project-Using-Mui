@@ -14,7 +14,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { Email, Lock, Visibility, VisibilityOff } from "@mui/icons-material";
-import { data, useNavigate } from "react-router-dom";
+import { data, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { tokenContext } from "../../Context/tokenContext";
 import PageMeta from "../../components/PageMeta/PageMeta";
@@ -29,7 +29,11 @@ export default function Login() {
 
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [snack, setSnack] = useState({ open: false, message: "", severity: "info" });
+  const [snack, setSnack] = useState({
+    open: false,
+    message: "",
+    severity: "info",
+  });
   const navigate = useNavigate();
 
   const togglePassword = () => setShowPassword((s) => !s);
@@ -41,7 +45,7 @@ export default function Login() {
 
   const onSubmit = async (formData) => {
     setLoading(true);
-    let receivedToken = null; 
+    let receivedToken = null;
 
     try {
       const { data } = await axios.post(
@@ -50,11 +54,10 @@ export default function Login() {
           email: formData.email.trim(),
           password: formData.password,
         }
-        
       );
 
       if (data.token) {
-        receivedToken = data.token; 
+        receivedToken = data.token;
       }
 
       setSnack({
@@ -67,11 +70,10 @@ export default function Login() {
       setTimeout(() => {
         if (receivedToken) {
           localStorage.setItem("userToken", receivedToken);
-          setUserToken(receivedToken); 
+          setUserToken(receivedToken);
           navigate("/");
         }
       }, 1000); // ✅ المدة الجديدة
-
     } catch (err) {
       // هنا لا يتغير شيء، الخطأ يعمل بشكل صحيح
       const msg =
@@ -95,7 +97,7 @@ export default function Login() {
         p: 2,
       }}
     >
-        <PageMeta
+      <PageMeta
         title="Login"
         description="Access your account by logging in with your credentials."
       />
@@ -232,6 +234,25 @@ export default function Login() {
                 "Login"
               )}
             </Button>
+
+            <Typography
+              variant="body2"
+              align="center"
+              sx={{ mt: 3, color: "text.secondary" }}
+            >
+              Don’t have an account?{" "}
+              <Link
+                to="/register"
+                style={{
+                  textDecoration: "none",
+                  color: "#1976d2",
+                  fontWeight: "bold",
+                  cursor: "pointer",
+                }}
+              >
+                Create one now
+              </Link>
+            </Typography>
           </motion.div>
         </Paper>
       </motion.div>
@@ -239,7 +260,7 @@ export default function Login() {
       <Snackbar
         open={snack.open}
         autoHideDuration={1000} // ✅ مدة ظهور الـ Snackbar (1.2 ثانية)
-        onClose={handleSnackClose} 
+        onClose={handleSnackClose}
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       >
         <Alert severity={snack.severity}>{snack.message}</Alert>

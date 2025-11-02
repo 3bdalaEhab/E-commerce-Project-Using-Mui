@@ -25,7 +25,7 @@ import {
   CalendarMonth,
   Wc,
 } from "@mui/icons-material";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import PageMeta from "../../components/PageMeta/PageMeta";
 
 // ✅ Transition Animation for Snackbar
@@ -81,14 +81,17 @@ export default function Register() {
       );
 
       showToast("✅ Account created successfully!");
-      setTimeout(() => {navigate("/login") , reset()}, 1000);
+      setTimeout(() => {
+        navigate("/login");
+        reset();
+      }, 1200);
     } catch (error) {
       if (error.message === "Network Error") {
         showToast("⚠️ No Internet Connection. Please check your network.");
       } else if (error.code === "ECONNABORTED") {
         showToast("⏱️ Connection timed out. Try again later.");
       } else if (error.response) {
-        showToast(`❌ ${error.response?.data?.error || "Server Error"}`);
+        showToast(`❌ ${error.response?.data?.message || "Server Error"}`);
       } else {
         showToast("❌ Something went wrong. Please try again.");
       }
@@ -115,7 +118,7 @@ export default function Register() {
         py: { xs: 2, sm: 4 },
       }}
     >
-       <PageMeta
+      <PageMeta
         title="Register"
         description="Create a new account to start shopping with us."
       />
@@ -346,6 +349,26 @@ export default function Register() {
             )}
           </Button>
         </motion.div>
+
+        {/* ✅ Already have account */}
+        <Typography
+          variant="body2"
+          align="center"
+          sx={{ mt: 1, color: "text.secondary" }}
+        >
+          Already have an account?{" "}
+          <Link
+            to="/login"
+            style={{
+              textDecoration: "none",
+              color: "#1976d2",
+              fontWeight: "bold",
+              cursor: "pointer",
+            }}
+          >
+            Login here
+          </Link>
+        </Typography>
       </MotionPaper>
 
       {/* Snackbar Notification */}
