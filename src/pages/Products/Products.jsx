@@ -21,7 +21,7 @@ import { CartContext } from "../../Context/CartContext";
 import { WishlistContext } from "../../Context/WishlistContext";
 import PageMeta from "../../components/PageMeta/PageMeta";
 
-// 🔹 Framer Motion variants for card animations
+// 🔹 Animation variants for product cards
 const cardVariants = {
   hidden: { opacity: 0, x: -50 },
   visible: (delay) => ({
@@ -41,36 +41,50 @@ const cardVariants = {
 export default function Products() {
   const navigate = useNavigate();
 
-  // 🔹 Access cart and wishlist functions from context
+  // 🔹 Get cart & wishlist functions from context
   const { addToCart } = useContext(CartContext);
-  const { addToWishlist } = useContext(WishlistContext);
+  const { addToWishlist, wishListItemId, removeFromWishlist } =
+    useContext(WishlistContext);
 
-  // 🔹 State for snackbar notifications
+  // 🔹 Snackbar for feedback messages
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
     severity: "success",
   });
 
-  // 🔹 Add product to cart and show snackbar feedback
+  // 🔹 Fetch all products from API
+  const getProducts = async () => {
+    const { data } = await axios.get(
+      "https://ecommerce.routemisr.com/api/v1/products"
+    );
+    return data.data;
+  };
+
+  // 🔹 React Query to manage data fetching & caching
+  const { data, isLoading, isError, error } = useQuery({
+    queryKey: ["products"],
+    queryFn: getProducts,
+  });
+
+  // 🔹 Add product to cart
   const addCart = async (productId) => {
     try {
       const data = await addToCart(productId);
-
       if (data?.status === "success") {
         setSnackbar({
           open: true,
-          message: data.message || "Product added successfully to your cart",
+          message: data.message || "Product added to cart successfully",
           severity: "success",
         });
       } else {
         setSnackbar({
           open: true,
-          message: data?.message || "Failed to add product to your cart",
+          message: data?.message || "Failed to add product to cart",
           severity: "error",
         });
       }
-    } catch (error) {
+    } catch {
       setSnackbar({
         open: true,
         message: "Server error. Please try again later.",
@@ -79,24 +93,40 @@ export default function Products() {
     }
   };
 
-  // 🔹 Fetch products from API
-  const getProducts = async () => {
-    const { data } = await axios.get(
-      "https://ecommerce.routemisr.com/api/v1/products"
-    );
-    return data.data;
+  // 🔹 Add or remove item from wishlist
+  const handleWishlistToggle = async (e, productId) => {
+    e.stopPropagation(); // prevent opening product details
+    try {
+      if (wishListItemId.includes(productId)) {
+        // ✅ Already in wishlist → remove
+        await removeFromWishlist(productId);
+        setSnackbar({
+          open: true,
+          message: "Removed from wishlist",
+          severity: "error",
+        });
+      } else {
+        // ➕ Not in wishlist → add
+        await addToWishlist(productId);
+        setSnackbar({
+          open: true,
+          message: "Added to wishlist",
+          severity: "success",
+        });
+      }
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        message: "Failed to update wishlist",
+        severity: "error",
+      });
+    }
   };
 
-  // 🔹 Use React Query to fetch products
-  const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["products"],
-    queryFn: getProducts,
-  });
-
-  // 🔄 Loading state: show loader while fetching
+  // 🔄 Loading state
   if (isLoading) return <Loading />;
 
-  // ❌ Error state: display error message
+  // ❌ Error state
   if (isError)
     return (
       <Box sx={{ p: 4 }}>
@@ -104,15 +134,14 @@ export default function Products() {
       </Box>
     );
 
+  // ✅ Render product grid
   return (
     <>
-
       <Box sx={{ p: 4, backgroundColor: "#fafafa" }}>
         <Typography color="primary" variant="h4" fontWeight="bold" mb={3}>
           Products
         </Typography>
 
-        {/* 🔹 Products grid */}
         <Box
           sx={{
             display: "grid",
@@ -128,7 +157,7 @@ export default function Products() {
               initial="hidden"
               whileInView="visible"
               whileHover="hover"
-              custom={(index % 4) * 0.1} // stagger animation
+              custom={(index % 4) * 0.1}
               viewport={{ once: true, amount: 0.3 }}
               style={{ display: "flex", flexDirection: "column" }}
             >
@@ -146,7 +175,6 @@ export default function Products() {
                 }}
                 onClick={() => navigate("/details/" + product._id)}
               >
-                {/* 🔹 Product image */}
                 <CardMedia
                   component="img"
                   image={product.imageCover}
@@ -160,7 +188,6 @@ export default function Products() {
                   }}
                 />
 
-                {/* 🔹 Product content */}
                 <CardContent
                   sx={{
                     flex: 1,
@@ -178,7 +205,6 @@ export default function Products() {
                     </Typography>
                   </Box>
 
-                  {/* 🔹 Price and rating */}
                   <Box
                     sx={{
                       display: "flex",
@@ -191,11 +217,12 @@ export default function Products() {
 
                     <Box sx={{ display: "flex", alignItems: "center" }}>
                       <Star sx={{ color: "#eebe22ff", fontSize: "30px" }} />
-                      <Typography variant="h6">{product.ratingsAverage}</Typography>
+                      <Typography variant="h6">
+                        {product.ratingsAverage}
+                      </Typography>
                     </Box>
                   </Box>
 
-                  {/* 🔹 Add to cart button */}
                   <Box
                     sx={{
                       display: "flex",
@@ -226,7 +253,7 @@ export default function Products() {
                         },
                       }}
                       onClick={(e) => {
-                        e.stopPropagation(); // prevent navigating to details
+                        e.stopPropagation();
                         addCart(product._id);
                       }}
                     >
@@ -235,32 +262,20 @@ export default function Products() {
                   </Box>
                 </CardContent>
 
-                {/* 🔹 Wishlist Icon */}
+                {/* ❤️ Wishlist toggle button */}
                 <IconButton
                   sx={{
                     position: "absolute",
                     top: 10,
                     right: 10,
                     background: "white",
+                    color: wishListItemId.includes(product._id)
+                      ? "red"
+                      : "gray",
                     boxShadow: "0 2px 6px rgba(0, 0, 0, 0.1)",
+                    transition: "all 0.3s ease",
                   }}
-                  onClick={async (e) => {
-                    e.stopPropagation(); // prevent navigating to details
-                    try {
-                      await addToWishlist(product._id);
-                      setSnackbar({
-                        open: true,
-                        message: "Added to wishlist",
-                        severity: "success",
-                      });
-                    } catch (error) {
-                      setSnackbar({
-                        open: true,
-                        message: "Failed to add to wishlist",
-                        severity: "error",
-                      });
-                    }
-                  }}
+                  onClick={(e) => handleWishlistToggle(e, product._id)}
                 >
                   <Favorite />
                 </IconButton>
@@ -270,7 +285,7 @@ export default function Products() {
         </Box>
       </Box>
 
-      {/* 🔹 Snackbar / Alert notifications */}
+      {/* 🔹 Snackbar feedback message */}
       <Snackbar
         open={snackbar.open}
         autoHideDuration={3000}
@@ -285,7 +300,11 @@ export default function Products() {
             fontSize: "1rem",
             fontWeight: "bold",
             backgroundColor:
-              snackbar.severity === "success" ? "#43a047" : "#e53935",
+              snackbar.severity === "success"
+                ? "#43a047"
+                : snackbar.severity === "info"
+                ? "#1976d2"
+                : "#e53935",
             color: "white",
           }}
         >
