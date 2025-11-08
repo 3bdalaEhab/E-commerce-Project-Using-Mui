@@ -13,6 +13,7 @@ import {
   Divider,
   Chip,
 } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
@@ -28,25 +29,30 @@ import PageMeta from "../../components/PageMeta/PageMeta";
 export default function Cart() {
   const { getCart, removeSpecificItem, removeAllItems, updateItem } =
     useContext(CartContext);
+  const theme = useTheme();
 
+  // State for cart data
   const [cart, setCart] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  // State for toast messages
   const [toast, setToast] = useState({
     open: false,
     message: "",
     type: "success",
   });
 
+  // Function to show toast message
   const showToast = (message, type = "success") => {
     setToast({ open: true, message, type });
   };
 
-  // 🧩 Update quantity
+  // Function to update item quantity
   async function updateQuantity(productId, newCount) {
     try {
       const res = await updateItem({ id: productId, count: newCount });
       if (res.status === "success") {
-        fetchCart();
+        fetchCart(); // Refresh cart
         showToast("Quantity updated successfully!", "success");
       }
     } catch (err) {
@@ -55,7 +61,7 @@ export default function Cart() {
     }
   }
 
-  // 🧩 Fetch Cart Data
+  // Fetch cart data from context
   async function fetchCart() {
     try {
       const { data } = await getCart();
@@ -68,7 +74,7 @@ export default function Cart() {
     }
   }
 
-  // 🧩 Remove Item
+  // Remove a specific item from cart
   async function removeItem(id) {
     try {
       const { data } = await removeSpecificItem(id);
@@ -80,7 +86,7 @@ export default function Cart() {
     }
   }
 
-  // 🧩 Remove All
+  // Remove all items from cart
   async function handleClearAll() {
     try {
       const res = await removeAllItems();
@@ -89,112 +95,108 @@ export default function Cart() {
         showToast("All items removed successfully!", "success");
       }
     } catch (error) {
-      console.log(error)
+      console.log(error);
       showToast("Failed to remove all items", "error");
     }
   }
 
+  // Fetch cart when component mounts
   useEffect(() => {
     fetchCart();
-    
   }, []);
 
+  // Show loading spinner
   if (loading)
     return (
-
       <Typography variant="h5" textAlign="center" color="primary" mt={10}>
-         <PageMeta
-     key={"My Cart"}
-        title="My Cart"
-        description="Review the products in your shopping cart"
-      />
+        <PageMeta title="My Cart" description="Review the products in your shopping cart" />
         <Loading />
       </Typography>
     );
 
+  // Show empty cart message
   if (!cart || cart.products.length === 0)
-    return (<>
-     <PageMeta
-     key={"My Cart"}
-        title="My Cart"
-        description="Review the products in your shopping cart"
-      />
-  
-      <Box
-        component={motion.div}
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          height: "80vh",
-          textAlign: "center",
-          background: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
-          borderRadius: 3,
-          px: 2,
-        }}
-      >
-  
-        <RemoveShoppingCartIcon
-          sx={{ fontSize: 90, color: "primary.main", mb: 2 }}
-        />
-        <Typography
-          variant="h4"
-          fontWeight="bold"
-          color="primary.dark"
-          gutterBottom
+    return (
+      <>
+        <PageMeta title="My Cart" description="Review the products in your shopping cart" />
+        <Box
+          component={motion.div}
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            height: "80vh",
+            textAlign: "center",
+            background: theme.palette.background.default,
+            borderRadius: 3,
+            px: 2,
+            color: theme.palette.text.primary,
+          }}
         >
-          Your cart is empty
-        </Typography>
-        <Typography
-          variant="body1"
-          color="text.secondary"
-          sx={{ maxWidth: 400, mb: 4 }}
-        >
-          Looks like you haven’t added anything yet. Start exploring our
-          products and add your favorite items to the cart.
-        </Typography>
-        <Link to="/" style={{ textDecoration: "none" }}>
-          <Button
-            component={motion.button}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            startIcon={<ShoppingBagIcon />}
-            variant="contained"
-            size="large"
-            sx={{
-              px: 5,
-              py: 1.2,
-              fontSize: "1rem",
-              textTransform: "none",
-              borderRadius: "10px",
-              fontWeight: "bold",
-              background: "linear-gradient(90deg, #1976d2 0%, #42a5f5 100%)",
-              boxShadow: "0 6px 20px rgba(25,118,210,0.3)",
-              "&:hover": {
-                background: "linear-gradient(90deg, #1565c0 0%, #1e88e5 100%)",
-                boxShadow: "0 8px 25px rgba(25,118,210,0.4)",
-              },
-            }}
+          <RemoveShoppingCartIcon
+            sx={{ fontSize: 90, color: theme.palette.primary.main, mb: 2 }}
+          />
+          <Typography
+            variant="h4"
+            fontWeight="bold"
+            color={theme.palette.text.primary}
+            gutterBottom
           >
-            Continue Shopping
-          </Button>
-        </Link>
-      </Box>
-    </>  );
+            Your cart is empty
+          </Typography>
+          <Typography
+            variant="body1"
+            color={theme.palette.text.secondary}
+            sx={{ maxWidth: 400, mb: 4 }}
+          >
+            Looks like you haven’t added anything yet. Start exploring our
+            products and add your favorite items to the cart.
+          </Typography>
+          <Link to="/" style={{ textDecoration: "none" }}>
+            <Button
+              component={motion.button}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              startIcon={<ShoppingBagIcon />}
+              variant="contained"
+              size="large"
+              sx={{
+                px: 5,
+                py: 1.2,
+                fontSize: "1rem",
+                textTransform: "none",
+                borderRadius: "10px",
+                fontWeight: "bold",
+                boxShadow: `0 6px 20px ${
+                  theme.palette.mode === "light"
+                    ? "rgba(25,118,210,0.3)"
+                    : "rgba(255,255,255,0.2)"
+                }`,
+              }}
+            >
+              Continue Shopping
+            </Button>
+          </Link>
+        </Box>
+      </>
+    );
 
+  // Main cart display
   return (
     <>
-    
       <Box
         sx={{
           minHeight: "100vh",
           py: 6,
           px: { xs: 1, sm: 3, md: 5 },
-          background: "linear-gradient(135deg, #f5f7fa 0%, #aac7f79c 100%)",
+          background:
+            theme.palette.mode === "light"
+              ? "linear-gradient(135deg, #f5f7fa 0%, #aac7f79c 100%)"
+              : `linear-gradient(135deg, ${theme.palette.background.default} 0%, ${theme.palette.background.paper} 100%)`,
         }}
       >
         <Box
@@ -205,17 +207,22 @@ export default function Cart() {
           sx={{
             maxWidth: 950,
             mx: "auto",
-            backgroundColor: "white",
+            backgroundColor: theme.palette.background.paper,
             borderRadius: 4,
-            boxShadow: "0 10px 35px rgba(0,0,0,0.15)",
+            boxShadow:
+              theme.palette.mode === "light"
+                ? "0 10px 35px rgba(0,0,0,0.15)"
+                : "0 10px 35px rgba(255,255,255,0.08)",
             p: { xs: 2, sm: 4 },
+            color: theme.palette.text.primary,
           }}
         >
+          {/* Cart title */}
           <Typography
             variant="h4"
             textAlign="center"
             fontWeight="bold"
-            color="primary"
+            color={theme.palette.text.primary}
             mb={3}
           >
             🛒 Your Shopping Cart
@@ -223,6 +230,7 @@ export default function Cart() {
 
           <Divider sx={{ mb: 3 }} />
 
+          {/* Total price and remove all button */}
           <Box
             display="flex"
             justifyContent="space-between"
@@ -230,9 +238,13 @@ export default function Cart() {
             mb={4}
             flexWrap="wrap"
           >
-            <Typography variant="h6" color="primary.dark">
+            <Typography variant="h6" color={theme.palette.text.primary}>
               Total Price:{" "}
-              <Typography component="span" color="black" fontWeight="medium">
+              <Typography
+                component="span"
+                color="primary.main"
+                fontWeight="medium"
+              >
                 {cart.totalCartPrice} EGP
               </Typography>
             </Typography>
@@ -242,15 +254,23 @@ export default function Cart() {
               color="error"
               onClick={handleClearAll}
               sx={{
-                borderRadius: "10px",
                 textTransform: "none",
+                borderRadius: 2,
                 fontWeight: "bold",
+                transition:"0.5s",
+                borderColor: theme.palette.error.main,
+                color: theme.palette.error.main,
+                "&:hover": {
+                  backgroundColor: theme.palette.error.main,
+                  color: "#fff",
+                },
               }}
             >
               Remove All
             </Button>
           </Box>
 
+          {/* Cart items */}
           <Grid container spacing={3}>
             {cart.products.map((item) => (
               <Grid item width={"100%"} xs={12} key={item._id}>
@@ -263,11 +283,15 @@ export default function Cart() {
                     flexDirection: { xs: "column", sm: "row" },
                     borderRadius: 3,
                     overflow: "hidden",
-                    boxShadow: "0 6px 25px rgba(0,0,0,0.1)",
-                    background: "#fafafa",
-                    width: "100%",
+                    boxShadow:
+                      theme.palette.mode === "light"
+                        ? "0 6px 25px rgba(0,0,0,0.1)"
+                        : "0 6px 25px rgba(255,255,255,0.08)",
+                    background: theme.palette.background.paper,
+                    color: theme.palette.text.primary,
                   }}
                 >
+                  {/* Product image */}
                   <CardMedia
                     component="img"
                     image={item.product.imageCover}
@@ -279,6 +303,7 @@ export default function Cart() {
                     }}
                   />
 
+                  {/* Product details */}
                   <CardContent
                     sx={{
                       flex: 1,
@@ -289,56 +314,53 @@ export default function Cart() {
                     }}
                   >
                     <Box>
+                      {/* Product title */}
                       <Typography
                         variant="h6"
                         fontWeight="bold"
-                        color="primary.dark"
+                        sx={{ color: theme.palette.primary.main }}
                       >
                         {item.product.title.split(" ").slice(0, 6).join(" ")}
                       </Typography>
 
+                      {/* Category and brand chips */}
                       <Box
                         sx={{
                           display: "flex",
-                          alignItems: "center",
-                          mt: 1,
+                          justifyContent: { xs: "center", md: "flex-start" },
                           flexWrap: "wrap",
+                          alignItems: "center",
+                          gap: 1.5,
+                          my: 2,
                         }}
                       >
                         <Chip
                           label={item.product.category.name}
                           color="primary"
-                          variant="outlined"
-                          sx={{
-                            fontWeight: "bold",
-                            fontSize: "0.8rem",
-                            px: 1.5,
-                            borderRadius: "8px",
-                            mr: 1,
-                            mb: 1,
-                          }}
+                          variant={theme.palette.mode === "dark" ? "filled" : "outlined"}
+                          sx={{ fontWeight: "bold" }}
                         />
                         {item.product.brand?.name && (
                           <Chip
                             label={item.product.brand.name}
                             color="secondary"
-                            variant="outlined"
-                            sx={{
-                              fontWeight: "bold",
-                              fontSize: "0.8rem",
-                              px: 1.5,
-                              borderRadius: "8px",
-                              mb: 1,
-                            }}
+                            variant={theme.palette.mode === "dark" ? "filled" : "outlined"}
+                            sx={{ fontWeight: "bold" }}
                           />
                         )}
                       </Box>
 
-                      <Typography color="primary" fontWeight="bold" mt={2}>
+                      {/* Product price */}
+                      <Typography
+                        color={theme.palette.primary.main}
+                        fontWeight="bold"
+                        mt={2}
+                      >
                         💰 {item.price} EGP
                       </Typography>
                     </Box>
 
+                    {/* Quantity controls and remove button */}
                     <Box
                       display="flex"
                       justifyContent="space-between"
@@ -356,7 +378,12 @@ export default function Cart() {
                         </IconButton>
 
                         <Typography
-                          sx={{ mx: 1, minWidth: 25, textAlign: "center" }}
+                          sx={{
+                            mx: 1,
+                            minWidth: 25,
+                            textAlign: "center",
+                            color: theme.palette.text.primary,
+                          }}
                         >
                           {item.count}
                         </Typography>
@@ -375,9 +402,21 @@ export default function Cart() {
 
                       <Button
                         startIcon={<DeleteIcon />}
+                        variant="outlined"
                         color="error"
                         onClick={() => removeItem(item.product.id)}
-                        sx={{ textTransform: "none", fontWeight: "bold" }}
+                        sx={{
+                          textTransform: "none",
+                          borderRadius: 2,
+                          fontWeight: "bold",
+                          transition:"0.5s",
+                          borderColor: theme.palette.error.main,
+                          color: theme.palette.error.main,
+                          "&:hover": {
+                            backgroundColor: theme.palette.error.main,
+                            color: "#fff",
+                          },
+                        }}
                       >
                         Remove
                       </Button>
@@ -388,6 +427,7 @@ export default function Cart() {
             ))}
           </Grid>
 
+          {/* Checkout button */}
           <Box textAlign="center" mt={5}>
             <Link to={`/checkout/${cart._id}`}>
               <Button
@@ -398,20 +438,18 @@ export default function Cart() {
                 variant="contained"
                 size="large"
                 sx={{
+                  background: `linear-gradient(90deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
                   px: 6,
                   py: 1.3,
                   fontSize: "1rem",
                   textTransform: "none",
                   borderRadius: "12px",
                   fontWeight: "bold",
-                  background:
-                    "linear-gradient(90deg, #1976d2 0%, #42a5f5 100%)",
-                  boxShadow: "0 6px 20px rgba(25,118,210,0.3)",
-                  "&:hover": {
-                    background:
-                      "linear-gradient(90deg, #1565c0 0%, #1e88e5 100%)",
-                    boxShadow: "0 8px 25px rgba(25,118,210,0.4)",
-                  },
+                  boxShadow: `0 6px 20px ${
+                    theme.palette.mode === "light"
+                      ? "rgba(25,118,210,0.3)"
+                      : "rgba(255,255,255,0.2)"
+                  }`,
                 }}
               >
                 Proceed to Checkout
@@ -421,7 +459,7 @@ export default function Cart() {
         </Box>
       </Box>
 
-      {/* ✅ Toast */}
+      {/* Toast notifications */}
       <Snackbar
         open={toast.open}
         autoHideDuration={3000}

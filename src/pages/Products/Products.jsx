@@ -20,19 +20,19 @@ import { useNavigate } from "react-router-dom";
 import { CartContext } from "../../Context/CartContext";
 import { WishlistContext } from "../../Context/WishlistContext";
 import PageMeta from "../../components/PageMeta/PageMeta";
+import { useTheme } from "@mui/material/styles";
 
 // 🔹 Animation variants for product cards
 const cardVariants = {
-  hidden: { opacity: 0, x: -50 },
-  visible: (delay) => ({
+  hidden: { opacity: 0, x: -50 }, // initial hidden state
+  visible: (delay) => ({ // visible state with optional delay
     opacity: 1,
     x: 0,
     transition: { duration: 0.6, ease: "easeOut", delay },
   }),
-  hover: {
+  hover: { // hover animation
     scale: 1.02,
-    boxShadow:
-      "0 15px 45px rgba(0, 0, 0, 0.15), 0 5px 10px rgba(0, 0, 0, 0.08)",
+    boxShadow: "0 15px 45px rgba(0, 0, 0, 0.15)",
     transition: { type: "spring", stiffness: 300, damping: 15 },
     borderRadius: 10,
   },
@@ -41,19 +41,20 @@ const cardVariants = {
 export default function Products() {
   const navigate = useNavigate();
 
-  // 🔹 Get cart & wishlist functions from context
+  // 🔹 Contexts for cart and wishlist
   const { addToCart } = useContext(CartContext);
   const { addToWishlist, wishListItemId, removeFromWishlist } =
     useContext(WishlistContext);
+  const theme = useTheme();
 
-  // 🔹 Snackbar for feedback messages
+  // 🔹 Snackbar state for notifications
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
     severity: "success",
   });
 
-  // 🔹 Fetch all products from API
+  // 🔹 Fetch products from API
   const getProducts = async () => {
     const { data } = await axios.get(
       "https://ecommerce.routemisr.com/api/v1/products"
@@ -61,26 +62,26 @@ export default function Products() {
     return data.data;
   };
 
-  // 🔹 React Query to manage data fetching & caching
+  // 🔹 useQuery to fetch and cache products
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["products"],
     queryFn: getProducts,
   });
 
-  // 🔹 Add product to cart
+  // 🔹 Add product to cart with notification
   const addCart = async (productId) => {
     try {
       const data = await addToCart(productId);
       if (data?.status === "success") {
         setSnackbar({
           open: true,
-          message: data.message || "Product added to cart successfully",
+          message: "Product added to cart successfully",
           severity: "success",
         });
       } else {
         setSnackbar({
           open: true,
-          message: data?.message || "Failed to add product to cart",
+          message: "Failed to add product to cart",
           severity: "error",
         });
       }
@@ -93,12 +94,11 @@ export default function Products() {
     }
   };
 
-  // 🔹 Add or remove item from wishlist
+  // 🔹 Toggle wishlist status
   const handleWishlistToggle = async (e, productId) => {
-    e.stopPropagation(); // prevent opening product details
+    e.stopPropagation(); // prevent card click navigation
     try {
       if (wishListItemId.includes(productId)) {
-        // ✅ Already in wishlist → remove
         await removeFromWishlist(productId);
         setSnackbar({
           open: true,
@@ -106,7 +106,6 @@ export default function Products() {
           severity: "error",
         });
       } else {
-        // ➕ Not in wishlist → add
         await addToWishlist(productId);
         setSnackbar({
           open: true,
@@ -114,7 +113,7 @@ export default function Products() {
           severity: "success",
         });
       }
-    } catch (error) {
+    } catch {
       setSnackbar({
         open: true,
         message: "Failed to update wishlist",
@@ -123,10 +122,10 @@ export default function Products() {
     }
   };
 
-  // 🔄 Loading state
+  // 🔹 Loading state
   if (isLoading) return <Loading />;
 
-  // ❌ Error state
+  // 🔹 Error state
   if (isError)
     return (
       <Box sx={{ p: 4 }}>
@@ -134,14 +133,26 @@ export default function Products() {
       </Box>
     );
 
-  // ✅ Render product grid
   return (
     <>
-      <Box sx={{ p: 4, backgroundColor: "#fafafa" }}>
-        <Typography color="primary" variant="h4" fontWeight="bold" mb={3}>
+      {/* 🔹 Page header */}
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          backgroundColor: theme.palette.background.default,
+          color: theme.palette.text.primary,
+          p: 3,
+        }}
+      >
+        <Typography variant="h4" fontWeight="bold">
           Products
         </Typography>
+      </Box>
 
+      {/* 🔹 Product grid container */}
+      <Box sx={{ p: 4, backgroundColor: theme.palette.background.default }}>
         <Box
           sx={{
             display: "grid",
@@ -161,6 +172,7 @@ export default function Products() {
               viewport={{ once: true, amount: 0.3 }}
               style={{ display: "flex", flexDirection: "column" }}
             >
+              {/* 🔹 Product card */}
               <Card
                 sx={{
                   cursor: "pointer",
@@ -168,13 +180,17 @@ export default function Products() {
                   flexDirection: "column",
                   height: "100%",
                   borderRadius: 3,
+                  backgroundColor: theme.palette.background.paper,
+                  color: theme.palette.text.primary,
                   boxShadow:
-                    "0 6px 15px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04)",
+                    theme.palette.mode === "light"
+                      ? "0 6px 15px rgba(0,0,0,0.08)"
+                      : "0 6px 15px rgba(255,255,255,0.05)",
                   position: "relative",
-                  backgroundColor: "white",
                 }}
                 onClick={() => navigate("/details/" + product._id)}
               >
+                {/* 🔹 Product image */}
                 <CardMedia
                   component="img"
                   image={product.imageCover}
@@ -188,6 +204,7 @@ export default function Products() {
                   }}
                 />
 
+                {/* 🔹 Card content */}
                 <CardContent
                   sx={{
                     flex: 1,
@@ -197,14 +214,21 @@ export default function Products() {
                   }}
                 >
                   <Box>
+                    {/* 🔹 Product title */}
                     <Typography variant="h6">
                       {product.title.split(" ").slice(0, 3).join(" ")}
                     </Typography>
-                    <Typography color="text.secondary" fontSize={14} mt={0.5}>
+                    {/* 🔹 Product description */}
+                    <Typography
+                      color={theme.palette.text.secondary}
+                      fontSize={14}
+                      mt={0.5}
+                    >
                       {product.description?.slice(0, 80)}...
                     </Typography>
                   </Box>
 
+                  {/* 🔹 Price and ratings */}
                   <Box
                     sx={{
                       display: "flex",
@@ -223,6 +247,7 @@ export default function Products() {
                     </Box>
                   </Box>
 
+                  {/* 🔹 Add to cart button */}
                   <Box
                     sx={{
                       display: "flex",
@@ -244,16 +269,12 @@ export default function Products() {
                         fontSize: "1rem",
                         textTransform: "none",
                         borderRadius: "12px",
-                        background:
-                          "linear-gradient(90deg, #1976d2 0%, #42a5f5 100%)",
-                        boxShadow: "0 6px 20px rgba(25,118,210,0.3)",
-                        "&:hover": {
-                          background:
-                            "linear-gradient(90deg, #1565c0 0%, #1e88e5 100%)",
-                        },
+                        background: `linear-gradient(90deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
+                        boxShadow: "0 6px 20px rgba(0,0,0,0.2)",
+                        "&:hover": { opacity: 0.9 },
                       }}
                       onClick={(e) => {
-                        e.stopPropagation();
+                        e.stopPropagation(); // prevent navigation
                         addCart(product._id);
                       }}
                     >
@@ -262,16 +283,16 @@ export default function Products() {
                   </Box>
                 </CardContent>
 
-                {/* ❤️ Wishlist toggle button */}
+                {/* 🔹 Wishlist button */}
                 <IconButton
                   sx={{
                     position: "absolute",
                     top: 10,
                     right: 10,
-                    background: "white",
+                    background: theme.palette.background.paper,
                     color: wishListItemId.includes(product._id)
-                      ? "red"
-                      : "gray",
+                      ? theme.palette.error.main
+                      : theme.palette.text.secondary,
                     boxShadow: "0 2px 6px rgba(0, 0, 0, 0.1)",
                     transition: "all 0.3s ease",
                   }}
@@ -285,7 +306,7 @@ export default function Products() {
         </Box>
       </Box>
 
-      {/* 🔹 Snackbar feedback message */}
+      {/* 🔹 Snackbar for notifications */}
       <Snackbar
         open={snackbar.open}
         autoHideDuration={3000}
@@ -301,11 +322,9 @@ export default function Products() {
             fontWeight: "bold",
             backgroundColor:
               snackbar.severity === "success"
-                ? "#43a047"
-                : snackbar.severity === "info"
-                ? "#1976d2"
-                : "#e53935",
-            color: "white",
+                ? theme.palette.success.main
+                : theme.palette.error.main,
+            color: "#fff",
           }}
         >
           {snackbar.message}

@@ -3,7 +3,7 @@ import { Controller, useForm } from "react-hook-form";
 import axios from "axios";
 import { motion } from "framer-motion";
 import {
-  Container,
+  Box,
   Paper,
   Typography,
   TextField,
@@ -13,8 +13,8 @@ import {
   MenuItem,
   Snackbar,
   Alert,
-  Slide,
   CircularProgress,
+  useTheme,
 } from "@mui/material";
 import {
   Person,
@@ -27,14 +27,7 @@ import {
 } from "@mui/icons-material";
 import { Link, useNavigate } from "react-router-dom";
 import PageMeta from "../../components/PageMeta/PageMeta";
-
-// ✅ Transition Animation for Snackbar
-function SlideTransition(props) {
-  return <Slide {...props} direction="up" />;
-}
-
-// ✅ Animated Paper (Form)
-const MotionPaper = motion.create(Paper);
+import { useThemeContext } from "../../Context/ThemeContext";
 
 export default function Register() {
   const {
@@ -49,20 +42,15 @@ export default function Register() {
   const password = watch("password");
   const [showPassword, setShowPassword] = useState(false);
   const [showRePassword, setShowRePassword] = useState(false);
-  const [open, setOpen] = useState(false);
-  const [toastMsg, setToastMsg] = useState("");
+  const [snack, setSnack] = useState({ open: false, message: "", severity: "info" });
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const showToast = (message) => {
-    setToastMsg(message);
-    setOpen(true);
-  };
+  const theme = useTheme();
+  const { mode } = useThemeContext();
 
-  const handleClickShowPassword = () => setShowPassword((prev) => !prev);
-  const handleClickShowRePassword = () => setShowRePassword((prev) => !prev);
+  const handleSnackClose = () => setSnack((s) => ({ ...s, open: false }));
 
-  // ✅ Handle form submission
   const onSubmit = async (data) => {
     setLoading(true);
     try {
@@ -75,324 +63,364 @@ export default function Register() {
         gender: data.gender,
       };
 
-      const { data: res } = await axios.post(
-        "https://ecommerce.routemisr.com/api/v1/auth/signup",
-        payload
-      );
+      await axios.post("https://ecommerce.routemisr.com/api/v1/auth/signup", payload);
+      setSnack({ open: true, message: "✅ Account created successfully!", severity: "success" });
 
-      showToast("✅ Account created successfully!");
       setTimeout(() => {
         navigate("/login");
         reset();
       }, 1200);
     } catch (error) {
-      if (error.message === "Network Error") {
-        showToast("⚠️ No Internet Connection. Please check your network.");
-      } else if (error.code === "ECONNABORTED") {
-        showToast("⏱️ Connection timed out. Try again later.");
-      } else if (error.response) {
-        showToast(`❌ ${error.response?.data?.message || "Server Error"}`);
-      } else {
-        showToast("❌ Something went wrong. Please try again.");
-      }
+      const msg =
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        "❌ Something went wrong. Please try again.";
+      setSnack({ open: true, message: msg, severity: "error" });
     } finally {
       setLoading(false);
     }
   };
 
-  // ✅ Animation variants for fields
-  const fieldAnimation = (x = 0, delay = 0) => ({
+const textFieldStyle = {
+
+    mb: 2,
+    "& .MuiInputBase-input": {
+      color: "black",
+      
+      borderRadius: "8px",
+    },
+    "& .MuiFormLabel-root": {
+      color:
+        theme.palette.mode === "dark"
+          ? theme.palette.primary.main
+          : theme.palette.text.secondary,
+    },
+    "& .MuiOutlinedInput-root": {
+      "& fieldset": {
+        borderColor:
+          theme.palette.mode === "dark"
+            ? "rgba(255,255,255,0.2)"
+            : "rgba(0,0,0,0.2)",
+      },
+      "&:hover fieldset": {
+        borderColor: theme.palette.primary.main,
+      },
+      "&.Mui-focused fieldset": {
+        borderColor: theme.palette.secondary.main,
+      },
+    },
+  };
+
+  // ✨ Animation helper
+  const fieldAnimation = (x, delay) => ({
     initial: { opacity: 0, x },
     animate: { opacity: 1, x: 0 },
     transition: { delay, duration: 0.5, ease: "easeOut" },
   });
 
   return (
-    <Container
-      maxWidth="sm"
+    <Box
       sx={{
+        minHeight: "100vh",
+        bgcolor: theme.palette.background.default,
         display: "flex",
-        alignItems: "center",
         justifyContent: "center",
-        borderRadius: "30px",
-        py: { xs: 2, sm: 4 },
+        alignItems: "center",
+        p: 2,
+        color: theme.palette.text.primary,
       }}
     >
-      <PageMeta
-        title="Register"
-        description="Create a new account to start shopping with us."
-      />
-      <MotionPaper
-        component="form"
-        onSubmit={handleSubmit(onSubmit)}
-        elevation={8}
-        initial={{ opacity: 0, y: 60, scale: 0.9 }}
+      <PageMeta title="Register" description="Create a new account." />
+
+      <motion.div
+        initial={{ opacity: 0, y: 40, scale: 0.95 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
-        sx={{
-          width: "100%",
-          p: { xs: 3, sm: 5 },
-          borderRadius: 5,
-          backgroundColor: "white",
-          display: "flex",
-          flexDirection: "column",
-          gap: 2,
-        }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        style={{ width: "100%", maxWidth: 500 }}
       >
-        <Typography
-          variant="h5"
-          align="center"
-          sx={{ mb: 2, fontWeight: "bold", color: "primary.main" }}
+        <Paper
+          elevation={6}
+          component="form"
+          onSubmit={handleSubmit(onSubmit)}
+          sx={{
+            width: "100%",
+            p: 4,
+            borderRadius: 3,
+            backgroundColor: theme.palette.background.paper,
+          }}
         >
-          Create Account
-        </Typography>
+          <Typography
+            variant="h5"
+            align="center"
+            sx={{ mb: 1, fontWeight: 700, color: theme.palette.text.primary }}
+          >
+            Create Account
+          </Typography>
+          <Typography
+            variant="body2"
+            align="center"
+            sx={{ mb: 2, color: theme.palette.text.secondary }}
+          >
+            Fill in your details below
+          </Typography>
 
-        {/* Full Name */}
-        <motion.div {...fieldAnimation(-30, 0.1)}>
-          <TextField
-            label="Full Name"
-            variant="outlined"
-            {...register("name", {
-              required: "Name is required",
-              minLength: { value: 3, message: "At least 3 characters" },
-              maxLength: { value: 20, message: "Less than 20 characters" },
-            })}
-            error={!!errors.name}
-            helperText={errors.name?.message}
-            fullWidth
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <Person color="primary" />
-                </InputAdornment>
-              ),
-            }}
-          />
-        </motion.div>
+          {/* Name */}
+          <motion.div {...fieldAnimation(-25, 0.2)}>
+            <TextField
+              label="Full Name"
+              fullWidth
+              sx={textFieldStyle}
+              {...register("name", {
+                required: "Name is required",
+                minLength: { value: 3, message: "At least 3 characters" },
+              })}
+              error={!!errors.name}
+              helperText={errors.name?.message}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Person color="primary" />
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </motion.div>
 
-        {/* Email */}
-        <motion.div {...fieldAnimation(30, 0.2)}>
-          <TextField
-            label="Email"
-            type="email"
-            variant="outlined"
-            {...register("email", {
-              required: "Email is required",
-              pattern: {
-                value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                message: "Invalid email address",
-              },
-            })}
-            error={!!errors.email}
-            helperText={errors.email?.message}
-            fullWidth
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <Email color="primary" />
-                </InputAdornment>
-              ),
-            }}
-          />
-        </motion.div>
+          {/* Email */}
+          <motion.div {...fieldAnimation(25, 0.3)}>
+            <TextField
+              label="Email"
+              type="email"
+              fullWidth
+              sx={textFieldStyle}
+              {...register("email", {
+                required: "Email is required",
+                pattern: {
+                  value: /^[^@ ]+@[^@ ]+\.[^@ .]{2,}$/,
+                  message: "Invalid email address",
+                },
+              })}
+              error={!!errors.email}
+              helperText={errors.email?.message}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Email color="primary" />
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </motion.div>
 
-        {/* Password */}
-        <motion.div {...fieldAnimation(-30, 0.3)}>
-          <TextField
-            label="Password"
-            type={showPassword ? "text" : "password"}
-            variant="outlined"
-            {...register("password", {
-              required: "Password is required",
-              validate: (value) => {
-                if (value.length < 8) return "At least 8 characters";
-                if (!/[A-Z]/.test(value)) return "Add uppercase letter";
-                if (!/[a-z]/.test(value)) return "Add lowercase letter";
-                if (!/[0-9]/.test(value)) return "Add a number";
-                if (!/[#?!@$%^&*-]/.test(value))
-                  return "Add a special character";
-                return true;
-              },
-            })}
-            error={!!errors.password}
-            helperText={errors.password?.message}
-            fullWidth
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <Lock color="primary" />
-                </InputAdornment>
-              ),
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton onClick={handleClickShowPassword}>
-                    {showPassword ? <VisibilityOff /> : <Visibility />}
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
-          />
-        </motion.div>
+          {/* Password */}
+          <motion.div {...fieldAnimation(-25, 0.4)}>
+            <TextField
+              label="Password"
+              type={showPassword ? "text" : "password"}
+              fullWidth
+              sx={textFieldStyle}
+              {...register("password", {
+                required: "Password is required",
+                minLength: { value: 8, message: "At least 8 characters" },
+                validate: (value) => {
+                  if (!/[A-Z]/.test(value)) return "Add uppercase letter";
+                  if (!/[a-z]/.test(value)) return "Add lowercase letter";
+                  if (!/[0-9]/.test(value)) return "Add a number";
+                  if (!/[#?!@$%^&*-]/.test(value))
+                    return "Add a special character";
+                  return true;
+                },
+              })}
+              error={!!errors.password}
+              helperText={errors.password?.message}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Lock color="primary" />
+                  </InputAdornment>
+                ),
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={() => setShowPassword(!showPassword)}>
+                      {showPassword ? <VisibilityOff  sx={{color:"black"}}/> : <Visibility  sx={{color:"black"}}/>}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </motion.div>
 
-        {/* Confirm Password */}
-        <motion.div {...fieldAnimation(30, 0.4)}>
-          <TextField
-            label="Confirm Password"
-            type={showRePassword ? "text" : "password"}
-            variant="outlined"
-            {...register("rePassword", {
-              required: "Please confirm password",
-              validate: (value) => value === password || "Passwords do not match",
-            })}
-            error={!!errors.rePassword}
-            helperText={errors.rePassword?.message}
-            fullWidth
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <Lock color="primary" />
-                </InputAdornment>
-              ),
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton onClick={handleClickShowRePassword}>
-                    {showRePassword ? <VisibilityOff /> : <Visibility />}
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
-          />
-        </motion.div>
+          {/* Confirm Password */}
+          <motion.div {...fieldAnimation(25, 0.5)}>
+            <TextField
+              label="Confirm Password"
+              type={showRePassword ? "text" : "password"}
+              fullWidth
+              sx={textFieldStyle}
+              {...register("rePassword", {
+                required: "Please confirm password",
+                validate: (value) =>
+                  value === password || "Passwords do not match",
+              })}
+              error={!!errors.rePassword}
+              helperText={errors.rePassword?.message}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Lock color="primary" />
+                  </InputAdornment>
+                ),
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() => setShowRePassword(!showRePassword)}
+                    >
+                      {showRePassword ? <VisibilityOff sx={{color:"black"}}/> : <Visibility sx={{color:"black"}}/>}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </motion.div>
 
-        {/* Date of Birth */}
-        <motion.div {...fieldAnimation(-30, 0.5)}>
-          <TextField
-            label="Date of Birth"
-            type="date"
-            InputLabelProps={{ shrink: true }}
-            {...register("dateOfBirth", {
-              required: "Date of Birth is required",
-            })}
-            error={!!errors.dateOfBirth}
-            helperText={errors.dateOfBirth?.message}
-            fullWidth
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <CalendarMonth color="primary" />
-                </InputAdornment>
-              ),
-            }}
-          />
-        </motion.div>
+          {/* Date of Birth */}
+          <motion.div {...fieldAnimation(-25, 0.6)}>
+            <TextField
+              label="Date of Birth"
+              type="date"
+              
+              InputLabelProps={{ shrink: true }}
+              fullWidth
+sx={{
+    ...textFieldStyle,
+    '& input::-webkit-calendar-picker-indicator': {
+          fontSize:20, 
+        mr:1,
+        borderRadius:10
+    },
+    
+  }}              {...register("dateOfBirth", {
+                required: "Date of Birth is required",
+              })}
+              error={!!errors.dateOfBirth}
+              helperText={errors.dateOfBirth?.message}
+              InputProps={{
+                
+                startAdornment: (
+                  <InputAdornment  position="start">
+                    <CalendarMonth  color="primary" />
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </motion.div>
 
-        {/* Gender */}
-        <motion.div {...fieldAnimation(30, 0.6)}>
-          <Controller
-            name="gender"
-            control={control}
-            defaultValue=""
-            rules={{ required: "Gender is required" }}
-            render={({ field }) => (
-              <TextField
-                select
-                label="Gender"
-                {...field}
-                error={!!errors.gender}
-                helperText={errors.gender?.message}
-                fullWidth
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <Wc color="primary" />
-                    </InputAdornment>
-                  ),
+          {/* Gender */}
+          <motion.div {...fieldAnimation(25, 0.7)}>
+            <Controller
+              name="gender"
+              control={control}
+              defaultValue=""
+              rules={{ required: "Gender is required" }}
+              render={({ field }) => (
+                <TextField
+                  select
+                  label="Gender"
+                  fullWidth
+          sx={{
+        ...textFieldStyle,
+        '& .MuiSelect-icon': {
+        fontSize:35, 
+        mr:1,
+        color:"black"
+        },
+      }}                  {...field}
+                  error={!!errors.gender}
+                  helperText={errors.gender?.message}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Wc color="primary" />
+                      </InputAdornment>
+                    ),
+                  }}
+                >
+                  <MenuItem value="male">Male</MenuItem>
+                  <MenuItem value="female">Female</MenuItem>
+                </TextField>
+              )}
+            />
+          </motion.div>
+
+          {/* Submit Button */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.8 }}
+          >
+            <Button
+              type="submit"
+              fullWidth
+              disabled={loading}
+              sx={{
+                mt: 2,
+                py: 1.2,
+                fontWeight: "bold",
+                borderRadius: "10px",
+                textTransform: "none",
+                background: loading
+                  ? "gray"
+                  : `linear-gradient(90deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
+                color: theme.palette.getContrastText(theme.palette.primary.main),
+                "&:hover": {
+                  background: loading
+                    ? "gray"
+                    : `linear-gradient(90deg, ${
+                        theme.palette.primary.dark || "#1565c0"
+                      } 0%, ${theme.palette.secondary.dark || "#1e88e5"} 100%)`,
+                },
+              }}
+            >
+              {loading ? (
+                <>
+                  <CircularProgress size={20} color="inherit" />
+                  Creating...
+                </>
+              ) : (
+                "Register"
+              )}
+            </Button>
+
+            <Typography
+              variant="body2"
+              align="center"
+              sx={{ mt: 3, color: theme.palette.text.secondary }}
+            >
+              Already have an account?{" "}
+              <Link
+                to="/login"
+                style={{
+                  textDecoration: "none",
+                  color: theme.palette.primary.main,
+                  fontWeight: "bold",
                 }}
               >
-                <MenuItem value="male">Male</MenuItem>
-                <MenuItem value="female">Female</MenuItem>
-              </TextField>
-            )}
-          />
-        </motion.div>
+                Login here
+              </Link>
+            </Typography>
+          </motion.div>
+        </Paper>
+      </motion.div>
 
-        {/* Submit Button */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.7 }}
-        >
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            sx={{
-              mt: 2,
-              borderRadius: "10px",
-              py: 1.2,
-              fontWeight: "bold",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 1,
-            }}
-            fullWidth
-            disabled={loading}
-          >
-            {loading ? (
-              <>
-                <CircularProgress size={20} color="inherit" />
-                Sending...
-              </>
-            ) : (
-              "Register"
-            )}
-          </Button>
-        </motion.div>
-
-        {/* ✅ Already have account */}
-        <Typography
-          variant="body2"
-          align="center"
-          sx={{ mt: 1, color: "text.secondary" }}
-        >
-          Already have an account?{" "}
-          <Link
-            to="/login"
-            style={{
-              textDecoration: "none",
-              color: "#1976d2",
-              fontWeight: "bold",
-              cursor: "pointer",
-            }}
-          >
-            Login here
-          </Link>
-        </Typography>
-      </MotionPaper>
-
-      {/* Snackbar Notification */}
+      {/* Snackbar */}
       <Snackbar
-        open={open}
-        autoHideDuration={4000}
-        onClose={() => setOpen(false)}
+        open={snack.open}
+        autoHideDuration={1500}
+        onClose={handleSnackClose}
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-        TransitionComponent={SlideTransition}
       >
-        <Alert
-          severity="info"
-          sx={{
-            bgcolor: "white",
-            color: "black",
-            fontWeight: "bold",
-            boxShadow: "0px 4px 12px rgba(0,0,0,0.2)",
-            borderRadius: "10px",
-          }}
-          icon={false}
-        >
-          {toastMsg}
-        </Alert>
+        <Alert severity={snack.severity}>{snack.message}</Alert>
       </Snackbar>
-    </Container>
+    </Box>
   );
 }

@@ -6,19 +6,21 @@ import TokenContextProvider from "./Context/tokenContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import CartContextProvider from "./Context/CartContext.jsx";
 import { WishlistProvider } from "./Context/WishlistContext.jsx";
-
+import ThemeContextProvider from "./Context/ThemeContext.jsx"; 
 const queryClient = new QueryClient();
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <WishlistProvider>
-        <TokenContextProvider>
-          <CartContextProvider>
+      <ThemeContextProvider> 
+        <WishlistProvider>
+          <TokenContextProvider>
+            <CartContextProvider>
               <App />
-          </CartContextProvider>
-        </TokenContextProvider>
-      </WishlistProvider>
+            </CartContextProvider>
+          </TokenContextProvider>
+        </WishlistProvider>
+      </ThemeContextProvider>
     </QueryClientProvider>
   </StrictMode>
 );

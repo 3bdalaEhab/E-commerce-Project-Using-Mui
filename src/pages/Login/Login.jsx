@@ -12,15 +12,20 @@ import {
   Snackbar,
   Alert,
   CircularProgress,
+  useTheme,
 } from "@mui/material";
 import { Email, Lock, Visibility, VisibilityOff } from "@mui/icons-material";
-import { data, Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { tokenContext } from "../../Context/tokenContext";
 import PageMeta from "../../components/PageMeta/PageMeta";
+import { useThemeContext } from "../../Context/ThemeContext"; // ✅ استدعاء الـ ThemeContext
 
 export default function Login() {
   const { setUserToken } = useContext(tokenContext);
+  const theme = useTheme();
+  const { mode } = useThemeContext(); // ✅ نقرأ وضع الثيم الحالي (light أو dark)
+
   const {
     register,
     handleSubmit,
@@ -37,11 +42,7 @@ export default function Login() {
   const navigate = useNavigate();
 
   const togglePassword = () => setShowPassword((s) => !s);
-
-  // دالة الإغلاق البسيطة للـ Snackbar
-  const handleSnackClose = () => {
-    setSnack((s) => ({ ...s, open: false }));
-  };
+  const handleSnackClose = () => setSnack((s) => ({ ...s, open: false }));
 
   const onSubmit = async (formData) => {
     setLoading(true);
@@ -56,9 +57,7 @@ export default function Login() {
         }
       );
 
-      if (data.token) {
-        receivedToken = data.token;
-      }
+      if (data.token) receivedToken = data.token;
 
       setSnack({
         open: true,
@@ -66,16 +65,14 @@ export default function Login() {
         severity: "success",
       });
 
-      // 💡 الحل القصير: تأخير التحديث والانتقال لمدة 1200 ميلي ثانية
       setTimeout(() => {
         if (receivedToken) {
           localStorage.setItem("userToken", receivedToken);
           setUserToken(receivedToken);
           navigate("/");
         }
-      }, 1000); // ✅ المدة الجديدة
+      }, 1000);
     } catch (err) {
-      // هنا لا يتغير شيء، الخطأ يعمل بشكل صحيح
       const msg =
         err.response?.data?.message ||
         err.response?.data?.error ||
@@ -86,21 +83,52 @@ export default function Login() {
     }
   };
 
+  const textFieldStyle = {
+    mb: 2,
+    "& .MuiInputBase-input": {
+      color: "black",
+      
+      borderRadius: "8px",
+    },
+    "& .MuiFormLabel-root": {
+      color:
+        theme.palette.mode === "dark"
+          ? theme.palette.primary.main
+          : theme.palette.text.secondary,
+    },
+    "& .MuiOutlinedInput-root": {
+      "& fieldset": {
+        borderColor:
+          theme.palette.mode === "dark"
+            ? "rgba(255,255,255,0.2)"
+            : "rgba(0,0,0,0.2)",
+      },
+      "&:hover fieldset": {
+        borderColor: theme.palette.primary.main,
+      },
+      "&.Mui-focused fieldset": {
+        borderColor: theme.palette.secondary.main,
+      },
+    },
+  };
+
   return (
     <Box
       sx={{
         minHeight: "100vh",
-        bgcolor: "#f5f5f5",
+        bgcolor: theme.palette.background.default,
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
         p: 2,
+        color: theme.palette.text.primary,
       }}
     >
       <PageMeta
         title="Login"
         description="Access your account by logging in with your credentials."
       />
+
       <motion.div
         initial={{ opacity: 0, y: 40, scale: 0.95 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -111,19 +139,24 @@ export default function Login() {
           elevation={6}
           component="form"
           onSubmit={handleSubmit(onSubmit)}
-          sx={{ width: "100%", p: 4, borderRadius: 3 }}
+          sx={{
+            width: "100%",
+            p: 4,
+            borderRadius: 3,
+            backgroundColor: theme.palette.background.paper,
+          }}
         >
           <Typography
             variant="h5"
             align="center"
-            sx={{ mb: 1, fontWeight: 700 }}
+            sx={{ mb: 1, fontWeight: 700, color: theme.palette.text.primary }}
           >
             Login
           </Typography>
           <Typography
             variant="body2"
             align="center"
-            sx={{ mb: 2, color: "text.secondary" }}
+            sx={{ mb: 2, color: theme.palette.text.secondary }}
           >
             Enter your credentials
           </Typography>
@@ -139,7 +172,7 @@ export default function Login() {
               type="email"
               autoComplete="new-email"
               fullWidth
-              sx={{ mb: 2 }}
+              sx={textFieldStyle}
               {...register("email", {
                 required: "Email is required",
                 pattern: {
@@ -170,7 +203,7 @@ export default function Login() {
               type={showPassword ? "text" : "password"}
               autoComplete="new-password"
               fullWidth
-              sx={{ mb: 2 }}
+              sx={textFieldStyle}
               {...register("password", {
                 required: "Password is required",
                 minLength: { value: 8, message: "At least 8 characters" },
@@ -187,14 +220,14 @@ export default function Login() {
               helperText={errors.password?.message}
               InputProps={{
                 startAdornment: (
-                  <InputAdornment position="start">
-                    <Lock color="primary" />
+                  <InputAdornment bgcolor="black" position="start">
+                    <Lock  color="primary" />
                   </InputAdornment>
                 ),
                 endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton onClick={togglePassword} edge="end">
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                  <InputAdornment  position="end">
+                    <IconButton   onClick={togglePassword} edge="end">
+                      {showPassword ? <VisibilityOff sx={{color:"black"}} /> : <Visibility sx={{color:"black"}} />}
                     </IconButton>
                   </InputAdornment>
                 ),
@@ -210,20 +243,32 @@ export default function Login() {
           >
             <Button
               type="submit"
-              variant="contained"
-              color="primary"
+              fullWidth
+              disabled={loading}
               sx={{
                 mt: 2,
-                borderRadius: "10px",
                 py: 1.2,
                 fontWeight: "bold",
+                borderRadius: "10px",
+                textTransform: "none",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 gap: 1,
+                background: loading
+                  ? "gray"
+                  : `linear-gradient(90deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
+                color: theme.palette.getContrastText(
+                  theme.palette.primary.main
+                ),
+                "&:hover": {
+                  background: loading
+                    ? "gray"
+                    : `linear-gradient(90deg, ${
+                        theme.palette.primary.dark || "#1565c0"
+                      } 0%, ${theme.palette.secondary.dark || "#1e88e5"} 100%)`,
+                },
               }}
-              fullWidth
-              disabled={loading}
             >
               {loading ? (
                 <>
@@ -238,16 +283,15 @@ export default function Login() {
             <Typography
               variant="body2"
               align="center"
-              sx={{ mt: 3, color: "text.secondary" }}
+              sx={{ mt: 3, color: theme.palette.text.secondary }}
             >
               Don’t have an account?{" "}
               <Link
                 to="/register"
                 style={{
                   textDecoration: "none",
-                  color: "#1976d2",
+                  color: theme.palette.primary.main,
                   fontWeight: "bold",
-                  cursor: "pointer",
                 }}
               >
                 Create one now
@@ -259,7 +303,7 @@ export default function Login() {
 
       <Snackbar
         open={snack.open}
-        autoHideDuration={1000} // ✅ مدة ظهور الـ Snackbar (1.2 ثانية)
+        autoHideDuration={1000}
         onClose={handleSnackClose}
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       >

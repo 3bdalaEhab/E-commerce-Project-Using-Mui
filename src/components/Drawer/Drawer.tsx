@@ -14,7 +14,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
-import { Snackbar, Alert } from "@mui/material";
+import { Snackbar, Alert, Tooltip } from "@mui/material";
 import {
   Home,
   ShoppingCart,
@@ -24,6 +24,8 @@ import {
   Login,
   AppRegistration,
   Logout,
+  LightMode,
+  Nightlight,
 } from "@mui/icons-material";
 
 import { Link, useNavigate } from "react-router-dom";
@@ -31,6 +33,7 @@ import { useContext } from "react";
 import { tokenContext } from "../../Context/tokenContext";
 import { CartContext } from "../../Context/CartContext";
 import { WishlistContext } from "../../Context/WishlistContext";
+import { useThemeContext } from "../../Context/ThemeContext";
 
 const drawerWidth = 240;
 
@@ -55,6 +58,7 @@ const DrawerAppBar: React.FC<DrawerAppBarProps> = (props) => {
   const { userToken, setUserToken } = useContext(tokenContext);
   const { numOfCartItems } = useContext(CartContext);
   const { numWishItemList } = useContext(WishlistContext);
+  const { mode, toggleTheme } = useThemeContext();
 
   const handleDrawerToggle = () => setMobileOpen((prev) => !prev);
   const handleClose = () => setOpen(false);
@@ -186,8 +190,33 @@ const DrawerAppBar: React.FC<DrawerAppBarProps> = (props) => {
           </IconButton>
 
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            MUI App
+            MUI App 
           </Typography>
+
+
+   <Tooltip title={mode === "light" ? "تفعيل الوضع الداكن" : "تفعيل الوضع الفاتح"}>
+      <IconButton
+        onClick={toggleTheme}
+        sx={{
+          color: "#fff",
+          transition: "all 0.3s ease",
+          "&:hover": {
+            transform: "scale(1.1)",
+            color: mode === "light" ? "#44433dff" : "#e9d30aff", 
+          },
+        }}
+      >
+        {mode === "light" ? <Nightlight /> : <LightMode />}
+      </IconButton>
+    </Tooltip>
+
+
+
+
+
+
+
+
 
           <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center", gap: 2 }}>
             {navItems.map((item) =>

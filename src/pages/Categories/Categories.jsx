@@ -13,9 +13,14 @@ import {
 import { motion } from "framer-motion";
 import Loading from "../../components/Loading/Loading";
 import PageMeta from "../../components/PageMeta/PageMeta";
+import { useTheme } from "@mui/material/styles";
+import { useThemeContext } from "../../Context/ThemeContext";
 
 export default function Categories() {
-  // 🔹 Fetch all categories from the API
+  const theme = useTheme();
+  const { mode } = useThemeContext();
+
+  // 🔹 Fetch categories from API
   const getCategories = async () => {
     const { data } = await axios.get(
       "https://ecommerce.routemisr.com/api/v1/categories"
@@ -23,26 +28,22 @@ export default function Categories() {
     return data.data;
   };
 
-  // 🔹 Use React Query to handle data fetching, loading, and error states
   const { data, isLoading, error } = useQuery({
     queryKey: ["categories"],
     queryFn: getCategories,
   });
 
-  // 🔹 Show loading spinner
   if (isLoading)
     return (
       <Box sx={{ textAlign: "center", mt: 5 }}>
-          <PageMeta
-            key={"Categories"}
-        title="Categories"
-        description="Browse products by categories and find what you need easily."
-      />
+        <PageMeta
+          title="Categories"
+          description="Browse products by categories and find what you need easily."
+        />
         <Loading />
       </Box>
     );
 
-  // 🔹 Show error message if fetching fails
   if (error)
     return (
       <Typography color="error" sx={{ textAlign: "center", mt: 5 }}>
@@ -51,13 +52,21 @@ export default function Categories() {
     );
 
   return (
-    <Container sx={{ py: 5 }}>
-        <PageMeta
-      
+    <Container
+      sx={{
+        py: 5,
+        backgroundColor: theme.palette.background.default,
+        color: theme.palette.text.primary,
+        minHeight: "100vh",
+        transition: "background-color 0.3s, color 0.3s",
+      }}
+    >
+      <PageMeta
         title="Categories"
         description="Browse products by categories and find what you need easily."
       />
-      {/* 🔹 Page title with animation */}
+
+      {/* Title */}
       <motion.div
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
@@ -66,7 +75,7 @@ export default function Categories() {
         <Typography
           variant="h4"
           sx={{
-            color: "primary.main",
+            color: theme.palette.primary.main,
             mb: 5,
             fontWeight: "bold",
             textAlign: "center",
@@ -76,21 +85,19 @@ export default function Categories() {
         </Typography>
       </motion.div>
 
-      {/* 🔹 Categories grid */}
+      {/* Categories Grid */}
       <Grid
         container
         spacing={3}
         sx={{
           display: "flex",
           flexWrap: "wrap",
-          textAlign: "center",
           justifyContent: "center",
           alignItems: "center",
         }}
       >
         {data.map((category, index) => (
-          <Grid  item key={category._id}  >
-            {/* 🔹 Card animation on load and hover */}
+          <Grid item key={category._id}>
             <motion.div
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
@@ -101,19 +108,26 @@ export default function Categories() {
               }}
               whileHover={{ scale: 1.06, transition: { duration: 0.3 } }}
             >
-              {/* 🔹 Category card */}
               <Card
                 sx={{
                   borderRadius: 3,
-                  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                  boxShadow:
+                    mode === "light"
+                      ? "0 4px 12px rgba(0,0,0,0.1)"
+                      : "0 4px 20px rgba(255,255,255,0.08)",
                   overflow: "hidden",
                   width: 260,
                   height: 300,
-                  "&:hover": { boxShadow: "0 8px 20px rgba(0,0,0,0.2)" },
+                  backgroundColor: theme.palette.background.paper,
+                  transition: "background-color 0.3s, box-shadow 0.3s",
+                  "&:hover": {
+                    boxShadow:
+                      mode === "light"
+                        ? "0 8px 20px rgba(0,0,0,0.2)"
+                        : "0 8px 25px rgba(255,255,255,0.15)",
+                  },
                 }}
-              
               >
-                {/* 🔹 Category image */}
                 <CardMedia
                   component="img"
                   height="200"
@@ -121,16 +135,14 @@ export default function Categories() {
                   alt={category.name}
                   sx={{ objectFit: "cover" }}
                 />
-
-                {/* 🔹 Category name */}
                 <CardContent sx={{ textAlign: "center", py: 4 }}>
                   <Typography
                     variant="h6"
-                    color="primary"
                     sx={{
                       fontWeight: 600,
                       fontSize: "1.1rem",
                       textTransform: "capitalize",
+                      color: theme.palette.primary.main,
                     }}
                   >
                     {category.name}

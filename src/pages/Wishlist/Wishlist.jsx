@@ -13,6 +13,8 @@ import {
   Alert,
   Slide,
 } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+
 import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
@@ -20,6 +22,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import Loading from "../../components/Loading/Loading";
 import PageMeta from "../../components/PageMeta/PageMeta";
+import { useTheme } from "@mui/material/styles";
+import { useThemeContext } from "../../Context/ThemeContext";
 
 // ✅ Animation transition for Snackbar
 function SlideUpTransition(props) {
@@ -31,7 +35,9 @@ export default function Wishlist() {
     useContext(WishlistContext);
   const navigate = useNavigate();
 
-  // Snackbar state
+  const theme = useTheme();
+  const { mode } = useThemeContext();
+
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
@@ -41,26 +47,24 @@ export default function Wishlist() {
   const handleCloseSnackbar = () =>
     setSnackbar((prev) => ({ ...prev, open: false }));
 
-  // Fetch wishlist when mounted
   useEffect(() => {
     getWishlist();
   }, []);
 
-  // 🔹 Handle remove
   const handleRemove = useCallback(
     async (e, id) => {
       e.stopPropagation();
       await removeFromWishlist(id);
       setSnackbar({
         open: true,
-       message: "Item removed successfully ",
-      severity: "error", 
+        message: "Item removed successfully",
+        severity: "error",
       });
     },
     [removeFromWishlist]
   );
 
-  // 🔹 Loading view
+  // ✅ Loading
   if (loading) {
     return (
       <Box
@@ -69,6 +73,7 @@ export default function Wishlist() {
           justifyContent: "center",
           alignItems: "center",
           height: "80vh",
+          backgroundColor: theme.palette.background.default,
         }}
       >
         <Loading />
@@ -76,7 +81,7 @@ export default function Wishlist() {
     );
   }
 
-  // 🔹 Empty wishlist view
+  // ✅ Empty wishlist view
   if (!wishlist.length) {
     return (
       <>
@@ -96,26 +101,30 @@ export default function Wishlist() {
             justifyContent: "center",
             height: "80vh",
             textAlign: "center",
-            background: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
+            backgroundColor: theme.palette.background.default,
             borderRadius: 3,
             px: 2,
+            color: theme.palette.text.primary,
           }}
         >
           <FavoriteBorderOutlinedIcon
-            sx={{ fontSize: 90, color: "primary.main", mb: 2 }}
+            sx={{ fontSize: 90, color: theme.palette.primary.main, mb: 2 }}
           />
           <Typography
             variant="h4"
             fontWeight="bold"
-            color="primary.dark"
+            sx={{ color: theme.palette.text.primary }}
             gutterBottom
           >
             Your Wishlist is Empty
           </Typography>
           <Typography
             variant="body1"
-            color="text.secondary"
-            sx={{ maxWidth: 400, mb: 4 }}
+            sx={{
+              color: theme.palette.text.secondary,
+              maxWidth: 400,
+              mb: 4,
+            }}
           >
             Looks like you haven’t added anything yet. Start exploring our
             products and add your favorite items to your wishlist.
@@ -135,13 +144,10 @@ export default function Wishlist() {
                 textTransform: "none",
                 borderRadius: "10px",
                 fontWeight: "bold",
-                background: "linear-gradient(90deg, #1976d2 0%, #42a5f5 100%)",
-                boxShadow: "0 6px 20px rgba(25,118,210,0.3)",
-                "&:hover": {
-                  background:
-                    "linear-gradient(90deg, #1565c0 0%, #1e88e5 100%)",
-                  boxShadow: "0 8px 25px rgba(25,118,210,0.4)",
-                },
+                boxShadow:
+                  mode === "light"
+                    ? "0 6px 20px rgba(25,118,210,0.3)"
+                    : "0 6px 20px rgba(144,202,249,0.3)",
               }}
             >
               Continue Shopping
@@ -152,7 +158,7 @@ export default function Wishlist() {
     );
   }
 
-  // 🔹 Wishlist view
+  // ✅ Wishlist with theme colors
   return (
     <>
       <PageMeta
@@ -160,13 +166,20 @@ export default function Wishlist() {
         description="See all your favorite products in wishlist"
       />
 
-      <Container sx={{ py: 5 }}>
+      <Container
+        sx={{
+          py: 5,
+          backgroundColor: theme.palette.background.default,
+          minHeight: "100vh",
+          transition: "background-color 0.3s ease",
+        }}
+      >
         <Typography
           variant="h4"
           fontWeight="bold"
           textAlign="center"
           mb={5}
-          color="primary.main"
+          sx={{ color: theme.palette.text.primary }}
           component={motion.div}
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -189,13 +202,17 @@ export default function Wishlist() {
                   width: 280,
                   height: 400,
                   borderRadius: 3,
-                  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                  boxShadow:
+                    mode === "light"
+                      ? "0 4px 12px rgba(0,0,0,0.1)"
+                      : "0 4px 20px rgba(255,255,255,0.08)",
                   overflow: "hidden",
                   cursor: "pointer",
-                  backgroundColor: "#fff",
+                  backgroundColor: theme.palette.background.paper,
                   display: "flex",
                   flexDirection: "column",
                   justifyContent: "space-between",
+                  transition: "background-color 0.3s, box-shadow 0.3s",
                 }}
               >
                 <CardMedia
@@ -209,24 +226,32 @@ export default function Wishlist() {
                   <Typography
                     variant="h6"
                     fontWeight="bold"
-                    color="primary.dark"
-                    mb={1}
+                    sx={{ color: theme.palette.primary.main, mb: 1 }}
                     noWrap
                   >
                     {item.title || "No Title"}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary" mb={2}>
+                  <Typography
+                    variant="body1"
+                    sx={{ color: theme.palette.text.secondary, mb: 2 }}
+                  >
                     Price: ${item.price}
                   </Typography>
                   <Button
                     variant="outlined"
-                    color="error"
-                    startIcon={<DeleteOutlineIcon />}
+                    startIcon={<DeleteIcon />}
                     onClick={(e) => handleRemove(e, item._id)}
                     sx={{
                       textTransform: "none",
                       borderRadius: 2,
                       fontWeight: "bold",
+                      transition:"0.5s",
+                      borderColor: theme.palette.error.main,
+                      color: theme.palette.error.main,
+                      "&:hover": {
+                        backgroundColor: theme.palette.error.main,
+                        color: "#fff",
+                      },
                     }}
                   >
                     Remove
@@ -238,17 +263,27 @@ export default function Wishlist() {
         </Grid>
       </Container>
 
-      {/* ✅ Snackbar in center bottom */}
+      {/* ✅ Snackbar */}
       <Snackbar
         open={snackbar.open}
         autoHideDuration={1500}
         onClose={handleCloseSnackbar}
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        TransitionComponent={SlideUpTransition}
       >
         <Alert
           onClose={handleCloseSnackbar}
+          severity={snackbar.severity}
           variant="filled"
-          sx={{ width: "100%", fontWeight: "bold" }}
+          sx={{
+            width: "100%",
+            fontWeight: "bold",
+            backgroundColor:
+              snackbar.severity === "success"
+                ? theme.palette.success.main
+                : theme.palette.error.main,
+            color: "#fff",
+          }}
         >
           {snackbar.message}
         </Alert>
