@@ -306,9 +306,8 @@ export default function Login() {
                   theme.palette.primary.main
                 ),
                 "&:hover:not(:disabled)": {
-                  background: `linear-gradient(90deg, ${
-                    theme.palette.primary.dark || "#1565c0"
-                  } 0%, ${theme.palette.secondary.dark || "#1e88e5"} 100%)`,
+                  background: `linear-gradient(90deg, ${theme.palette.primary.dark || "#1565c0"
+                    } 0%, ${theme.palette.secondary.dark || "#1e88e5"} 100%)`,
                   transform: "translateY(-2px)",
                   boxShadow: `0 8px 20px ${theme.palette.primary.main}40`,
                 },

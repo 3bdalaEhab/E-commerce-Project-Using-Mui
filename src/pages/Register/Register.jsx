@@ -54,6 +54,7 @@ export default function Register() {
   const onSubmit = async (data) => {
     setLoading(true);
     try {
+      // ✅ استخدام linked-posts API
       const payload = {
         name: data.name.trim(),
         email: data.email.trim(),
@@ -81,12 +82,12 @@ export default function Register() {
     }
   };
 
-const textFieldStyle = {
+  const textFieldStyle = {
 
     mb: 2,
     "& .MuiInputBase-input": {
       color: "black",
-      
+
       borderRadius: "8px",
     },
     "& .MuiFormLabel-root": {
@@ -242,7 +243,7 @@ const textFieldStyle = {
                 endAdornment: (
                   <InputAdornment position="end">
                     <IconButton onClick={() => setShowPassword(!showPassword)}>
-                      {showPassword ? <VisibilityOff  sx={{color:"black"}}/> : <Visibility  sx={{color:"black"}}/>}
+                      {showPassword ? <VisibilityOff sx={{ color: "black" }} /> : <Visibility sx={{ color: "black" }} />}
                     </IconButton>
                   </InputAdornment>
                 ),
@@ -275,7 +276,7 @@ const textFieldStyle = {
                     <IconButton
                       onClick={() => setShowRePassword(!showRePassword)}
                     >
-                      {showRePassword ? <VisibilityOff sx={{color:"black"}}/> : <Visibility sx={{color:"black"}}/>}
+                      {showRePassword ? <VisibilityOff sx={{ color: "black" }} /> : <Visibility sx={{ color: "black" }} />}
                     </IconButton>
                   </InputAdornment>
                 ),
@@ -288,27 +289,27 @@ const textFieldStyle = {
             <TextField
               label="Date of Birth"
               type="date"
-              
+
               InputLabelProps={{ shrink: true }}
               fullWidth
-sx={{
-    ...textFieldStyle,
-    '& input::-webkit-calendar-picker-indicator': {
-          fontSize:20, 
-        mr:1,
-        borderRadius:10
-    },
-    
-  }}              {...register("dateOfBirth", {
+              sx={{
+                ...textFieldStyle,
+                '& input::-webkit-calendar-picker-indicator': {
+                  fontSize: 20,
+                  mr: 1,
+                  borderRadius: 10
+                },
+
+              }}              {...register("dateOfBirth", {
                 required: "Date of Birth is required",
               })}
               error={!!errors.dateOfBirth}
               helperText={errors.dateOfBirth?.message}
               InputProps={{
-                
+
                 startAdornment: (
-                  <InputAdornment  position="start">
-                    <CalendarMonth  color="primary" />
+                  <InputAdornment position="start">
+                    <CalendarMonth color="primary" />
                   </InputAdornment>
                 ),
               }}
@@ -327,14 +328,14 @@ sx={{
                   select
                   label="Gender"
                   fullWidth
-          sx={{
-        ...textFieldStyle,
-        '& .MuiSelect-icon': {
-        fontSize:35, 
-        mr:1,
-        color:"black"
-        },
-      }}                  {...field}
+                  sx={{
+                    ...textFieldStyle,
+                    '& .MuiSelect-icon': {
+                      fontSize: 35,
+                      mr: 1,
+                      color: "black"
+                    },
+                  }}                  {...field}
                   error={!!errors.gender}
                   helperText={errors.gender?.message}
                   InputProps={{
@@ -375,9 +376,8 @@ sx={{
                 "&:hover": {
                   background: loading
                     ? "gray"
-                    : `linear-gradient(90deg, ${
-                        theme.palette.primary.dark || "#1565c0"
-                      } 0%, ${theme.palette.secondary.dark || "#1e88e5"} 100%)`,
+                    : `linear-gradient(90deg, ${theme.palette.primary.dark || "#1565c0"
+                    } 0%, ${theme.palette.secondary.dark || "#1e88e5"} 100%)`,
                 },
               }}
             >

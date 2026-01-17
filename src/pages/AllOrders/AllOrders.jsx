@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
-import * as jwt_decode from "jwt-decode"; 
+import * as jwt_decode from "jwt-decode";
 import { motion } from "framer-motion";
 import PageMeta from "../../components/PageMeta/PageMeta";
-import { 
-  Box, 
-  Card, 
-  CardContent, 
-  CardMedia, 
-  Typography, 
-  Chip, 
+import {
+  Box,
+  Card,
+  CardContent,
+  CardMedia,
+  Typography,
+  Chip,
   Divider,
   Alert,
   Container,
@@ -47,13 +47,13 @@ export default function AllOrders() {
       if (!userId) return [];
       const res = await axios.get(
         `https://ecommerce.routemisr.com/api/v1/orders/user/${userId}`,
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { token } }
       );
-      
+
       console.log("📡 Full API Response:", res.data); // ✅ للـ debugging
       console.log("📡 Response Type:", typeof res.data); // ✅ نوع الاستجابة
       console.log("📡 Is Array:", Array.isArray(res.data)); // ✅ هل مصفوفة
-      
+
       // ✅ الاستجابة قد تكون array مباشرة أو object بـ data/results
       let orders = [];
       if (Array.isArray(res.data)) {
@@ -68,13 +68,13 @@ export default function AllOrders() {
       } else {
         console.warn("⚠️ Unexpected response structure:", res.data);
       }
-      
+
       // ✅ طباعة أول طلب لنشوف البيانات
       if (orders.length > 0) {
         console.log("📦 First Order Details:", orders[0]);
         console.log("📍 Shipping Address:", orders[0].shippingAddress);
       }
-      
+
       console.log("✅ Processed orders:", orders); // ✅ للـ debugging
       return orders;
     },
@@ -131,11 +131,11 @@ export default function AllOrders() {
 
       <Container maxWidth="lg" sx={{ p: { xs: 2, sm: 3 }, my: 3 }}>
         {/* العنوان */}
-        <Typography 
-          variant="h4" 
-          gutterBottom 
-          color={theme.palette.text.primary} 
-          fontWeight={700} 
+        <Typography
+          variant="h4"
+          gutterBottom
+          color={theme.palette.text.primary}
+          fontWeight={700}
           textAlign="center"
           sx={{ mb: 4 }}
         >
@@ -155,10 +155,10 @@ export default function AllOrders() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
               >
-                <Card 
-                  sx={{ 
+                <Card
+                  sx={{
                     p: 0,
-                    borderRadius: 3, 
+                    borderRadius: 3,
                     boxShadow: 3,
                     background: theme.palette.background.paper,
                     color: theme.palette.text.primary,
@@ -175,9 +175,9 @@ export default function AllOrders() {
                   <CardContent sx={{ pb: 1 }}>
                     <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 2 }}>
                       <Box>
-                        <Typography 
-                          variant="h6" 
-                          sx={{ 
+                        <Typography
+                          variant="h6"
+                          sx={{
                             color: theme.palette.text.primary,
                             fontWeight: 600,
                             mb: 0.5,
@@ -185,8 +185,8 @@ export default function AllOrders() {
                         >
                           Order #{order._id?.slice(0, 8)}...
                         </Typography>
-                        <Typography 
-                          variant="caption" 
+                        <Typography
+                          variant="caption"
                           sx={{ color: theme.palette.text.secondary }}
                         >
                           📅 {order.createdAt ? new Date(order.createdAt).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }) : "N/A"}
@@ -194,7 +194,7 @@ export default function AllOrders() {
                       </Box>
 
                       {/* زر التوسيع */}
-                      <IconButton 
+                      <IconButton
                         onClick={() => toggleRowExpansion(order._id)}
                         size="small"
                         sx={{ mt: -1 }}
@@ -223,9 +223,9 @@ export default function AllOrders() {
                           Payment Status
                         </Typography>
                         <Box sx={{ mt: 0.5 }}>
-                          <Chip 
-                            label={order.isPaid ? "✅ Paid" : "⏳ Not Paid"} 
-                            size="small" 
+                          <Chip
+                            label={order.isPaid ? "✅ Paid" : "⏳ Not Paid"}
+                            size="small"
                             color={order.isPaid ? "success" : "warning"}
                             sx={{ fontWeight: 600 }}
                           />
@@ -238,9 +238,9 @@ export default function AllOrders() {
                           Delivery Status
                         </Typography>
                         <Box sx={{ mt: 0.5 }}>
-                          <Chip 
-                            label={order.isDelivered ? "✅ Delivered" : "🚚 Shipping"} 
-                            size="small" 
+                          <Chip
+                            label={order.isDelivered ? "✅ Delivered" : "🚚 Shipping"}
+                            size="small"
                             color={order.isDelivered ? "success" : "info"}
                             sx={{ fontWeight: 600 }}
                           />
@@ -280,8 +280,8 @@ export default function AllOrders() {
                     <Divider />
                     <CardContent>
                       {/* المنتجات */}
-                      <Typography 
-                        variant="subtitle1" 
+                      <Typography
+                        variant="subtitle1"
                         sx={{ mb: 2, color: theme.palette.text.primary, fontWeight: 600 }}
                       >
                         📦 Products Details:
@@ -296,9 +296,9 @@ export default function AllOrders() {
                               animate={{ opacity: 1, x: 0 }}
                               transition={{ duration: 0.3, delay: 0.1 * index }}
                             >
-                              <Box 
-                                sx={{ 
-                                  display: "flex", 
+                              <Box
+                                sx={{
+                                  display: "flex",
                                   gap: 2,
                                   p: 1.5,
                                   backgroundColor: theme.palette.mode === "dark" ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.02)",
@@ -312,19 +312,19 @@ export default function AllOrders() {
                                     component="img"
                                     image={item.product.imageCover}
                                     alt={item.product?.title || "Product"}
-                                    sx={{ 
-                                      width: 80, 
-                                      height: 80, 
-                                      objectFit: "cover", 
+                                    sx={{
+                                      width: 80,
+                                      height: 80,
+                                      objectFit: "cover",
                                       borderRadius: 1,
                                       flexShrink: 0,
                                     }}
                                   />
                                 ) : (
-                                  <Box 
-                                    sx={{ 
-                                      width: 80, 
-                                      height: 80, 
+                                  <Box
+                                    sx={{
+                                      width: 80,
+                                      height: 80,
                                       backgroundColor: theme.palette.action.hover,
                                       borderRadius: 1,
                                       display: "flex",
@@ -339,9 +339,9 @@ export default function AllOrders() {
 
                                 {/* معلومات المنتج */}
                                 <Box sx={{ flex: 1 }}>
-                                  <Typography 
-                                    sx={{ 
-                                      fontWeight: 600, 
+                                  <Typography
+                                    sx={{
+                                      fontWeight: 600,
                                       color: theme.palette.text.primary,
                                       mb: 1,
                                     }}
@@ -349,14 +349,14 @@ export default function AllOrders() {
                                     {item.product?.title || "Product"}
                                   </Typography>
                                   <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
-                                    <Chip 
-                                      label={`Qty: ${item.count || 0}`} 
-                                      size="small" 
+                                    <Chip
+                                      label={`Qty: ${item.count || 0}`}
+                                      size="small"
                                       variant="outlined"
                                     />
-                                    <Chip 
-                                      label={`$${item.price?.toFixed(2) || "0.00"}`} 
-                                      size="small" 
+                                    <Chip
+                                      label={`$${item.price?.toFixed(2) || "0.00"}`}
+                                      size="small"
                                       color="primary"
                                     />
                                   </Box>
@@ -373,8 +373,8 @@ export default function AllOrders() {
 
                       {/* معلومات الشحن الكاملة */}
                       <Divider sx={{ my: 2 }} />
-                      <Typography 
-                        variant="subtitle1" 
+                      <Typography
+                        variant="subtitle1"
                         sx={{ mb: 2, color: theme.palette.text.primary, fontWeight: 600 }}
                       >
                         🏠 Shipping Details:
@@ -393,8 +393,8 @@ export default function AllOrders() {
 
                       {/* معلومات المستخدم */}
                       <Divider sx={{ my: 2 }} />
-                      <Typography 
-                        variant="subtitle1" 
+                      <Typography
+                        variant="subtitle1"
                         sx={{ mb: 2, color: theme.palette.text.primary, fontWeight: 600 }}
                       >
                         👤 Customer Information:

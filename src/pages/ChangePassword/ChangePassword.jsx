@@ -87,103 +87,63 @@ export default function ChangePassword() {
     }
   }, [navigate]);
 
-const onSubmit = async (formData) => {
-  setLoading(true);
+  const onSubmit = async (formData) => {
+    setLoading(true);
 
-  try {
-    const token = localStorage.getItem('userToken');
-    
-    if (!token) {
-      setSnack({ open: true, message: '❌ يجب تسجيل الدخول أولاً', severity: 'error' });
-      return;
-    }
-
-    // ✅ اختبار التوكن أولاً
-    console.log('🔍 اختبار التوكن...');
     try {
-      await axios.get('https://linked-posts.routemisr.com/users/me', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      console.log('✅ التوكن سليم');
-    } catch (e) {
-      console.log('❌ التوكن منتهي - إعادة تسجيل الدخول');
-      localStorage.removeItem('userToken');
-      setSnack({ open: true, message: '❌ انتهت صلاحية الجلسة - يرجى تسجيل الدخول مرة أخرى', severity: 'warning' });
-      setTimeout(() => navigate('/login'), 2000);
-      return;
-    }
+      const token = localStorage.getItem('userToken');
 
-    // ✅ جرب الـ endpoints المختلفة
-    const endpoints = [
-      'https://linked-posts.routemisr.com/users/change-password',
-      'https://linked-posts.routemisr.com/change-password',
-      'https://linked-posts.routemisr.com/users/password',
-      'https://linked-posts.routemisr.com/api/users/change-password'
-    ];
-
-    const payloads = [
-      { currentPassword: formData.password.trim(), password: formData.newPassword.trim() },
-      { oldPassword: formData.password.trim(), newPassword: formData.newPassword.trim() },
-      { password: formData.password.trim(), newPassword: formData.newPassword.trim() },
-      { passwordCurrent: formData.password.trim(), password: formData.newPassword.trim() }
-    ];
-
-    let success = false;
-
-    // جرب كل الاحتمالات
-    for (let i = 0; i < endpoints.length; i++) {
-      for (let j = 0; j < payloads.length; j++) {
-        try {
-          console.log(`🔄 محاولة ${i+1}-${j+1}: ${endpoints[i]}`, payloads[j]);
-
-          const response = await axios.patch(endpoints[i], payloads[j], {
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json',
-            }
-          });
-
-          console.log(`✅ نجح مع endpoint ${i+1} payload ${j+1}!`, response.data);
-          success = true;
-
-          localStorage.removeItem('userToken');
-          setSnack({
-            open: true,
-            message: '✅ تم تغيير كلمة المرور بنجاح!\nسيتم تسجيل الخروج...',
-            severity: 'success',
-          });
-
-          reset();
-          setTimeout(() => navigate('/login', { replace: true }), 2500);
-          return;
-
-        } catch (error) {
-          console.log(`❌ فشل ${i+1}-${j+1}:`, error.response?.status, error.response?.data);
-          if (error.response?.status !== 401 && error.response?.status !== 400) {
-            throw error;
-          }
-        }
+      if (!token) {
+        setSnack({ open: true, message: '❌ يجب تسجيل الدخول أولاً', severity: 'error' });
+        setTimeout(() => navigate('/login'), 2000);
+        return;
       }
+
+      // ✅ استخدام الـ linked-posts API الصحيح
+      const { data } = await axios.patch(
+        'https://linked-posts.routemisr.com/users/change-password',
+        {
+          password: formData.password,        // كلمة المرور الحالية
+          newPassword: formData.newPassword,  // كلمة المرور الجديدة
+        },
+        {
+          headers: {
+            token: token,
+          },
+        }
+      );
+
+      console.log('✅ تم تغيير كلمة المرور:', data);
+
+      // حفظ التوكن الجديد لو موجود
+      if (data.token) {
+        localStorage.setItem('userToken', data.token);
+      }
+
+      setSnack({
+        open: true,
+        message: '✅ تم تغيير كلمة المرور بنجاح!',
+        severity: 'success',
+      });
+
+      reset();
+      setTimeout(() => navigate('/login', { replace: true }), 2500);
+
+    } catch (error) {
+      console.error('❌ خطأ:', error.response?.data);
+
+      let msg = '❌ فشل تغيير كلمة المرور';
+      if (error.response?.data?.message) {
+        msg = error.response.data.message;
+      } else if (error.response?.data?.error) {
+        msg = error.response.data.error;
+      }
+
+      setSnack({ open: true, message: msg, severity: 'error' });
+    } finally {
+      setLoading(false);
     }
-
-    // لو كله فشل
-    setSnack({
-      open: true,
-      message: '❌ تأكد من:\n1. تسجيل الدخول بـ email صحيح\n2. كلمة المرور الحالية\n3. اتصال الإنترنت',
-      severity: 'error',
-    });
-
-  } catch (error) {
-    console.error('❌ خطأ:', error.response?.data);
-    setSnack({
-      open: true,
-      message: error.response?.data?.message || '❌ مشكلة في الخادم',
-      severity: 'error',
-    });
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
 
   const textFieldStyle = {
