@@ -26,6 +26,7 @@ import {
   Logout,
   LightMode,
   Nightlight,
+  Lock,
 } from "@mui/icons-material";
 
 import { Link, useNavigate } from "react-router-dom";
@@ -74,6 +75,7 @@ const DrawerAppBar: React.FC<DrawerAppBarProps> = (props) => {
     setTimeout(() => navigate("/login"), 1500);
   }
 
+  // ✅ إضافة "Change Password" للقائمة
   const navItems: NavItem[] = userToken
     ? [
         { name: "Home", path: "/", icon: <Home /> },
@@ -91,6 +93,7 @@ const DrawerAppBar: React.FC<DrawerAppBarProps> = (props) => {
           numItem: numOfCartItems,
         },
         { name: "All Orders", path: "/allOrders", icon: <ListAlt /> },
+        { name: "Change Password", path: "/change-password", icon: <Lock /> }, // ✅ جديد
         { name: "LogOut", icon: <Logout /> },
       ]
     : [
@@ -113,7 +116,11 @@ const DrawerAppBar: React.FC<DrawerAppBarProps> = (props) => {
                 <ListItemText primary={item.name} />
               </ListItemButton>
             ) : (
-              <ListItemButton component={Link} to={item.path || "#"} sx={{ textAlign: "center" }}>
+              <ListItemButton 
+                component={Link} 
+                to={item.path || "#"} 
+                sx={{ textAlign: "center" }}
+              >
                 <ListItemIcon
                   sx={{
                     minWidth: "40px",
@@ -190,38 +197,36 @@ const DrawerAppBar: React.FC<DrawerAppBarProps> = (props) => {
           </IconButton>
 
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            MUI App 
+            MUI App
           </Typography>
 
+          {/* 🌙 Theme Toggle Button */}
+          <Tooltip title={mode === "light" ? "تفعيل الوضع الداكن" : "تفعيل الوضع الفاتح"}>
+            <IconButton
+              onClick={toggleTheme}
+              sx={{
+                color: "#fff",
+                transition: "all 0.3s ease",
+                "&:hover": {
+                  transform: "scale(1.1)",
+                  color: mode === "light" ? "#44433dff" : "#e9d30aff",
+                },
+              }}
+            >
+              {mode === "light" ? <Nightlight /> : <LightMode />}
+            </IconButton>
+          </Tooltip>
 
-   <Tooltip title={mode === "light" ? "تفعيل الوضع الداكن" : "تفعيل الوضع الفاتح"}>
-      <IconButton
-        onClick={toggleTheme}
-        sx={{
-          color: "#fff",
-          transition: "all 0.3s ease",
-          "&:hover": {
-            transform: "scale(1.1)",
-            color: mode === "light" ? "#44433dff" : "#e9d30aff", 
-          },
-        }}
-      >
-        {mode === "light" ? <Nightlight /> : <LightMode />}
-      </IconButton>
-    </Tooltip>
-
-
-
-
-
-
-
-
-
+          {/* 📱 Desktop Navigation */}
           <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center", gap: 2 }}>
             {navItems.map((item) =>
               item.name === "LogOut" ? (
-                <Button key={item.name} onClick={logOut} sx={{ color: "#fff" }} startIcon={item.icon}>
+                <Button 
+                  key={item.name} 
+                  onClick={logOut} 
+                  sx={{ color: "#fff" }} 
+                  startIcon={item.icon}
+                >
                   {item.name}
                 </Button>
               ) : (
@@ -229,7 +234,13 @@ const DrawerAppBar: React.FC<DrawerAppBarProps> = (props) => {
                   key={item.name}
                   component={Link}
                   to={item.path || "#"}
-                  sx={{ color: "#fff", position: "relative" }}
+                  sx={{ 
+                    color: "#fff", 
+                    position: "relative",
+                    "&:hover": {
+                      backgroundColor: "rgba(255, 255, 255, 0.1)",
+                    },
+                  }}
                   startIcon={item.icon}
                 >
                   {item.name}
@@ -276,6 +287,7 @@ const DrawerAppBar: React.FC<DrawerAppBarProps> = (props) => {
         </Toolbar>
       </AppBar>
 
+      {/* 📱 Mobile Drawer */}
       <Box component="nav">
         <Drawer
           container={container}
@@ -296,6 +308,7 @@ const DrawerAppBar: React.FC<DrawerAppBarProps> = (props) => {
         </Drawer>
       </Box>
 
+      {/* ✅ Logout Notification */}
       <Snackbar
         open={open}
         autoHideDuration={1500}

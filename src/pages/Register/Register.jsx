@@ -63,7 +63,7 @@ export default function Register() {
         gender: data.gender,
       };
 
-      await axios.post("https://ecommerce.routemisr.com/api/v1/auth/signup", payload);
+      await axios.post("https://linked-posts.routemisr.com/users/signup", payload);
       setSnack({ open: true, message: "✅ Account created successfully!", severity: "success" });
 
       setTimeout(() => {

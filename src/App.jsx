@@ -16,7 +16,10 @@ import { tokenContext } from "./Context/tokenContext";
 import UnProtectedRoutes from "./components/DirectingUsers/UnProtectedRoutes";
 import ProtectedRoutes from "./components/DirectingUsers/protectedRoutes";
 import Checkout from "./pages/Checkout/Checkout";
-
+import ForgotPass from "./pages/ForgotPass/ForgotPass";
+import VerifyResetCode from "./pages/VerifyResetCode/VerifyResetCode";
+import ResetPassword from "./pages/ResetPassword/ResetPassword";
+import ChangePassword from "./pages/ChangePassword/ChangePassword"; // ✅ استيراد
 
 function App() {
   const { setUserToken } = useContext(tokenContext);
@@ -27,23 +30,130 @@ function App() {
     }
   }, []);
 
-
-  
   const routers = createBrowserRouter([
     {
       path: "/",
       element: <LayOut />,
       children: [
-        { index: true, element: <ProtectedRoutes><Home /></ProtectedRoutes> },
-        { path: "/products", element: <ProtectedRoutes><Products /></ProtectedRoutes> },
-        { path: "/cart", element: <ProtectedRoutes><Cart /></ProtectedRoutes> },
-        { path: "/categories", element: <ProtectedRoutes><Categories /></ProtectedRoutes> },
-        { path: "/wishlist", element: <ProtectedRoutes><Wishlist /></ProtectedRoutes> },
-        { path: "/details/:id", element: <ProtectedRoutes><Details /></ProtectedRoutes> },
-        { path: "/allorders", element: <ProtectedRoutes><AllOrders /></ProtectedRoutes> },
-        { path: "/Checkout/:sessionId", element: <ProtectedRoutes><Checkout/></ProtectedRoutes> },
-        { path: "/register", element: <UnProtectedRoutes><Register /></UnProtectedRoutes> },
-{ path: "/login", element: <UnProtectedRoutes><Login /></UnProtectedRoutes> },
+        // ✅ الصفحات المحمية (تحتاج توكن)
+        {
+          index: true,
+          element: (
+            <ProtectedRoutes>
+              <Home />
+            </ProtectedRoutes>
+          ),
+        },
+        {
+          path: "/products",
+          element: (
+            <ProtectedRoutes>
+              <Products />
+            </ProtectedRoutes>
+          ),
+        },
+        {
+          path: "/cart",
+          element: (
+            <ProtectedRoutes>
+              <Cart />
+            </ProtectedRoutes>
+          ),
+        },
+        {
+          path: "/categories",
+          element: (
+            <ProtectedRoutes>
+              <Categories />
+            </ProtectedRoutes>
+          ),
+        },
+        {
+          path: "/wishlist",
+          element: (
+            <ProtectedRoutes>
+              <Wishlist />
+            </ProtectedRoutes>
+          ),
+        },
+        {
+          path: "/details/:id",
+          element: (
+            <ProtectedRoutes>
+              <Details />
+            </ProtectedRoutes>
+          ),
+        },
+        {
+          path: "/allorders",
+          element: (
+            <ProtectedRoutes>
+              <AllOrders />
+            </ProtectedRoutes>
+          ),
+        },
+        {
+          path: "/Checkout/:sessionId",
+          element: (
+            <ProtectedRoutes>
+              <Checkout />
+            </ProtectedRoutes>
+          ),
+        },
+        {
+          path: "/change-password", // ✅ صفحة تغيير كلمة المرور
+          element: (
+            <ProtectedRoutes>
+              <ChangePassword />
+            </ProtectedRoutes>
+          ),
+        },
+
+        // ✅ صفحات المصادقة (لا تحتاج توكن)
+        {
+          path: "/register",
+          element: (
+            <UnProtectedRoutes>
+              <Register />
+            </UnProtectedRoutes>
+          ),
+        },
+        {
+          path: "/login",
+          element: (
+            <UnProtectedRoutes>
+              <Login />
+            </UnProtectedRoutes>
+          ),
+        },
+
+        // ✅ صفحات استعادة كلمة المرور (لا تحتاج توكن)
+        {
+          path: "/forgot-password",
+          element: (
+            <UnProtectedRoutes>
+              <ForgotPass />
+            </UnProtectedRoutes>
+          ),
+        },
+        {
+          path: "/VerifyResetCode",
+          element: (
+            <UnProtectedRoutes>
+              <VerifyResetCode />
+            </UnProtectedRoutes>
+          ),
+        },
+        {
+          path: "/ResetPassword",
+          element: (
+            <UnProtectedRoutes>
+              <ResetPassword />
+            </UnProtectedRoutes>
+          ),
+        },
+
+        // ✅ صفحة 404
         { path: "*", element: <NotFound /> },
       ],
     },

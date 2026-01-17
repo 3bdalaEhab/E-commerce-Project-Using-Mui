@@ -19,12 +19,12 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { tokenContext } from "../../Context/tokenContext";
 import PageMeta from "../../components/PageMeta/PageMeta";
-import { useThemeContext } from "../../Context/ThemeContext"; // ✅ استدعاء الـ ThemeContext
+import { useThemeContext } from "../../Context/ThemeContext";
 
 export default function Login() {
   const { setUserToken } = useContext(tokenContext);
   const theme = useTheme();
-  const { mode } = useThemeContext(); // ✅ نقرأ وضع الثيم الحالي (light أو dark)
+  const { mode } = useThemeContext();
 
   const {
     register,
@@ -50,7 +50,7 @@ export default function Login() {
 
     try {
       const { data } = await axios.post(
-        "https://ecommerce.routemisr.com/api/v1/auth/signin",
+        "https://linked-posts.routemisr.com/users/signin",
         {
           email: formData.email.trim(),
           password: formData.password,
@@ -61,7 +61,7 @@ export default function Login() {
 
       setSnack({
         open: true,
-        message: "Logged in successfully!",
+        message: "✅ Logged in successfully!",
         severity: "success",
       });
 
@@ -71,7 +71,7 @@ export default function Login() {
           setUserToken(receivedToken);
           navigate("/");
         }
-      }, 1000);
+      }, 1500);
     } catch (err) {
       const msg =
         err.response?.data?.message ||
@@ -83,11 +83,11 @@ export default function Login() {
     }
   };
 
+  // ✅ تنسيق ديناميكي يدعم Light/Dark Mode
   const textFieldStyle = {
     mb: 2,
     "& .MuiInputBase-input": {
-      color: "black",
-      
+      color: theme.palette.text.primary,
       borderRadius: "8px",
     },
     "& .MuiFormLabel-root": {
@@ -146,31 +146,46 @@ export default function Login() {
             backgroundColor: theme.palette.background.paper,
           }}
         >
-          <Typography
-            variant="h5"
-            align="center"
-            sx={{ mb: 1, fontWeight: 700, color: theme.palette.text.primary }}
+          {/* 📌 رأس الصفحة */}
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
           >
-            Login
-          </Typography>
-          <Typography
-            variant="body2"
-            align="center"
-            sx={{ mb: 2, color: theme.palette.text.secondary }}
-          >
-            Enter your credentials
-          </Typography>
+            <Typography
+              variant="h4"
+              align="center"
+              sx={{
+                mb: 1,
+                fontWeight: 700,
+                color: theme.palette.text.primary,
+              }}
+            >
+              Welcome Back
+            </Typography>
+            <Typography
+              variant="body2"
+              align="center"
+              sx={{
+                mb: 3,
+                color: theme.palette.text.secondary,
+                lineHeight: 1.6,
+              }}
+            >
+              Sign in to your account to continue
+            </Typography>
+          </motion.div>
 
-          {/* Email Field */}
+          {/* 📧 Email Field */}
           <motion.div
             initial={{ opacity: 0, x: -25 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.3 }}
           >
             <TextField
-              label="Email"
+              label="Email Address"
               type="email"
-              autoComplete="new-email"
+              autoComplete="email"
               fullWidth
               sx={textFieldStyle}
               {...register("email", {
@@ -189,10 +204,11 @@ export default function Login() {
                   </InputAdornment>
                 ),
               }}
+              disabled={loading}
             />
           </motion.div>
 
-          {/* Password Field */}
+          {/* 🔒 Password Field */}
           <motion.div
             initial={{ opacity: 0, x: 25 }}
             animate={{ opacity: 1, x: 0 }}
@@ -201,7 +217,7 @@ export default function Login() {
             <TextField
               label="Password"
               type={showPassword ? "text" : "password"}
-              autoComplete="new-password"
+              autoComplete="current-password"
               fullWidth
               sx={textFieldStyle}
               {...register("password", {
@@ -220,22 +236,50 @@ export default function Login() {
               helperText={errors.password?.message}
               InputProps={{
                 startAdornment: (
-                  <InputAdornment bgcolor="black" position="start">
-                    <Lock  color="primary" />
+                  <InputAdornment position="start">
+                    <Lock color="primary" />
                   </InputAdornment>
                 ),
                 endAdornment: (
-                  <InputAdornment  position="end">
-                    <IconButton   onClick={togglePassword} edge="end">
-                      {showPassword ? <VisibilityOff sx={{color:"black"}} /> : <Visibility sx={{color:"black"}} />}
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={togglePassword}
+                      edge="end"
+                      sx={{
+                        color: theme.palette.text.primary,
+                      }}
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
                     </IconButton>
                   </InputAdornment>
                 ),
               }}
+              disabled={loading}
             />
           </motion.div>
 
-          {/* Submit Button */}
+          {/* 🔗 Forgot Password Link */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.45 }}
+          >
+            <Box sx={{ mb: 2, textAlign: "right" }}>
+              <Link
+                to="/forgot-password"
+                style={{
+                  textDecoration: "none",
+                  color: theme.palette.primary.main,
+                  fontSize: "0.875rem",
+                  fontWeight: 500,
+                }}
+              >
+                Forgot Password?
+              </Link>
+            </Box>
+          </motion.div>
+
+          {/* 🔘 Submit Button */}
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -246,11 +290,11 @@ export default function Login() {
               fullWidth
               disabled={loading}
               sx={{
-                mt: 2,
-                py: 1.2,
+                py: 1.3,
                 fontWeight: "bold",
                 borderRadius: "10px",
                 textTransform: "none",
+                fontSize: "1rem",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -261,13 +305,17 @@ export default function Login() {
                 color: theme.palette.getContrastText(
                   theme.palette.primary.main
                 ),
-                "&:hover": {
-                  background: loading
-                    ? "gray"
-                    : `linear-gradient(90deg, ${
-                        theme.palette.primary.dark || "#1565c0"
-                      } 0%, ${theme.palette.secondary.dark || "#1e88e5"} 100%)`,
+                "&:hover:not(:disabled)": {
+                  background: `linear-gradient(90deg, ${
+                    theme.palette.primary.dark || "#1565c0"
+                  } 0%, ${theme.palette.secondary.dark || "#1e88e5"} 100%)`,
+                  transform: "translateY(-2px)",
+                  boxShadow: `0 8px 20px ${theme.palette.primary.main}40`,
                 },
+                "&:disabled": {
+                  opacity: 0.6,
+                },
+                transition: "all 0.3s ease",
               }}
             >
               {loading ? (
@@ -276,38 +324,52 @@ export default function Login() {
                   Signing in...
                 </>
               ) : (
-                "Login"
+                "🔐 Login"
               )}
             </Button>
 
-            <Typography
-              variant="body2"
-              align="center"
-              sx={{ mt: 3, color: theme.palette.text.secondary }}
+            {/* 📝 Sign Up & Forgot Password Links */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.6 }}
             >
-              Don’t have an account?{" "}
-              <Link
-                to="/register"
-                style={{
-                  textDecoration: "none",
-                  color: theme.palette.primary.main,
-                  fontWeight: "bold",
+              <Typography
+                variant="body2"
+                align="center"
+                sx={{
+                  mt: 2.5,
+                  color: theme.palette.text.secondary,
+                  lineHeight: 1.8,
                 }}
               >
-                Create one now
-              </Link>
-            </Typography>
+                Don't have an account?{" "}
+                <Link
+                  to="/register"
+                  style={{
+                    textDecoration: "none",
+                    color: theme.palette.primary.main,
+                    fontWeight: "bold",
+                  }}
+                >
+                  Create one now
+                </Link>
+              </Typography>
+            </motion.div>
           </motion.div>
         </Paper>
       </motion.div>
 
+      {/* 🔔 Snackbar Notifications */}
       <Snackbar
         open={snack.open}
-        autoHideDuration={1000}
+        autoHideDuration={4000}
         onClose={handleSnackClose}
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       >
-        <Alert severity={snack.severity}>{snack.message}</Alert>
+        <Alert severity={snack.severity} onClose={handleSnackClose}>
+          {snack.message}
+        </Alert>
       </Snackbar>
     </Box>
   );
