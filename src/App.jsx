@@ -19,7 +19,7 @@ import Checkout from "./pages/Checkout/Checkout";
 import ForgotPass from "./pages/ForgotPass/ForgotPass";
 import VerifyResetCode from "./pages/VerifyResetCode/VerifyResetCode";
 import ResetPassword from "./pages/ResetPassword/ResetPassword";
-import ChangePassword from "./pages/ChangePassword/ChangePassword"; // ✅ استيراد
+import ChangePassword from "./pages/ChangePassword/ChangePassword";
 
 function App() {
   const { setUserToken } = useContext(tokenContext);
@@ -35,7 +35,7 @@ function App() {
       path: "/",
       element: <LayOut />,
       children: [
-        // ✅ الصفحات المحمية (تحتاج توكن)
+        // Protected Routes (Require Token)
         {
           index: true,
           element: (
@@ -101,7 +101,7 @@ function App() {
           ),
         },
         {
-          path: "/change-password", // ✅ صفحة تغيير كلمة المرور
+          path: "/change-password",
           element: (
             <ProtectedRoutes>
               <ChangePassword />
@@ -109,7 +109,7 @@ function App() {
           ),
         },
 
-        // ✅ صفحات المصادقة (لا تحتاج توكن)
+        // Authentication Routes (No Token Required)
         {
           path: "/register",
           element: (
@@ -127,7 +127,7 @@ function App() {
           ),
         },
 
-        // ✅ صفحات استعادة كلمة المرور (لا تحتاج توكن)
+        // Password Recovery Routes (No Token Required)
         {
           path: "/forgot-password",
           element: (
@@ -153,7 +153,7 @@ function App() {
           ),
         },
 
-        // ✅ صفحة 404
+        // 404 Page
         { path: "*", element: <NotFound /> },
       ],
     },

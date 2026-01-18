@@ -1,14 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import {
   Box,
   Button,
-  TextField,
   Typography,
-  Snackbar,
-  Alert,
   Autocomplete,
   CircularProgress,
   useTheme,
+  Paper,
+  Container,
 } from "@mui/material";
 import PaymentIcon from "@mui/icons-material/Payment";
 import { motion } from "framer-motion";
@@ -16,277 +15,154 @@ import { useForm, Controller } from "react-hook-form";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import PageMeta from "../../components/PageMeta/PageMeta";
+import { useToast } from "../../Context/ToastContext";
+import CustomTextField from "../../components/Common/CustomTextField";
+import LocalShippingIcon from "@mui/icons-material/LocalShipping";
+import PhoneIphoneIcon from "@mui/icons-material/PhoneIphone";
+import LocationCityIcon from "@mui/icons-material/LocationCity";
 
 export default function Checkout() {
   const theme = useTheme();
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({
-    defaultValues: {
-      details: "",
-      phone: "",
-      city: null,
-    },
+  const { sessionId } = useParams();
+  const { showToast } = useToast();
+  const [loading, setLoading] = useState(false);
+
+  const { control, handleSubmit, formState: { errors } } = useForm({
+    defaultValues: { details: "", phone: "", city: null },
   });
 
-  let { sessionId } = useParams();
-  const [toast, setToast] = useState({
-    open: false,
-    message: "",
-    type: "success",
-  });
-  const [loading, setLoading] = useState(false); // 🔹 حالة التحميل
+  const cities = ["Cairo", "Giza", "Alexandria", "Aswan", "Luxor", "Suez", "Ismailia", "Port Said", "Damietta", "Fayoum", "Minya", "Qena"];
 
-  const cities = [
-    "Cairo",
-    "Giza",
-    "Alexandria",
-    "Aswan",
-    "Luxor",
-    "Suez",
-    "Ismailia",
-    "Port Said",
-    "Damietta",
-    "Fayoum",
-    "Minya",
-    "Qena",
-  ];
-
-  const onSubmit = async (data) => {
+  const onSubmit = useCallback(async (data) => {
     try {
-      setLoading(true); // ⏳ بدء التحميل
+      setLoading(true);
       const token = localStorage.getItem("userToken");
       const { data: res } = await axios.post(
-        `https://ecommerce.routemisr.com/api/v1/orders/checkout-session/${sessionId}?url=http://localhost:3000`,
+        `https://ecommerce.routemisr.com/api/v1/orders/checkout-session/${sessionId}?url=${window.location.origin}`,
         { shippingAddress: data },
         { headers: { token } }
       );
-
       window.location.href = res.session.url;
     } catch (error) {
-      console.error(error);
-      setToast({ open: true, message: "Checkout failed", type: "error" });
+      showToast("❌ Checkout failed. Please try again.", "error");
     } finally {
-      setLoading(false); // ✅ إنهاء التحميل بعد العملية
+      setLoading(false);
     }
-  };
-
-  // 🔹 ستايل موحد للحقول
-  const commonTextFieldStyles = {
-    mb: 2,
-    "& .MuiInputBase-input": {
-      color:
-        theme.palette.mode === "dark" ? "black" : theme.palette.text.primary,
-      backgroundColor:
-        theme.palette.mode === "dark" ? theme.palette.background : "#fff",
-      borderRadius: "8px",
-    },
-    "& .MuiFormLabel-root": {
-      color:
-        theme.palette.mode === "dark"
-          ? theme.palette.primary.main
-          : theme.palette.text.secondary,
-    },
-    "& .MuiOutlinedInput-root": {
-      "& fieldset": {
-        borderColor:
-          theme.palette.mode === "dark"
-            ? "rgba(0, 0, 0, 0.4)"
-            : "rgba(0, 0, 0, 0.2)",
-      },
-      "&:hover fieldset": {
-        borderColor: theme.palette.primary.main,
-      },
-      "&.Mui-focused fieldset": {
-        borderColor: theme.palette.secondary.main,
-      },
-    },
-  };
+  }, [sessionId, showToast]);
 
   return (
-    <>
-      <PageMeta
-        key={"Checkout"}
-        title="Checkout"
-        description="Complete your order and payment securely"
-      />
-      <Box
-        sx={{
-          minHeight: "100vh",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          p: 2,
-          backgroundColor: theme.palette.background.default,
-          color: theme.palette.text.primary,
-        }}
-      >
+    <Box sx={{ bgcolor: "background.default", minHeight: "100vh", py: 10, display: "flex", alignItems: "center" }}>
+      <PageMeta title="Checkout" description="Secure payment and delivery details." />
+
+      <Container maxWidth="sm">
         <motion.div
-          initial="hidden"
-          animate="visible"
-          variants={{
-            hidden: { opacity: 0, y: 30 },
-            visible: { opacity: 1, y: 0 },
-          }}
-          transition={{ duration: 0.5 }}
-          style={{
-            maxWidth: 500,
-            width: "100%",
-            background: theme.palette.background.paper,
-            padding: 32,
-            borderRadius: 24,
-            boxShadow: "0 10px 35px rgba(0,0,0,0.15)",
-          }}
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
         >
-          <Typography
-            variant="h4"
-            fontWeight="bold"
-            mb={3}
-            textAlign="center"
-            color={theme.palette.text.primary}
-          >
-            🛒 Checkout
-          </Typography>
-
-          {/* Details */}
-          <Controller
-            name="details"
-            control={control}
-            rules={{ required: "Details required" }}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                label="Details"
-                fullWidth
-                error={!!errors.details}
-                helperText={errors.details?.message}
-                autoComplete="off"
-                sx={commonTextFieldStyles}
-              />
-            )}
-          />
-
-          {/* Phone */}
-          <Controller
-            name="phone"
-            control={control}
-            rules={{
-              required: "Phone required",
-              pattern: {
-                value: /^\d{11}$/,
-                message: "Phone must be 11 digits",
-              },
+          <Paper
+            elevation={0}
+            sx={{
+              p: { xs: 3, sm: 6 },
+              borderRadius: "24px",
+              bgcolor: "background.paper",
+              border: `1px solid ${theme.palette.divider}`,
+              boxShadow: theme.palette.mode === "dark"
+                ? "0 20px 60px rgba(0,0,0,0.5)"
+                : "0 20px 60px rgba(0,0,0,0.05)",
             }}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                label="Phone"
-                fullWidth
-                error={!!errors.phone}
-                helperText={errors.phone?.message}
-                autoComplete="off"
-                sx={commonTextFieldStyles}
-              />
-            )}
-          />
+          >
+            <Box sx={{ textAlign: "center", mb: 5 }}>
+              <Typography variant="h3" fontWeight="900" sx={{ mb: 1, letterSpacing: -1 }}>
+                Checkout
+              </Typography>
+              <Typography variant="body1" color="text.secondary">
+                Complete your order details below
+              </Typography>
+            </Box>
 
-          {/* City */}
-          <Controller
-            name="city"
-            control={control}
-            rules={{ required: "City required" }}
-            render={({ field }) => (
-              <Autocomplete
-                {...field}
-                options={cities}
-                value={field.value}
-                onChange={(_, value) => field.onChange(value)}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="City"
-                    fullWidth
-                    error={!!errors.city}
-                    helperText={errors.city?.message}
-                    sx={{
-                      ...commonTextFieldStyles,
-                      "& .MuiAutocomplete-popupIndicator": {
-                        color: "black",
-                        fontSize: 28,
-                      },
-                    }}
+            <form onSubmit={handleSubmit(onSubmit)}>
+              <Controller
+                name="details"
+                control={control}
+                rules={{ required: "Address details are required" }}
+                render={({ field }) => (
+                  <CustomTextField
+                    {...field}
+                    label="Shipping Address"
+                    placeholder="Street name, building number, etc."
+                    icon={LocalShippingIcon}
+                    error={!!errors.details}
+                    helperText={errors.details?.message}
                   />
                 )}
               />
-            )}
-          />
 
-          {/* Submit Button */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.4 }}
-          >
-            <Button
-              onClick={handleSubmit(onSubmit)}
-              fullWidth
-              startIcon={!loading && <PaymentIcon />}
-              disabled={loading} // 🔹 تعطيل الزرار وقت التحميل
-              sx={{
-                py: 1.5,
-                fontWeight: "bold",
-                borderRadius: "12px",
-                textTransform: "none",
-                background: loading
-                  ? "gray"
-                  : `linear-gradient(90deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
-                color: theme.palette.getContrastText(
-                  theme.palette.primary.main
-                ),
-                "&:hover": {
-                  background: loading
-                    ? "gray"
-                    : `linear-gradient(90deg, ${
-                        theme.palette.primary.dark || "#1565c0"
-                      } 0%, ${theme.palette.secondary.dark || "#1e88e5"} 100%)`,
-                },
-              }}
-            >
-              {loading ? (
-                <>
-                  <CircularProgress size={22} color="inherit" sx={{ mr: 1 }} />
-                  Loading...
-                </>
-              ) : (
-                "Proceed to Payment"
-              )}
-            </Button>
-          </motion.div>
+              <Controller
+                name="phone"
+                control={control}
+                rules={{
+                  required: "Phone number is required",
+                  pattern: { value: /^\d{11}$/, message: "Please enter a valid 11-digit phone number" }
+                }}
+                render={({ field }) => (
+                  <CustomTextField
+                    {...field}
+                    label="Phone Number"
+                    placeholder="01xxxxxxxxx"
+                    icon={PhoneIphoneIcon}
+                    error={!!errors.phone}
+                    helperText={errors.phone?.message}
+                  />
+                )}
+              />
 
-          {/* Toast */}
-          <Snackbar
-            open={toast.open}
-            autoHideDuration={2500}
-            onClose={() => setToast({ ...toast, open: false })}
-            anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-          >
-            <Alert
-              severity={toast.type}
-              onClose={() => setToast({ ...toast, open: false })}
-              variant="filled"
-              sx={{
-                fontSize: "1rem",
-                fontWeight: "bold",
-                borderRadius: "10px",
-              }}
-            >
-              {toast.message}
-            </Alert>
-          </Snackbar>
+              <Controller
+                name="city"
+                control={control}
+                rules={{ required: "Selecting a city is required" }}
+                render={({ field }) => (
+                  <Autocomplete
+                    {...field}
+                    options={cities}
+                    onChange={(_, value) => field.onChange(value)}
+                    renderInput={(params) => (
+                      <CustomTextField
+                        {...params}
+                        label="City"
+                        icon={LocationCityIcon}
+                        error={!!errors.city}
+                        helperText={errors.city?.message}
+                      />
+                    )}
+                  />
+                )}
+              />
+
+              <Button
+                type="submit"
+                fullWidth
+                disabled={loading}
+                variant="contained"
+                size="large"
+                startIcon={!loading && <PaymentIcon />}
+                sx={{
+                  mt: 3, py: 2, borderRadius: "14px", fontWeight: "bold", fontSize: "1.1rem",
+                  textTransform: "none",
+                  background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                  "&:hover": { transform: "scale(1.02)", boxShadow: theme.shadows[10] }
+                }}
+              >
+                {loading ? <CircularProgress size={24} color="inherit" /> : "Proceed to Secure Payment"}
+              </Button>
+            </form>
+
+            <Typography variant="body2" color="text.secondary" textAlign="center" sx={{ mt: 4 }}>
+              🔒 Secure SSL Encryption • Trusted Payment Gateway
+            </Typography>
+          </Paper>
         </motion.div>
-      </Box>
-    </>
+      </Container>
+    </Box>
   );
 }

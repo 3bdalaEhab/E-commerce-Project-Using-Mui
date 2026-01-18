@@ -10,11 +10,16 @@ import {
   Divider,
   Chip,
   useTheme,
-  Snackbar,
-  Alert,
+  Stack,
+  Container,
+  Paper,
+  Grid,
+  IconButton,
+  CircularProgress,
 } from "@mui/material";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Autoplay } from "swiper/modules";
 import "swiper/css";
@@ -23,11 +28,14 @@ import "swiper/css/pagination";
 import Loading from "../../components/Loading/Loading";
 import { CartContext } from "../../Context/CartContext";
 import PageMeta from "../../components/PageMeta/PageMeta";
+import { useToast } from "../../Context/ToastContext";
 
 export default function Details() {
   const { id } = useParams();
   const theme = useTheme();
   const { addToCart } = useContext(CartContext);
+  const { showToast } = useToast();
+  const [loading, setLoading] = useState(false);
 
   const getDetails = async () => {
     const { data } = await axios.get(
@@ -41,37 +49,17 @@ export default function Details() {
     queryFn: getDetails,
   });
 
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: "",
-    severity: "success",
-  });
-  const [loading, setLoading] = useState(false);
-
   async function addCart() {
     try {
       setLoading(true);
-      const data = await addToCart(id);
-
-      if (data?.status === "success") {
-        setSnackbar({
-          open: true,
-          message: data.message || "Product added successfully to your cart",
-          severity: "success",
-        });
+      const res = await addToCart(id);
+      if (res?.status === "success") {
+        showToast("✨ Product added to your premium collection!", "success");
       } else {
-        setSnackbar({
-          open: true,
-          message: data?.message || "Failed to add product to your cart",
-          severity: "error",
-        });
+        showToast(res?.message || "Failed to add product.", "error");
       }
     } catch {
-      setSnackbar({
-        open: true,
-        message: "Server error. Please try again later.",
-        severity: "error",
-      });
+      showToast("❌ Connection error. Please try again.", "error");
     } finally {
       setLoading(false);
     }
@@ -81,272 +69,122 @@ export default function Details() {
 
   if (isError)
     return (
-      <Box sx={{ p: 4 }}>
-        <Typography color="error" fontWeight="bold">
-          Error: {error.message}
-        </Typography>
-      </Box>
+      <Container maxWidth="md" sx={{ py: 10 }}>
+        <Alert severity="error" sx={{ borderRadius: "16px" }}>
+          <strong>Error loading product details:</strong> {error?.message}
+        </Alert>
+      </Container>
     );
 
   const allImages = [data.imageCover, ...(data.images || [])];
 
   return (
-    <>
-      <PageMeta
-        key={"Product Details"}
-        title="Product Details"
-        description="Detailed information about the selected product"
-      />
+    <Box sx={{ bgcolor: "background.default", minHeight: "100vh", pb: 10 }}>
+      <PageMeta title={data.title} description={data.description.slice(0, 160)} />
 
-      <Box
-        component={motion.div}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.8 }}
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          py: { xs: 3, md: 6 },
-          px: { xs: 2, sm: 4 },
-          minHeight: "100vh",
-          background:
-            theme.palette.mode === "dark"
-              ? theme.palette.background.default
-              : "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
-        }}
-      >
-        <Box
-          component={motion.div}
-          initial={{ scale: 0.95, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.8 }}
+      <Container maxWidth="lg" sx={{ pt: { xs: 5, md: 10 } }}>
+        <Paper
+          elevation={0}
           sx={{
-            display: "flex",
-            flexDirection: { xs: "column", md: "row" },
-            gap: { xs: 3, md: 5 },
-            backgroundColor: theme.palette.background.paper,
-            borderRadius: 4,
-            boxShadow:
-              theme.palette.mode === "dark"
-                ? "0 10px 25px rgba(255,255,255,0.08)"
-                : "0 10px 35px rgba(0,0,0,0.1)",
+            borderRadius: "32px",
             overflow: "hidden",
-            maxWidth: 1000,
-            width: "100%",
-            p: { xs: 2, sm: 3, md: 4 },
+            border: `1px solid ${theme.palette.divider}`,
+            bgcolor: "background.paper",
+            boxShadow: theme.palette.mode === 'dark' ? "0 20px 60px rgba(0,0,0,0.5)" : "0 20px 60px rgba(0,0,0,0.05)",
           }}
         >
-          {/* 🖼️ Slider */}
-          <Box
-            sx={{
-              flex: 1,
-              position: "relative",
-              minWidth: { xs: "100%", md: "45%" },
-            }}
-          >
-            <Swiper
-              modules={[Navigation, Pagination, Autoplay]}
-              navigation
-              pagination={{ clickable: true }}
-              autoplay={{ delay: 2500 }}
-              loop
-              style={{ borderRadius: "16px" }}
-            >
-              {allImages.map((img, index) => (
-                <SwiperSlide key={index}>
-                  <motion.img
-                    src={img}
-                    alt={`Product image ${index + 1}`}
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      maxHeight: "450px",
-                      objectFit: "cover",
-                      borderRadius: "12px",
-                      cursor: "grab",
-                      backgroundColor: theme.palette.background.default,
-                    }}
-                    whileHover={{ scale: 1.03 }}
-                    transition={{ duration: 0.4 }}
-                  />
-                </SwiperSlide>
-              ))}
-            </Swiper>
-          </Box>
-
-          {/* 📋 Product Details */}
-          <Box
-            sx={{
-              flex: 1,
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              textAlign: { xs: "center", md: "left" },
-              p: { xs: 1, sm: 2 },
-              color: theme.palette.text.primary,
-            }}
-          >
-            <Typography
-              variant="h5"
-              fontWeight="bold"
-              gutterBottom
-              sx={{ color: theme.palette.primary.main }}
-            >
-              {data.title}
-            </Typography>
-
-            <Divider
-              sx={{
-                mb: 2,
-                mx: { xs: "auto", md: 0 },
-                width: "70px",
-                borderBottomWidth: 3,
-                borderColor: theme.palette.primary.main,
-              }}
-            />
-
-            <Typography
-              variant="body1"
-              sx={{ mb: 3, lineHeight: 1.7, color: theme.palette.text.secondary }}
-            >
-              {data.description}
-            </Typography>
-
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: { xs: "center", md: "flex-start" },
-                flexWrap: "wrap",
-                alignItems: "center",
-                gap: 1.5,
-                mb: 2,
-              }}
-            >
-              <Chip
-                label={data.category.name}
-                color="primary"
-                variant={
-                  theme.palette.mode === "dark" ? "filled" : "outlined"
-                }
-                sx={{ fontWeight: "bold" }}
-              />
-              {data.brand?.name && (
+          <Grid container>
+            {/* Image Gallery */}
+            <Grid item xs={12} md={6} sx={{ p: { xs: 2, md: 4 }, borderRight: { md: `1px solid ${theme.palette.divider}` } }}>
+              <Box sx={{ position: 'relative' }}>
+                <Swiper
+                  modules={[Navigation, Pagination, Autoplay]}
+                  navigation
+                  pagination={{ clickable: true }}
+                  autoplay={{ delay: 4000 }}
+                  loop
+                  style={{ borderRadius: "24px", overflow: 'hidden' }}
+                >
+                  {allImages.map((img, index) => (
+                    <SwiperSlide key={index}>
+                      <Box sx={{ height: { xs: 350, md: 500 }, bgcolor: 'action.hover' }}>
+                        <img
+                          src={img}
+                          alt={data.title}
+                          style={{ width: "100%", height: "100%", objectFit: "contain" }}
+                        />
+                      </Box>
+                    </SwiperSlide>
+                  ))}
+                </Swiper>
                 <Chip
-                  label={data.brand.name}
-                  color="secondary"
-                  variant={
-                    theme.palette.mode === "dark" ? "filled" : "outlined"
-                  }
-                  sx={{ fontWeight: "bold" }}
+                  label="PREMIUM"
+                  sx={{ position: 'absolute', top: 20, left: 20, zIndex: 2, bgcolor: 'rgba(0,0,0,0.6)', color: 'white', backdropFilter: 'blur(8px)', fontWeight: 900, borderRadius: '8px' }}
                 />
-              )}
-            </Box>
+              </Box>
+            </Grid>
 
-            <Typography
-              variant="h6"
-              fontWeight="bold"
-              sx={{
-                mb: 2,
-                color:theme.palette.primary.main
-                
-              }}
-            >
-              💰 ${data.price}
-            </Typography>
+            {/* Content */}
+            <Grid item xs={12} md={6}>
+              <Box sx={{ p: { xs: 4, md: 6 }, height: '100%', display: 'flex', flexDirection: 'column' }}>
+                <Stack spacing={2} mb={4}>
+                  <Stack direction="row" spacing={1}>
+                    <Chip label={data.category.name} size="small" variant="outlined" sx={{ fontWeight: 800, borderRadius: '8px' }} />
+                    {data.brand && <Chip label={data.brand.name} size="small" variant="outlined" sx={{ fontWeight: 800, borderRadius: '8px' }} />}
+                  </Stack>
+                  <Typography variant="h3" fontWeight="1000" sx={{ letterSpacing: -1.5, lineHeight: 1.1 }}>
+                    {data.title}
+                  </Typography>
+                  <Stack direction="row" spacing={1} alignItems="center">
+                    <Rating value={data.ratingsAverage} precision={0.1} readOnly sx={{ color: 'primary.main' }} />
+                    <Typography variant="body2" fontWeight="700">({data.ratingsAverage.toFixed(1)} Rating)</Typography>
+                  </Stack>
+                </Stack>
 
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: { xs: "center", md: "flex-start" },
-                alignItems: "center",
-                gap: 1,
-                mb: 3,
-              }}
-            >
-              <Rating
-                value={data.ratingsAverage}
-                precision={0.1}
-                readOnly
-                sx={{
-                  "& .MuiRating-iconFilled": {
-                    color: theme.palette.warning.main,
-                  },
-                }}
-              />
-              <Typography variant="body1">
-                {data.ratingsAverage.toFixed(1)} / 5
-              </Typography>
-            </Box>
+                <Typography variant="body1" color="text.secondary" sx={{ mb: 4, lineHeight: 1.8, flex: 1 }}>
+                  {data.description}
+                </Typography>
 
-            <Box sx={{ textAlign: { xs: "center", md: "left" } }}>
-              <Button
-                component={motion.button}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                startIcon={<ShoppingCartIcon />}
-                variant="contained"
-                size="large"
-                disabled={loading}
-                sx={{
-                  px: 5,
-                  py: 1.3,
-                  fontSize: "1rem",
-                  textTransform: "none",
-                  borderRadius: "12px",
-                  background: loading
-                    ? "gray"
-                    : `linear-gradient(90deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
-                  color: theme.palette.getContrastText(
-                    theme.palette.primary.main
-                  ),
-                  boxShadow:
-                    theme.palette.mode === "dark"
-                      ? "0 6px 20px rgba(255,255,255,0.1)"
-                      : "0 6px 20px rgba(25,118,210,0.3)",
-                  "&:hover": {
-                    background: loading
-                      ? "gray"
-                      : `linear-gradient(90deg, ${
-                          theme.palette.primary.dark
-                        } 0%, ${theme.palette.secondary.dark} 100%)`,
-                  },
-                }}
-                onClick={addCart}
-              >
-                {loading ? "Loading..." : "Add to Cart"}
-              </Button>
-            </Box>
+                <Divider sx={{ mb: 4, opacity: 0.5 }} />
 
-            {/* Snackbar */}
-            <Snackbar
-              open={snackbar.open}
-              autoHideDuration={3000}
-              onClose={() => setSnackbar({ ...snackbar, open: false })}
-              anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-            >
-              <Alert
-                onClose={() => setSnackbar({ ...snackbar, open: false })}
-                severity={snackbar.severity}
-                sx={{
-                  width: "100%",
-                  fontSize: "1rem",
-                  fontWeight: "bold",
-                  backgroundColor:
-                    snackbar.severity === "success"
-                      ? theme.palette.success.main
-                      : theme.palette.error.main,
-                  color: theme.palette.getContrastText(
-                    theme.palette.error.main
-                  ),
-                }}
-              >
-                {snackbar.message}
-              </Alert>
-            </Snackbar>
-          </Box>
-        </Box>
-      </Box>
-    </>
+                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3} alignItems={{ xs: 'flex-start', sm: 'center' }}>
+                  <Box>
+                    <Typography variant="caption" color="text.secondary" fontWeight="800" sx={{ textTransform: 'uppercase' }}>Price</Typography>
+                    <Typography variant="h3" fontWeight="1000" color="primary">
+                      ${data.price}
+                    </Typography>
+                  </Box>
+
+                  <Stack direction="row" spacing={2} sx={{ width: '100%' }}>
+                    <Button
+                      fullWidth
+                      variant="contained"
+                      size="large"
+                      startIcon={!loading && <ShoppingCartIcon />}
+                      disabled={loading}
+                      onClick={addCart}
+                      sx={{
+                        borderRadius: "14px",
+                        py: 2,
+                        fontWeight: "900",
+                        textTransform: "none",
+                        fontSize: "1.1rem",
+                        background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                        "&:hover": { transform: "translateY(-4px)", boxShadow: theme.shadows[10] }
+                      }}
+                    >
+                      {loading ? <CircularProgress size={24} color="inherit" /> : "Add to Cart"}
+                    </Button>
+                    <IconButton sx={{ bgcolor: 'action.hover', borderRadius: '14px', width: 60, height: 60 }}>
+                      <FavoriteBorderIcon />
+                    </IconButton>
+                  </Stack>
+                </Stack>
+              </Box>
+            </Grid>
+          </Grid>
+        </Paper>
+      </Container>
+    </Box>
   );
 }
