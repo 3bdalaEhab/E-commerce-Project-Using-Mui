@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect, useCallback } from "react";
 import axios from "axios";
 
 // 🔹 Create Wishlist Context
@@ -26,7 +26,7 @@ export function WishlistProvider({ children }) {
   });
 
   // 🔹 Fetch all wishlist items
-  const getWishlist = async () => {
+  const getWishlist = useCallback(async () => {
     if (!token) return; // stop if user not logged in
     try {
       setLoading(true);
@@ -39,10 +39,10 @@ export function WishlistProvider({ children }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [token]);
 
   // 🔹 Add product to wishlist
-  const addToWishlist = async (productId) => {
+  const addToWishlist = useCallback(async (productId) => {
     if (!token) return;
     try {
       const { data } = await api.post("/", { productId }); // send POST request to add
@@ -52,10 +52,10 @@ export function WishlistProvider({ children }) {
     } catch (error) {
       console.error("❌ Error adding to wishlist:", error);
     }
-  };
+  }, [token]);
 
   // 🔹 Remove product from wishlist
-  const removeFromWishlist = async (productId) => {
+  const removeFromWishlist = useCallback(async (productId) => {
     if (!token) return;
     try {
       await api.delete(`/${productId}`); // delete from API
@@ -65,12 +65,12 @@ export function WishlistProvider({ children }) {
     } catch (error) {
       console.error("❌ Error removing from wishlist:", error);
     }
-  };
+  }, [token]);
 
   // 🔹 Fetch wishlist once on mount or when token changes
   useEffect(() => {
     if (token) getWishlist();
-  }, [token]);
+  }, [token, getWishlist]);
 
   // 🔹 Provide all states and functions to children components
   return (

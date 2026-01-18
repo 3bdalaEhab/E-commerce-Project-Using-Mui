@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useState } from "react";
+import React, { createContext, useEffect, useState, useCallback } from "react";
 import axios from "axios";
 
 export const CartContext = createContext();
@@ -7,7 +7,22 @@ export default function CartContextProvider({ children }) {
   const token = localStorage.getItem("userToken");
   const [numOfCartItems, setNumOfCartItems] = useState(0);
 
-  async function addToCart(productId) {
+  const getCart = useCallback(async () => {
+    if (!token) return;
+    try {
+      const { data } = await axios.get(
+        "https://ecommerce.routemisr.com/api/v1/cart",
+        { headers: { token } }
+      );
+      setNumOfCartItems(data.numOfCartItems ?? 0);
+      return data;
+    } catch (error) {
+      console.error("Error fetching cart:", error);
+      throw error;
+    }
+  }, [token]);
+
+  const addToCart = useCallback(async (productId) => {
     try {
       const { data } = await axios.post(
         "https://ecommerce.routemisr.com/api/v1/cart",
@@ -18,23 +33,26 @@ export default function CartContextProvider({ children }) {
       return data;
     } catch (error) {
       console.error("Error adding to cart:", error);
+      throw error;
     }
-  }
+  }, [token]);
 
-  async function updateItem({ id, count }) {
+  const updateItem = useCallback(async ({ id, count }) => {
     try {
       const { data } = await axios.put(
         `https://ecommerce.routemisr.com/api/v1/cart/${id}`,
         { count },
         { headers: { token } }
       );
+      setNumOfCartItems(data.numOfCartItems ?? 0);
       return data;
     } catch (error) {
       console.error("Error updating item:", error);
+      throw error;
     }
-  }
+  }, [token]);
 
-  async function removeSpecificItem(productId) {
+  const removeSpecificItem = useCallback(async (productId) => {
     try {
       const { data } = await axios.delete(
         `https://ecommerce.routemisr.com/api/v1/cart/${productId}`,
@@ -44,10 +62,11 @@ export default function CartContextProvider({ children }) {
       return data;
     } catch (error) {
       console.error("Error removing item:", error);
+      throw error;
     }
-  }
+  }, [token]);
 
-  async function removeAllItems() {
+  const removeAllItems = useCallback(async () => {
     try {
       const { data } = await axios.delete(
         "https://ecommerce.routemisr.com/api/v1/cart",
@@ -57,25 +76,13 @@ export default function CartContextProvider({ children }) {
       return data;
     } catch (error) {
       console.error("Error clearing cart:", error);
+      throw error;
     }
-  }
-
-  async function getCart() {
-    try {
-      const { data } = await axios.get(
-        "https://ecommerce.routemisr.com/api/v1/cart",
-        { headers: { token } }
-      );
-      setNumOfCartItems(data.numOfCartItems ?? 0);
-      return data;
-    } catch (error) {
-      console.error("Error fetching cart:", error);
-    }
-  }
+  }, [token]);
 
   useEffect(() => {
     if (token) getCart();
-  }, [token]);
+  }, [token, getCart]);
 
   return (
     <CartContext.Provider

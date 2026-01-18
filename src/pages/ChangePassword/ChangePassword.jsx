@@ -59,11 +59,12 @@ export default function ChangePassword() {
     setLoading(true);
     try {
       const token = localStorage.getItem("userToken");
-      const { data } = await axios.patch(
-        "https://linked-posts.routemisr.com/users/change-password",
+      const { data } = await axios.put(
+        "https://ecommerce.routemisr.com/api/v1/users/changeMyPassword",
         {
-          password: formData.password,
-          newPassword: formData.newPassword,
+          currentPassword: formData.password,
+          password: formData.newPassword,
+          rePassword: formData.passwordConfirm
         },
         { headers: { token } }
       );

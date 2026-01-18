@@ -13,7 +13,7 @@ import ListItemText from "@mui/material/ListItemText";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
-import { Tooltip, useTheme, CircularProgress } from "@mui/material";
+import { Tooltip, useTheme } from "@mui/material";
 import {
   Menu,
   MenuItem,
@@ -33,13 +33,10 @@ import {
   LightMode,
   Nightlight,
   Lock as LockIcon,
-  ExpandMore,
-  PhotoCamera,
 } from "@mui/icons-material";
 
 import { Link, useNavigate } from "react-router-dom";
-import { useContext, useRef, useState, useEffect } from "react";
-import axios from "axios";
+import { useContext } from "react";
 import { tokenContext } from "../../Context/tokenContext";
 import { CartContext } from "../../Context/CartContext";
 import { WishlistContext } from "../../Context/WishlistContext";
@@ -75,18 +72,6 @@ const DrawerAppBar: React.FC<DrawerAppBarProps> = (props) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const isMenuOpen = Boolean(anchorEl);
 
-  // Profile Photo States
-  const [uploading, setUploading] = useState(false);
-  const [profilePic, setProfilePic] = useState<string | null>(localStorage.getItem("userPhoto"));
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    if (!userToken) {
-      setProfilePic(null);
-      localStorage.removeItem("userPhoto");
-    }
-  }, [userToken]);
-
   const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -97,64 +82,14 @@ const DrawerAppBar: React.FC<DrawerAppBarProps> = (props) => {
 
   const handleDrawerToggle = () => setMobileOpen((prev) => !prev);
 
-  const triggerFileUpload = () => {
-    fileInputRef.current?.click();
-    handleMenuClose();
-  };
-
-  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    // Validation
-    if (!file.type.startsWith("image/")) {
-      showToast("Please select an image file", "error");
-      return;
-    }
-    if (file.size > 4 * 1024 * 1024) {
-      showToast("File size must be less than 4MB", "error");
-      return;
-    }
-
-    setUploading(true);
-    const formData = new FormData();
-    formData.append("photo", file);
-
-    try {
-      const { data } = await axios.put(
-        "https://linked-posts.routemisr.com/users/upload-photo",
-        formData,
-        {
-          headers: {
-            token: userToken,
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-
-      if (data.message === "success") {
-        const photoUrl = data.user.photo;
-        setProfilePic(photoUrl);
-        localStorage.setItem("userPhoto", photoUrl);
-        showToast("✅ Profile photo updated!", "success");
-      }
-    } catch (err: any) {
-      const msg = err.response?.data?.message || "Failed to upload photo";
-      showToast(msg, "error");
-    } finally {
-      setUploading(false);
-      // Reset input
-      if (fileInputRef.current) fileInputRef.current.value = "";
-    }
-  };
-
   function logOut() {
     try {
       localStorage.removeItem("userToken");
-      localStorage.removeItem("userPhoto");
-    } catch (err) { }
+    } catch (err) {
+      console.error("Logout error:", err);
+    }
     setUserToken(null);
-    setProfilePic(null);
+    handleMenuClose();
     showToast("Logged out successfully 👋", "success");
     setTimeout(() => navigate("/login"), 1500);
   }
@@ -263,15 +198,6 @@ const DrawerAppBar: React.FC<DrawerAppBarProps> = (props) => {
   return (
     <Box sx={{ display: "flex", height: 65 }}>
       <CssBaseline />
-
-      {/* Hidden File Input */}
-      <input
-        type="file"
-        hidden
-        ref={fileInputRef}
-        onChange={handleFileChange}
-        accept="image/*"
-      />
 
       <AppBar
         component="nav"
@@ -391,34 +317,17 @@ const DrawerAppBar: React.FC<DrawerAppBarProps> = (props) => {
                     aria-haspopup="true"
                     aria-expanded={isMenuOpen ? 'true' : undefined}
                   >
-                    <Box sx={{ position: "relative", display: "flex" }}>
-                      <Avatar
-                        src={profilePic || undefined}
-                        sx={{
-                          width: 32,
-                          height: 32,
-                          bgcolor: theme.palette.primary.main,
-                          fontSize: '0.9rem',
-                          fontWeight: 700,
-                          opacity: uploading ? 0.5 : 1
-                        }}
-                      >
-                        {!profilePic && "U"}
-                      </Avatar>
-                      {uploading && (
-                        <CircularProgress
-                          size={32}
-                          sx={{
-                            color: theme.palette.primary.main,
-                            position: "absolute",
-                            top: 0,
-                            left: 0,
-                            zIndex: 1,
-                          }}
-                        />
-                      )}
-                    </Box>
-                    <ExpandMore sx={{ fontSize: '1rem', ml: 0.5, color: theme.palette.text.secondary }} />
+                    <Avatar
+                      sx={{
+                        width: 32,
+                        height: 32,
+                        bgcolor: theme.palette.primary.main,
+                        fontSize: '0.9rem',
+                        fontWeight: 700,
+                      }}
+                    >
+                      U
+                    </Avatar>
                   </IconButton>
                 </Tooltip>
               </Box>
@@ -460,24 +369,6 @@ const DrawerAppBar: React.FC<DrawerAppBarProps> = (props) => {
               anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
             >
               <MenuItem
-                onClick={triggerFileUpload}
-                disabled={uploading}
-                sx={{
-                  py: 1.2,
-                  px: 2,
-                  borderRadius: 1.5,
-                  mb: 0.5,
-                  transition: 'all 0.2s',
-                  '&:hover': { bgcolor: mode === 'light' ? '#f1f5f9' : '#334155' }
-                }}
-              >
-                <ListItemIcon>
-                  <PhotoCamera fontSize="small" />
-                </ListItemIcon>
-                <Typography variant="body2" fontWeight={600}>Change Photo</Typography>
-              </MenuItem>
-
-              <MenuItem
                 component={Link}
                 to="/change-password"
                 onClick={handleMenuClose}
@@ -499,7 +390,7 @@ const DrawerAppBar: React.FC<DrawerAppBarProps> = (props) => {
               <Divider sx={{ my: 1, opacity: 0.6 }} />
 
               <MenuItem
-                onClick={() => { logOut(); handleMenuClose(); }}
+                onClick={logOut}
                 sx={{
                   py: 1.2,
                   px: 2,

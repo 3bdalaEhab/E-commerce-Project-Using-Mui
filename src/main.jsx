@@ -8,7 +8,19 @@ import CartContextProvider from "./Context/CartContext.jsx";
 import { WishlistProvider } from "./Context/WishlistContext.jsx";
 import ThemeContextProvider from "./Context/ThemeContext.jsx";
 import { ToastProvider } from "./Context/ToastContext.jsx";
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: Infinity,    // Never consider data stale
+      gcTime: Infinity,       // Never garbage collect
+      refetchOnWindowFocus: false,
+      refetchOnMount: false,  // Don't refetch on component mount
+      refetchOnReconnect: false,
+      retry: 1,
+    },
+  },
+});
+
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>

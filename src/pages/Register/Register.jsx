@@ -14,12 +14,12 @@ import {
 } from "@mui/material";
 import {
   Email,
+  Person,
   Lock,
   Visibility,
   VisibilityOff,
-  Person,
-  CalendarToday,
   Wc,
+  Phone as PhoneIcon,
 } from "@mui/icons-material";
 import { Link, useNavigate } from "react-router-dom";
 import { useToast } from "../../Context/ToastContext";
@@ -172,7 +172,7 @@ export default function Register() {
         {/* 📞 Phone Field */}
         <CustomTextField
           label="Phone Number"
-          icon={CalendarToday}
+          icon={PhoneIcon}
           {...register("phone", {
             required: "Phone is required",
             pattern: {
