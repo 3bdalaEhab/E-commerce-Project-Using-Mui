@@ -60,21 +60,17 @@ function App() {
                 {
                     index: true,
                     element: (
-                        <ProtectedRoutes>
-                            <SuspenseWrapper>
-                                <Home />
-                            </SuspenseWrapper>
-                        </ProtectedRoutes>
+                        <SuspenseWrapper>
+                            <Home />
+                        </SuspenseWrapper>
                     ),
                 },
                 {
                     path: '/products',
                     element: (
-                        <ProtectedRoutes>
-                            <SuspenseWrapper>
-                                <Products />
-                            </SuspenseWrapper>
-                        </ProtectedRoutes>
+                        <SuspenseWrapper>
+                            <Products />
+                        </SuspenseWrapper>
                     ),
                 },
                 {
@@ -90,11 +86,9 @@ function App() {
                 {
                     path: '/categories',
                     element: (
-                        <ProtectedRoutes>
-                            <SuspenseWrapper>
-                                <Categories />
-                            </SuspenseWrapper>
-                        </ProtectedRoutes>
+                        <SuspenseWrapper>
+                            <Categories />
+                        </SuspenseWrapper>
                     ),
                 },
                 {
@@ -110,11 +104,9 @@ function App() {
                 {
                     path: '/details/:id',
                     element: (
-                        <ProtectedRoutes>
-                            <SuspenseWrapper>
-                                <Details />
-                            </SuspenseWrapper>
-                        </ProtectedRoutes>
+                        <SuspenseWrapper>
+                            <Details />
+                        </SuspenseWrapper>
                     ),
                 },
                 {

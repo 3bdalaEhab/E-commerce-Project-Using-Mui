@@ -1,7 +1,8 @@
 import React, { useContext, useEffect, useCallback } from "react";
 import { WishlistContext, CartContext, useToast } from "../../Context";
 import ProductCard from "../../components/Common/ProductCard";
-Box,
+import {
+    Box,
     Typography,
     Grid,
     Container,

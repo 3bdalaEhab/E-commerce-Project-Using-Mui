@@ -15,20 +15,20 @@ import {
     Card,
     CardContent,
     IconButton,
-    Divider
+    CircularProgress
 } from "@mui/material";
 import PersonIcon from "@mui/icons-material/Person";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
 import LogoutIcon from "@mui/icons-material/Logout";
-import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 import { userService, addressService } from "../../services";
-import { useToast } from "../../Context";
+import { useToast, tokenContext } from "../../Context";
 import PageMeta from "../../components/PageMeta/PageMeta";
-import { Address } from "../../types";
+import { Address, User } from "../../types";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface TabPanelProps {
@@ -48,12 +48,69 @@ function TabPanel(props: TabPanelProps) {
 
 const Profile: React.FC = () => {
     const theme = useTheme();
+    const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState(0);
     const { showToast } = useToast();
     const queryClient = useQueryClient();
+    const { logout } = React.useContext(tokenContext);
 
-    // User Data Query
-    // const { data: userData } = useQuery({ ... }); // Assuming context or simple local storage for name for now, or fetch from getMe
+    // User Data State
+    const [userData, setUserData] = useState<User | null>(null);
+    const [formData, setFormData] = useState({ name: '', email: '', phone: '' });
+    const [saving, setSaving] = useState(false);
+
+    // Load user data on mount
+    useEffect(() => {
+        const user = userService.getMe();
+        if (user) {
+            setUserData(user);
+            setFormData({
+                name: user.name || '',
+                email: user.email || '',
+                phone: ''  // Phone not in token, user can add
+            });
+        }
+    }, []);
+
+    // Handle tab change
+    const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+        if (newValue === 3) {
+            // Logout tab
+            handleLogout();
+            return;
+        }
+        if (newValue === 2) {
+            // Orders tab - navigate to orders page
+            navigate('/allorders');
+            return;
+        }
+        setActiveTab(newValue);
+    };
+
+    // Handle logout
+    const handleLogout = () => {
+        logout();
+        showToast("👋 تم تسجيل الخروج بنجاح", "success");
+        navigate('/login');
+    };
+
+    // Handle save changes
+    const handleSaveChanges = async () => {
+        try {
+            setSaving(true);
+            await userService.updateMe({
+                name: formData.name,
+                email: formData.email,
+                phone: formData.phone
+            });
+            showToast("✅ تم حفظ التغييرات بنجاح", "success");
+        } catch (error: any) {
+            const msg = error.response?.data?.message || "❌ فشل في حفظ التغييرات";
+            showToast(msg, "error");
+        } finally {
+            setSaving(false);
+        }
+    };
 
     // Addresses Query
     const { data: addressesData, isLoading: addressesLoading } = useQuery({
@@ -67,11 +124,11 @@ const Profile: React.FC = () => {
         mutationFn: addressService.addAddress,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['addresses'] });
-            showToast("✅ Address added successfully", "success");
+            showToast("✅ تم إضافة العنوان بنجاح", "success");
             setNewAddress({ name: '', details: '', phone: '', city: '' });
             setShowAddAddress(false);
         },
-        onError: () => showToast("❌ Failed to add address", "error")
+        onError: () => showToast("❌ فشل في إضافة العنوان", "error")
     });
 
     // Remove Address Mutation
@@ -79,7 +136,7 @@ const Profile: React.FC = () => {
         mutationFn: addressService.removeAddress,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['addresses'] });
-            showToast("🗑️ Address removed", "success");
+            showToast("🗑️ تم حذف العنوان", "success");
         }
     });
 
@@ -90,6 +147,9 @@ const Profile: React.FC = () => {
         e.preventDefault();
         addAddressMutation.mutate(newAddress);
     };
+
+    // Get user initial for avatar
+    const userInitial = userData?.name?.charAt(0)?.toUpperCase() || 'U';
 
     return (
         <Box sx={{ bgcolor: "background.default", minHeight: "100vh", pb: 10 }}>
@@ -106,12 +166,22 @@ const Profile: React.FC = () => {
             }}>
                 <Container maxWidth="lg">
                     <Stack direction="row" spacing={3} alignItems="center">
-                        <Avatar sx={{ width: 100, height: 100, fontSize: '3rem', bgcolor: 'white', color: 'primary.main', fontWeight: 900, boxShadow: theme.shadows[10] }}>
-                            M
+                        <Avatar sx={{
+                            width: 100,
+                            height: 100,
+                            fontSize: '3rem',
+                            bgcolor: 'white',
+                            color: 'primary.main',
+                            fontWeight: 900,
+                            boxShadow: theme.shadows[10]
+                        }}>
+                            {userInitial}
                         </Avatar>
                         <Box>
                             <Typography variant="h3" fontWeight="900">My Account</Typography>
-                            <Typography variant="h6" sx={{ opacity: 0.8 }}>Welcome back, User</Typography>
+                            <Typography variant="h6" sx={{ opacity: 0.8 }}>
+                                Welcome back, {userData?.name || 'User'}
+                            </Typography>
                         </Box>
                     </Stack>
                 </Container>
@@ -146,7 +216,7 @@ const Profile: React.FC = () => {
                         <Tabs
                             orientation="vertical"
                             value={activeTab}
-                            onChange={(e, v) => setActiveTab(v)}
+                            onChange={handleTabChange}
                             sx={{
                                 '& .MuiTabs-indicator': { width: 4, left: 0, borderRadius: '0 4px 4px 0' },
                                 '& .MuiTab-root': { alignItems: 'flex-start', textAlign: 'left', pl: 4, py: 3, fontWeight: 700, fontSize: '1rem', textTransform: 'none' },
@@ -167,18 +237,47 @@ const Profile: React.FC = () => {
                             <Typography color="text.secondary" mb={4}>Update your personal details here.</Typography>
 
                             <Grid container spacing={3}>
-                                <Grid item xs={12} md={6}>
-                                    <TextField fullWidth label="Full Name" defaultValue="" variant="outlined" InputProps={{ sx: { borderRadius: "12px" } }} />
+                                <Grid size={{ xs: 12, md: 6 }}>
+                                    <TextField
+                                        fullWidth
+                                        label="Full Name"
+                                        value={formData.name}
+                                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                        variant="outlined"
+                                        InputProps={{ sx: { borderRadius: "12px" } }}
+                                    />
                                 </Grid>
-                                <Grid item xs={12} md={6}>
-                                    <TextField fullWidth label="Email Address" defaultValue="" disabled variant="outlined" InputProps={{ sx: { borderRadius: "12px" } }} />
+                                <Grid size={{ xs: 12, md: 6 }}>
+                                    <TextField
+                                        fullWidth
+                                        label="Email Address"
+                                        value={formData.email}
+                                        disabled
+                                        variant="outlined"
+                                        InputProps={{ sx: { borderRadius: "12px" } }}
+                                        helperText="Email cannot be changed"
+                                    />
                                 </Grid>
-                                <Grid item xs={12} md={6}>
-                                    <TextField fullWidth label="Phone Number" defaultValue="" variant="outlined" InputProps={{ sx: { borderRadius: "12px" } }} />
+                                <Grid size={{ xs: 12, md: 6 }}>
+                                    <TextField
+                                        fullWidth
+                                        label="Phone Number"
+                                        value={formData.phone}
+                                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                        variant="outlined"
+                                        InputProps={{ sx: { borderRadius: "12px" } }}
+                                        placeholder="01xxxxxxxxx"
+                                    />
                                 </Grid>
-                                <Grid item xs={12}>
-                                    <Button variant="contained" size="large" sx={{ borderRadius: "12px", px: 4, py: 1.5, fontWeight: 900 }}>
-                                        Save Changes
+                                <Grid size={{ xs: 12 }}>
+                                    <Button
+                                        variant="contained"
+                                        size="large"
+                                        onClick={handleSaveChanges}
+                                        disabled={saving}
+                                        sx={{ borderRadius: "12px", px: 4, py: 1.5, fontWeight: 900 }}
+                                    >
+                                        {saving ? <CircularProgress size={24} color="inherit" /> : "Save Changes"}
                                     </Button>
                                 </Grid>
                             </Grid>
@@ -208,34 +307,36 @@ const Profile: React.FC = () => {
                                             <CardContent>
                                                 <form onSubmit={handleAddressSubmit}>
                                                     <Grid container spacing={2}>
-                                                        <Grid item xs={12}>
+                                                        <Grid size={{ xs: 12 }}>
                                                             <TextField
                                                                 fullWidth label="Alias (e.g., Home, Work)" required
                                                                 value={newAddress.name} onChange={e => setNewAddress({ ...newAddress, name: e.target.value })}
                                                             />
                                                         </Grid>
-                                                        <Grid item xs={12}>
+                                                        <Grid size={{ xs: 12 }}>
                                                             <TextField
                                                                 fullWidth label="Detailed Address" required
                                                                 value={newAddress.details} onChange={e => setNewAddress({ ...newAddress, details: e.target.value })}
                                                             />
                                                         </Grid>
-                                                        <Grid item xs={12} sm={6}>
+                                                        <Grid size={{ xs: 12, sm: 6 }}>
                                                             <TextField
                                                                 fullWidth label="Phone" required
                                                                 value={newAddress.phone} onChange={e => setNewAddress({ ...newAddress, phone: e.target.value })}
                                                             />
                                                         </Grid>
-                                                        <Grid item xs={12} sm={6}>
+                                                        <Grid size={{ xs: 12, sm: 6 }}>
                                                             <TextField
                                                                 fullWidth label="City" required
                                                                 value={newAddress.city} onChange={e => setNewAddress({ ...newAddress, city: e.target.value })}
                                                             />
                                                         </Grid>
-                                                        <Grid item xs={12}>
+                                                        <Grid size={{ xs: 12 }}>
                                                             <Stack direction="row" spacing={2} justifyContent="flex-end">
                                                                 <Button onClick={() => setShowAddAddress(false)} color="inherit">Cancel</Button>
-                                                                <Button type="submit" variant="contained">Save Address</Button>
+                                                                <Button type="submit" variant="contained" disabled={addAddressMutation.isPending}>
+                                                                    {addAddressMutation.isPending ? <CircularProgress size={20} /> : "Save Address"}
+                                                                </Button>
                                                             </Stack>
                                                         </Grid>
                                                     </Grid>
@@ -248,7 +349,9 @@ const Profile: React.FC = () => {
 
                             <Stack spacing={2}>
                                 {addressesLoading ? (
-                                    <Typography>Loading addresses...</Typography>
+                                    <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+                                        <CircularProgress />
+                                    </Box>
                                 ) : addressesData?.length === 0 ? (
                                     <Typography color="text.secondary" align="center" py={4}>No addresses saved yet.</Typography>
                                 ) : (
@@ -262,7 +365,12 @@ const Profile: React.FC = () => {
                                                 <Typography color="text.secondary" variant="body2">{addr.details}</Typography>
                                                 <Typography color="text.secondary" variant="body2">{addr.phone}</Typography>
                                             </Box>
-                                            <IconButton onClick={() => removeAddressMutation.mutate(addr._id)} color="error" sx={{ bgcolor: 'error.lighter' }}>
+                                            <IconButton
+                                                onClick={() => removeAddressMutation.mutate(addr._id)}
+                                                color="error"
+                                                sx={{ bgcolor: 'error.lighter' }}
+                                                disabled={removeAddressMutation.isPending}
+                                            >
                                                 <DeleteIcon />
                                             </IconButton>
                                         </Paper>
@@ -271,12 +379,10 @@ const Profile: React.FC = () => {
                             </Stack>
                         </TabPanel>
 
+                        {/* Orders tab now redirects, but keep empty panel for structure */}
                         <TabPanel value={activeTab} index={2}>
                             <Typography variant="h5" fontWeight="800" gutterBottom>Order History</Typography>
-                            <Typography color="text.secondary">Track your past purchases.</Typography>
-                            <Box sx={{ py: 8, textAlign: 'center' }}>
-                                <Typography variant="h6" color="text.secondary">Coming Soon...</Typography>
-                            </Box>
+                            <Typography color="text.secondary">Redirecting to orders page...</Typography>
                         </TabPanel>
                     </Box>
                 </Paper>

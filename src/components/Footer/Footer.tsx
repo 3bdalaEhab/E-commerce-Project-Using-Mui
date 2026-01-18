@@ -1,7 +1,8 @@
 import React from 'react';
-import { Box, Container, Typography, Link, Stack, IconButton, Divider, useTheme, Grid, TextField, Button } from '@mui/material';
+import { Box, Container, Typography, Link as MuiLink, Stack, IconButton, Divider, useTheme, Grid, TextField, Button } from '@mui/material';
 import { Facebook, Twitter, Instagram, LinkedIn, GitHub, MailOutline, Phone, LocationOn } from '@mui/icons-material';
 import { motion } from 'framer-motion';
+import { Link as RouterLink } from 'react-router-dom';
 
 export default function Footer() {
     const theme = useTheme();
@@ -9,22 +10,22 @@ export default function Footer() {
 
     const footerLinks = {
         shop: [
-            { name: 'All Products', href: '/' },
-            { name: 'Featured Categories', href: '/' },
-            { name: 'New Arrivals', href: '/' },
-            { name: 'Special Offers', href: '/' },
+            { name: 'All Products', path: '/products' },
+            { name: 'Categories', path: '/categories' },
+            { name: 'Cart', path: '/cart' },
+            { name: 'Wishlist', path: '/wishlist' },
         ],
         support: [
-            { name: 'Contact Us', href: '/' },
-            { name: 'FAQs', href: '/' },
-            { name: 'Shipping Info', href: '/' },
-            { name: 'Return Policy', href: '/' },
+            { name: 'My Profile', path: '/profile' },
+            { name: 'Orders', path: '/allorders' },
+            { name: 'Privacy Policy', path: '#' },
+            { name: 'Terms of Service', path: '#' },
         ],
         company: [
-            { name: 'About Us', href: '/' },
-            { name: 'Our Stores', href: '/' },
-            { name: 'Terms of Service', href: '/' },
-            { name: 'Privacy Policy', href: '/' },
+            { name: 'Sign In', path: '/login' },
+            { name: 'Create Account', path: '/register' },
+            { name: 'About Us', path: '#' },
+            { name: 'Contact Us', path: '#' },
         ]
     };
 
@@ -44,7 +45,7 @@ export default function Footer() {
             <Container maxWidth="lg">
                 <Grid container spacing={6}>
                     {/* Brand & Newsletter Column */}
-                    <Grid item xs={12} lg={4}>
+                    <Grid size={{ xs: 12, lg: 4 }}>
                         <Box mb={4}>
                             <Typography
                                 variant="h4"
@@ -86,29 +87,29 @@ export default function Footer() {
                     </Grid>
 
                     {/* Links Columns */}
-                    <Grid item xs={12} sm={4} lg={2}>
+                    <Grid size={{ xs: 12, sm: 4, lg: 2 }}>
                         <Typography variant="subtitle1" sx={{ fontWeight: 900, mb: 3 }}>Shop</Typography>
                         <Stack spacing={1.5}>
                             {footerLinks.shop.map((link) => (
-                                <Link key={link.name} href={link.href} color="text.secondary" underline="none" sx={{ transition: '0.3s', '&:hover': { color: 'primary.main', pl: 0.5 } }}>
+                                <MuiLink key={link.name} component={RouterLink} to={link.path} color="text.secondary" underline="none" sx={{ transition: '0.3s', '&:hover': { color: 'primary.main', pl: 0.5 } }}>
                                     {link.name}
-                                </Link>
+                                </MuiLink>
                             ))}
                         </Stack>
                     </Grid>
 
-                    <Grid item xs={12} sm={4} lg={2}>
+                    <Grid size={{ xs: 12, sm: 4, lg: 2 }}>
                         <Typography variant="subtitle1" sx={{ fontWeight: 900, mb: 3 }}>Support</Typography>
                         <Stack spacing={1.5}>
                             {footerLinks.support.map((link) => (
-                                <Link key={link.name} href={link.href} color="text.secondary" underline="none" sx={{ transition: '0.3s', '&:hover': { color: 'primary.main', pl: 0.5 } }}>
+                                <MuiLink key={link.name} component={RouterLink} to={link.path} color="text.secondary" underline="none" sx={{ transition: '0.3s', '&:hover': { color: 'primary.main', pl: 0.5 } }}>
                                     {link.name}
-                                </Link>
+                                </MuiLink>
                             ))}
                         </Stack>
                     </Grid>
 
-                    <Grid item xs={12} sm={4} lg={4}>
+                    <Grid size={{ xs: 12, sm: 4, lg: 4 }}>
                         <Typography variant="subtitle1" sx={{ fontWeight: 900, mb: 3 }}>Get in Touch</Typography>
                         <Stack spacing={3}>
                             <Stack direction="row" spacing={2} alignItems="center">

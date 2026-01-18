@@ -17,6 +17,7 @@ import {
     Lock as LockIcon,
 } from "@mui/icons-material";
 import { useThemeContext, tokenContext, useToast } from "../../Context";
+import GlobalSearch from "../Common/GlobalSearch";
 import { NavItem } from "./types";
 
 interface MobileDrawerContentProps {
@@ -47,21 +48,27 @@ const MobileDrawerContent: React.FC<MobileDrawerContentProps> = ({
     };
 
     return (
-        <Box onClick={handleDrawerToggle} sx={{ textAlign: "center", p: 2 }}>
-            <Typography
-                variant="h5"
-                sx={{
-                    my: 2,
-                    fontWeight: 900,
-                    background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
-                }}
-            >
-                E-COMMERCE
-            </Typography>
+        <Box sx={{ textAlign: "center", p: 2 }}>
+            <Box onClick={handleDrawerToggle}>
+                <Typography
+                    variant="h5"
+                    sx={{
+                        my: 2,
+                        fontWeight: 900,
+                        background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                        WebkitBackgroundClip: "text",
+                        WebkitTextFillColor: "transparent",
+                    }}
+                >
+                    E-COMMERCE
+                </Typography>
+            </Box>
             <Divider sx={{ mb: 2 }} />
-            <List>
+            <Box sx={{ mb: 2, px: 1 }}>
+                <GlobalSearch />
+            </Box>
+            <Divider sx={{ mb: 2 }} />
+            <List onClick={handleDrawerToggle}>
                 {navItems.map((item) => (
                     <ListItem key={item.name} disablePadding sx={{ mb: 1 }}>
                         <ListItemButton

@@ -46,11 +46,11 @@ const Register: React.FC = () => {
     } = useForm<RegisterCredentials>({
         mode: "onChange",
         defaultValues: {
-            name: "New Elite User",
-            email: "new_user@example.com",
-            phone: "01012345678",
-            password: "Password123!",
-            rePassword: "Password123!"
+            name: "",
+            email: "",
+            phone: "",
+            password: "",
+            rePassword: ""
         }
     });
 

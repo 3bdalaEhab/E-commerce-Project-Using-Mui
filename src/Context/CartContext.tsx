@@ -1,6 +1,7 @@
-import React, { createContext, useEffect, useState, useCallback, useMemo, ReactNode } from 'react';
+import React, { createContext, useEffect, useState, useCallback, useMemo, ReactNode, useContext } from 'react';
 import { cartService } from '../services';
 import { Cart, CartResponse } from '../types';
+import { tokenContext } from './tokenContext';
 
 // Types
 interface CartContextType {
@@ -35,10 +36,10 @@ export default function CartContextProvider({ children }: CartProviderProps) {
     const [cartData, setCartData] = useState<Cart | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
 
-    const token = localStorage.getItem('userToken');
+    const { userToken } = useContext(tokenContext);
 
     const getCart = useCallback(async () => {
-        if (!token) return null;
+        if (!userToken) return null;
         try {
             setLoading(true);
             const data = await cartService.getCart();
@@ -51,7 +52,7 @@ export default function CartContextProvider({ children }: CartProviderProps) {
         } finally {
             setLoading(false);
         }
-    }, [token]);
+    }, [userToken]);
 
     const addToCart = useCallback(async (productId: string) => {
         try {
@@ -107,8 +108,8 @@ export default function CartContextProvider({ children }: CartProviderProps) {
     }, []);
 
     useEffect(() => {
-        if (token) getCart();
-    }, [token, getCart]);
+        if (userToken) getCart();
+    }, [userToken, getCart]);
 
     // Memoize context value to prevent unnecessary re-renders
     const contextValue = useMemo<CartContextType>(

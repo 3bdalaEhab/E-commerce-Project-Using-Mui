@@ -1,7 +1,8 @@
 import React from "react";
 import { Box, Button, Badge, useTheme } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useThemeContext } from "../../Context";
+import GlobalSearch from "../Common/GlobalSearch";
 import { NavItem } from "./types";
 
 interface DesktopNavProps {
@@ -11,9 +12,12 @@ interface DesktopNavProps {
 const DesktopNav: React.FC<DesktopNavProps> = ({ navItems }) => {
     const theme = useTheme();
     const { mode } = useThemeContext();
+    const location = useLocation();
+    const isHomePage = location.pathname === '/';
 
     return (
         <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center", gap: 1 }}>
+            <GlobalSearch />
             {navItems.map((item) => (
                 <Button
                     key={item.name}
@@ -63,6 +67,7 @@ const DesktopNav: React.FC<DesktopNavProps> = ({ navItems }) => {
                     {item.name}
                 </Button>
             ))}
+
         </Box>
     );
 };

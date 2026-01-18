@@ -19,14 +19,17 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import { useQuickView } from '../../Context/QuickViewContext';
-import { CartContext, WishlistContext, useToast } from '../../Context';
+import { useNavigate } from 'react-router-dom';
+import { CartContext, WishlistContext, useToast, tokenContext } from '../../Context';
 import { Link } from 'react-router-dom';
 
 const QuickViewModal = () => {
     const theme = useTheme();
+    const navigate = useNavigate();
     const { activeProduct, isOpen, closeQuickView } = useQuickView();
     const { addToCart } = useContext(CartContext);
     const { addToWishlist, removeFromWishlist, wishListItemId } = useContext(WishlistContext);
+    const { userToken } = useContext<any>(tokenContext);
     const { showToast } = useToast();
 
     const [addingToCart, setAddingToCart] = useState(false);
@@ -37,6 +40,12 @@ const QuickViewModal = () => {
     const isInWishlist = wishListItemId.includes(activeProduct._id);
 
     const handleAddToCart = async () => {
+        if (!userToken) {
+            showToast("👋 Please login to add items to your cart", "warning");
+            closeQuickView();
+            setTimeout(() => navigate('/login'), 1500);
+            return;
+        }
         setAddingToCart(true);
         try {
             const res = await addToCart(activeProduct._id);
@@ -53,6 +62,12 @@ const QuickViewModal = () => {
     };
 
     const handleWishlistToggle = async () => {
+        if (!userToken) {
+            showToast("❤ Please login to save items to your wishlist", "warning");
+            closeQuickView();
+            setTimeout(() => navigate('/login'), 1500);
+            return;
+        }
         setWishlistLoading(true);
         try {
             if (isInWishlist) {
@@ -101,7 +116,7 @@ const QuickViewModal = () => {
                 <DialogContent sx={{ p: 0 }}>
                     <Grid container>
                         {/* Image Section */}
-                        <Grid item xs={12} md={6} sx={{ bgcolor: 'action.hover', position: 'relative', minHeight: { xs: 300, md: 500 }, display: 'flex', alignItems: 'center', justifyContent: 'center', p: 4 }}>
+                        <Grid size={{ xs: 12, md: 6 }} sx={{ bgcolor: 'action.hover', position: 'relative', minHeight: { xs: 300, md: 500 }, display: 'flex', alignItems: 'center', justifyContent: 'center', p: 4 }}>
                             <img
                                 src={activeProduct.imageCover}
                                 alt={activeProduct.title}
@@ -110,7 +125,7 @@ const QuickViewModal = () => {
                         </Grid>
 
                         {/* Details Section */}
-                        <Grid item xs={12} md={6}>
+                        <Grid size={{ xs: 12, md: 6 }}>
                             <Box sx={{ p: { xs: 3, md: 5 }, display: 'flex', flexDirection: 'column', height: '100%' }}>
                                 <Stack spacing={1} sx={{ mb: 2 }}>
                                     <Chip
@@ -118,7 +133,16 @@ const QuickViewModal = () => {
                                         size="small"
                                         sx={{ alignSelf: 'flex-start', fontWeight: 700, borderRadius: '8px' }}
                                     />
-                                    <Typography variant="h4" fontWeight="900" sx={{ lineHeight: 1.2 }}>
+                                    <Typography
+                                        variant="h4"
+                                        fontWeight="900"
+                                        sx={{
+                                            lineHeight: 1.2,
+                                            whiteSpace: 'nowrap',
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis'
+                                        }}
+                                    >
                                         {activeProduct.title}
                                     </Typography>
                                     <Stack direction="row" alignItems="center" spacing={1}>
@@ -129,7 +153,19 @@ const QuickViewModal = () => {
                                     </Stack>
                                 </Stack>
 
-                                <Typography variant="body2" color="text.secondary" sx={{ mb: 3, flex: 1, lineHeight: 1.6 }}>
+                                <Typography
+                                    variant="body2"
+                                    color="text.secondary"
+                                    sx={{
+                                        mb: 3,
+                                        flex: 1,
+                                        lineHeight: 1.6,
+                                        display: '-webkit-box',
+                                        WebkitLineClamp: 4,
+                                        WebkitBoxOrient: 'vertical',
+                                        overflow: 'hidden'
+                                    }}
+                                >
                                     {activeProduct.description}
                                 </Typography>
 
@@ -138,8 +174,13 @@ const QuickViewModal = () => {
                                 <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 4 }}>
                                     <Box>
                                         <Typography variant="caption" color="text.secondary" fontWeight="700">PRICE</Typography>
-                                        <Typography variant="h4" fontWeight="900" color="primary">
-                                            ${activeProduct.price}
+                                        <Typography
+                                            variant="h4"
+                                            fontWeight="900"
+                                            color="primary"
+                                            sx={{ whiteSpace: 'nowrap' }}
+                                        >
+                                            {activeProduct.price} EGP
                                         </Typography>
                                     </Box>
                                     <IconButton
@@ -169,6 +210,7 @@ const QuickViewModal = () => {
                                             py: 1.5,
                                             borderRadius: '16px',
                                             fontWeight: 900,
+                                            whiteSpace: 'nowrap',
                                             background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
                                             boxShadow: '0 8px 20px rgba(0,0,0,0.15)',
                                             '&:hover': { transform: 'translateY(-2px)', boxShadow: '0 12px 25px rgba(0,0,0,0.2)' }
@@ -177,8 +219,8 @@ const QuickViewModal = () => {
                                         {addingToCart ? <CircularProgress size={24} color="inherit" /> : 'Add to Cart'}
                                     </Button>
 
-                                    <Link to={`/products/${activeProduct._id}`} onClick={closeQuickView} style={{ textDecoration: 'none' }}>
-                                        <Button fullWidth onClick={closeQuickView} sx={{ fontWeight: 800, color: 'text.secondary' }}>
+                                    <Link to={`/details/${activeProduct._id}`} onClick={closeQuickView} style={{ textDecoration: 'none' }}>
+                                        <Button fullWidth variant="text" sx={{ fontWeight: 800, color: 'text.secondary' }}>
                                             View Full Details
                                         </Button>
                                     </Link>

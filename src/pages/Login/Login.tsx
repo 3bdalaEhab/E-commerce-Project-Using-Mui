@@ -42,8 +42,8 @@ const Login: React.FC = () => {
     } = useForm<LoginCredentials>({
         mode: 'onChange',
         defaultValues: {
-            email: "ahmed@example.com",
-            password: "Password123!"
+            email: "",
+            password: ""
         }
     });
 

@@ -1,10 +1,20 @@
 import api from './api';
 import { ApiResponse, User } from '../types';
+import { jwtDecode } from 'jwt-decode';
 
 interface UserData {
     name: string;
     email: string;
     phone: string;
+}
+
+interface DecodedToken {
+    id: string;
+    name: string;
+    email?: string;
+    role: string;
+    iat: number;
+    exp: number;
 }
 
 export const userService = {
@@ -14,15 +24,22 @@ export const userService = {
         return data;
     },
 
-    // Get current user data
-    getMe: async (): Promise<ApiResponse<User>> => {
-        // This endpoint might vary, but usually it's /users/getMe or verified via token
-        // For RouteMisr, often we rely on token decode or localized storage, 
-        // but let's assume standard REST pattern for now or just use update logic.
-        // If /users/me exists:
-        // const { data } = await api.get<ApiResponse>('/users/me');
-        // return data;
-        return { message: 'User data' }; // Placeholder if not strictly needed yet
+    // Get current user data from token
+    getMe: (): User | null => {
+        try {
+            const token = localStorage.getItem('userToken');
+            if (!token) return null;
+
+            const decoded = jwtDecode<DecodedToken>(token);
+            return {
+                name: decoded.name || 'User',
+                email: decoded.email || '',
+                role: decoded.role || 'user'
+            };
+        } catch (error) {
+            console.error('Error decoding token:', error);
+            return null;
+        }
     }
 };
 

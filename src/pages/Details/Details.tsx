@@ -214,14 +214,16 @@ const Details: React.FC = () => {
                                     <Box>
                                         <Typography variant="caption" color="text.secondary" fontWeight="800" sx={{ textTransform: 'uppercase' }}>Price</Typography>
                                         <Typography variant="h3" fontWeight="1000" color="primary">
-                                            ${data.price}
+                                            {data.price} EGP
                                         </Typography>
-                                        <Stack direction="row" alignItems="center" spacing={0.5} sx={{ mt: 1, color: 'error.main' }}>
-                                            <LocalFireDepartment fontSize="small" sx={{ animation: 'pulse 1.5s infinite' }} />
-                                            <Typography variant="caption" fontWeight="800" sx={{ textTransform: 'uppercase' }}>
-                                                High Demand - Only 3 left!
-                                            </Typography>
-                                        </Stack>
+                                        {data.quantity <= 10 && (
+                                            <Stack direction="row" alignItems="center" spacing={0.5} sx={{ mt: 1, color: 'error.main' }}>
+                                                <LocalFireDepartment fontSize="small" sx={{ animation: 'pulse 1.5s infinite' }} />
+                                                <Typography variant="caption" fontWeight="800" sx={{ textTransform: 'uppercase' }}>
+                                                    {data.quantity === 0 ? 'Out of Stock!' : `High Demand - Only ${data.quantity} left!`}
+                                                </Typography>
+                                            </Stack>
+                                        )}
                                     </Box>
 
                                     <Stack direction="row" spacing={2} sx={{ width: '100%' }}>

@@ -1,13 +1,13 @@
-import React, { useContext, useCallback, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import React, { useContext, useCallback, useState, useEffect } from "react";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import {
     Box,
     Typography,
+    Container,
 } from "@mui/material";
 import SkeletonLoader from "../../components/Common/SkeletonLoader";
-import { Container } from "@mui/material";
-import { useNavigate } from "react-router-dom";
-import { CartContext, WishlistContext, useToast } from "../../Context";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { CartContext, WishlistContext, useToast, tokenContext } from "../../Context";
 import PageMeta from "../../components/PageMeta/PageMeta";
 import ProductCard from "../../components/Common/ProductCard";
 import ProductFilterBar from "../../components/Common/ProductFilterBar";
@@ -40,31 +40,50 @@ const itemVariants: any = {
 
 const Products: React.FC = () => {
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+
+    const urlKeyword = searchParams.get('keyword') || "";
+    const urlCategory = searchParams.get('category') || "";
+
     const { showToast } = useToast();
     const { addToCart } = useContext(CartContext);
     const { addToWishlist, wishListItemId, removeFromWishlist } = useContext(WishlistContext);
+    const { userToken } = useContext<any>(tokenContext);
 
     // Filter States
-    const [searchQuery, setSearchQuery] = useState("");
+    const [searchQuery, setSearchQuery] = useState(urlKeyword);
+    const [selectedCategory, setSelectedCategory] = useState(urlCategory);
     const [sortOption, setSortOption] = useState("price");
     const [priceRange, setPriceRange] = useState<number[]>([0, 50000]);
 
-    const { data: productsData, isLoading, isError, error } = useQuery({
-        queryKey: ["products", searchQuery, sortOption, priceRange],
+    // Sync state with URL keyword if it changes from external (global) search
+    useEffect(() => {
+        setSearchQuery(urlKeyword);
+        setSelectedCategory(urlCategory);
+    }, [urlKeyword, urlCategory]);
+
+    const { data: productsData, isLoading, isError, error, isFetching } = useQuery({
+        queryKey: ["products", searchQuery, selectedCategory, sortOption, priceRange],
         queryFn: () => productService.getProducts({
             keyword: searchQuery || undefined,
+            category: selectedCategory || undefined,
             sort: sortOption,
             'price[gte]': priceRange[0],
             'price[lte]': priceRange[1],
-            limit: 50
+            limit: 50, // Increased limit to show more products
         }),
-        keepPreviousData: true
+        placeholderData: keepPreviousData
     });
 
     const products = productsData?.data || [];
 
     const addCart = useCallback(
         async (productId: string) => {
+            if (!userToken) {
+                showToast("👋 Please login to add items to your cart", "warning");
+                setTimeout(() => navigate('/login'), 1500);
+                return;
+            }
             try {
                 const res = await addToCart(productId);
                 if (res?.status === "success") {
@@ -76,12 +95,17 @@ const Products: React.FC = () => {
                 showToast("❌ Server error", "error");
             }
         },
-        [addToCart, showToast]
+        [addToCart, showToast, userToken, navigate]
     );
 
     const handleWishlistToggle = useCallback(
         async (e: React.MouseEvent, productId: string) => {
             e.stopPropagation();
+            if (!userToken) {
+                showToast("❤ Please login to save items to your wishlist", "warning");
+                setTimeout(() => navigate('/login'), 1500);
+                return;
+            }
             try {
                 if (wishListItemId.includes(productId)) {
                     await removeFromWishlist(productId);
@@ -94,7 +118,7 @@ const Products: React.FC = () => {
                 showToast("❌ Wishlist update failed", "error");
             }
         },
-        [wishListItemId, removeFromWishlist, addToWishlist, showToast]
+        [wishListItemId, removeFromWishlist, addToWishlist, showToast, userToken, navigate]
     );
 
     const handleNavigate = useCallback(
@@ -144,7 +168,6 @@ const Products: React.FC = () => {
 
             <Container maxWidth="xl">
                 <ProductFilterBar
-                    onSearch={setSearchQuery}
                     onSort={setSortOption}
                     onPriceChange={setPriceRange}
                     maxPrice={50000}
@@ -168,6 +191,9 @@ const Products: React.FC = () => {
                                 display: "grid",
                                 gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
                                 gap: 4,
+                                opacity: isFetching ? 0.5 : 1, // Subtle fade only
+                                transition: 'opacity 0.2s ease',
+                                pointerEvents: isFetching ? 'none' : 'auto'
                             }}
                         >
                             {products.map((product: Product) => (

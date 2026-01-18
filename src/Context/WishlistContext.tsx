@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo, ReactNode } from 'react';
 import { wishlistService } from '../services';
 import { Product } from '../types';
+import { tokenContext } from './tokenContext';
 
 // Types
 interface WishlistContextType {
@@ -34,7 +35,7 @@ export function WishlistProvider({ children }: WishlistProviderProps) {
     const [loading, setLoading] = useState<boolean>(false);
     const [wishListItemId, setWishListItemId] = useState<string[]>([]);
 
-    const token = localStorage.getItem('userToken');
+    const { userToken } = useContext(tokenContext);
 
     // Extract product IDs from wishlist data
     const extractWishlistIds = useCallback((data: Product[]) => {
@@ -44,7 +45,7 @@ export function WishlistProvider({ children }: WishlistProviderProps) {
 
     // Fetch all wishlist items
     const getWishlist = useCallback(async () => {
-        if (!token) return;
+        if (!userToken) return;
         try {
             setLoading(true);
             const data = await wishlistService.getWishlist();
@@ -56,11 +57,11 @@ export function WishlistProvider({ children }: WishlistProviderProps) {
         } finally {
             setLoading(false);
         }
-    }, [token, extractWishlistIds]);
+    }, [userToken, extractWishlistIds]);
 
     // Add product to wishlist
     const addToWishlist = useCallback(async (productId: string) => {
-        if (!token) return;
+        if (!userToken) return;
         try {
             await wishlistService.addToWishlist(productId);
             setNumWishItemList((prev) => prev + 1);
@@ -69,11 +70,11 @@ export function WishlistProvider({ children }: WishlistProviderProps) {
             console.error('❌ Error adding to wishlist:', error);
             throw error;
         }
-    }, [token]);
+    }, [userToken]);
 
     // Remove product from wishlist
     const removeFromWishlist = useCallback(async (productId: string) => {
-        if (!token) return;
+        if (!userToken) return;
         try {
             await wishlistService.removeFromWishlist(productId);
             setWishlist((prev) => prev.filter((item) => item._id !== productId));
@@ -83,12 +84,12 @@ export function WishlistProvider({ children }: WishlistProviderProps) {
             console.error('❌ Error removing from wishlist:', error);
             throw error;
         }
-    }, [token]);
+    }, [userToken]);
 
     // Fetch wishlist on mount or when token changes
     useEffect(() => {
-        if (token) getWishlist();
-    }, [token, getWishlist]);
+        if (userToken) getWishlist();
+    }, [userToken, getWishlist]);
 
     // Memoize context value to prevent unnecessary re-renders
     const contextValue = useMemo<WishlistContextType>(

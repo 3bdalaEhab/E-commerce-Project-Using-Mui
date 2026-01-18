@@ -8,7 +8,7 @@ interface QuickViewContextType {
     closeQuickView: () => void;
 }
 
-const QuickViewContext = createContext<QuickViewContextType>({
+export const QuickViewContext = createContext<QuickViewContextType>({
     activeProduct: null,
     isOpen: false,
     openQuickView: () => { },

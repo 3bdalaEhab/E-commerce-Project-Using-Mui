@@ -18,6 +18,7 @@ import {
   AppRegistration,
   LightMode,
   Nightlight,
+  Storefront,
 } from "@mui/icons-material";
 
 import { Link } from "react-router-dom";
@@ -50,6 +51,7 @@ const DrawerAppBar: React.FC<DrawerAppBarProps> = (props) => {
   const navItems: NavItem[] = userToken
     ? [
       { name: "Home", path: "/", icon: <Home /> },
+      { name: "Products", path: "/products", icon: <Storefront /> },
       { name: "Categories", path: "/categories", icon: <Category /> },
       {
         name: "Wishlist",

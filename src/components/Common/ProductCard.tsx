@@ -44,13 +44,6 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
                 y: 0,
                 transition: { duration: 0.5, ease: "easeOut" as any, delay: i * 0.1 },
             }),
-            hover: {
-                y: -8,
-                boxShadow:
-                    theme.palette.mode === "light"
-                        ? "0 12px 30px rgba(0,0,0,0.12)"
-                        : "0 12px 30px rgba(0,0,0,0.4)",
-            },
         };
 
         return (
@@ -58,7 +51,6 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
                 variants={cardVariants}
                 initial="hidden"
                 whileInView="visible"
-                whileHover="hover"
                 custom={index % 4}
                 viewport={{ once: true, amount: 0.2 }}
                 style={{ display: "flex", flexDirection: "column", height: "100%" }}
@@ -69,22 +61,31 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
                         display: "flex",
                         flexDirection: "column",
                         height: "100%",
-                        borderRadius: "28px",
+                        borderRadius: "24px",
                         backgroundColor: theme.palette.background.paper,
                         position: "relative",
-                        overflow: "hidden",
+                        overflow: "hidden", // Ensures content doesn't bleed
                         border: `1px solid ${theme.palette.divider}`,
-                        transition: "all 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
+                        transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
                         "&:hover": {
                             borderColor: theme.palette.primary.main,
-                            transform: "translateY(-12px)",
-                            "& .product-image": { transform: "scale(1.15)" },
-                            "& .action-overlay": { opacity: 1, transform: "translateY(0)" },
+                            transform: "translateY(-8px)",
+                            boxShadow: theme.palette.mode === 'dark'
+                                ? '0 20px 40px rgba(0,0,0,0.6)'
+                                : '0 20px 40px rgba(0,0,0,0.1)',
+                            "& .product-image": { transform: "scale(1.1)" },
+                            "& .action-overlay": { opacity: 1, transform: "translate(-50%, -50%)" },
                         },
                     }}
                     onClick={() => onNavigate(product._id)}
                 >
-                    <Box sx={{ position: 'relative', overflow: 'hidden', height: 280 }}>
+                    <Box sx={{
+                        position: 'relative',
+                        overflow: 'hidden',
+                        height: 280,
+                        borderTopLeftRadius: '24px', // Explicit radius to match card
+                        borderTopRightRadius: '24px',
+                    }}>
                         <CardMedia
                             component="img"
                             image={product.imageCover}
@@ -99,23 +100,29 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
                                 transition: "transform 0.8s cubic-bezier(0.4, 0, 0.2, 1)"
                             }}
                         />
-                        {/* Status Chip */}
-                        <Box sx={{ position: 'absolute', top: 15, left: 15, zIndex: 1 }}>
-                            <Box sx={{
-                                bgcolor: 'rgba(2, 6, 23, 0.8)',
-                                backdropFilter: 'blur(8px)',
-                                color: 'white',
-                                px: 1.5,
-                                py: 0.5,
-                                borderRadius: '8px',
-                                fontSize: '0.65rem',
-                                fontWeight: 900,
-                                letterSpacing: '1px',
-                                border: '1px solid rgba(255,255,255,0.1)'
-                            }}>
-                                NEW ARRIVAL
-                            </Box>
-                        </Box>
+                        {/* Status Chip - Dynamic NEW ARRIVAL based on createdAt */}
+                        {(() => {
+                            const isNew = product.createdAt &&
+                                (Date.now() - new Date(product.createdAt).getTime()) < 7 * 24 * 60 * 60 * 1000;
+                            return isNew ? (
+                                <Box sx={{ position: 'absolute', top: 15, left: 15, zIndex: 1 }}>
+                                    <Box sx={{
+                                        bgcolor: 'rgba(2, 6, 23, 0.8)',
+                                        backdropFilter: 'blur(8px)',
+                                        color: 'white',
+                                        px: 1.5,
+                                        py: 0.5,
+                                        borderRadius: '8px',
+                                        fontSize: '0.65rem',
+                                        fontWeight: 900,
+                                        letterSpacing: '1px',
+                                        border: '1px solid rgba(255,255,255,0.1)'
+                                    }}>
+                                        NEW ARRIVAL
+                                    </Box>
+                                </Box>
+                            ) : null;
+                        })()}
                     </Box>
 
                     <CardContent
@@ -124,14 +131,17 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
                         <Box sx={{ mb: 2 }}>
                             <Stack direction="row" justifyContent="space-between" alignItems="center" mb={1}>
                                 <Typography
-                                    variant="subtitle2"
-                                    color="primary"
-                                    fontWeight="900"
+                                    variant="caption"
+                                    color="primary.main"
                                     sx={{
+                                        fontWeight: 1000,
                                         textTransform: "uppercase",
-                                        letterSpacing: "1.5px",
                                         fontSize: "0.65rem",
-                                        opacity: 0.8
+                                        opacity: 0.8,
+                                        whiteSpace: 'nowrap',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        maxWidth: '120px'
                                     }}
                                 >
                                     {product.category?.name}
@@ -152,15 +162,19 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
 
                             <Typography
                                 variant="h6"
+                                title={product.title}
                                 sx={{
                                     fontWeight: 1000,
                                     lineHeight: 1.1,
                                     mb: 1,
                                     letterSpacing: "-0.8px",
-                                    fontSize: '1.2rem'
+                                    fontSize: '1.2rem',
+                                    whiteSpace: 'nowrap',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis'
                                 }}
                             >
-                                {product.title.split(" ").slice(0, 2).join(" ")}
+                                {product.title}
                             </Typography>
                             <Typography
                                 variant="body2"
@@ -182,8 +196,16 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
                         <Box sx={{ mt: "auto", display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <Box>
                                 <Typography variant="caption" color="text.secondary" fontWeight="800" sx={{ fontSize: '0.65rem', display: 'block', mb: -0.5 }}>PRICE</Typography>
-                                <Typography variant="h5" fontWeight="1000" color="text.primary" sx={{ letterSpacing: '-1px' }}>
-                                    ${product.price}
+                                <Typography
+                                    variant="h5"
+                                    fontWeight="1000"
+                                    color="text.primary"
+                                    sx={{
+                                        letterSpacing: '-1px',
+                                        whiteSpace: 'nowrap'
+                                    }}
+                                >
+                                    {product.price} EGP
                                 </Typography>
                             </Box>
 
@@ -247,7 +269,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
                     >
                         <Button
                             variant="contained"
-                            startIcon={<Visibility />}
+                            startIcon={<Visibility sx={{ fontSize: '1.1rem !important' }} />}
                             onClick={(e) => {
                                 e.stopPropagation();
                                 openQuickView(product);
@@ -255,17 +277,22 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
                             sx={{
                                 borderRadius: '30px',
                                 textTransform: 'none',
-                                fontWeight: 700,
-                                bgcolor: 'rgba(255,255,255,0.9)',
+                                fontWeight: 800,
+                                fontSize: { xs: '0.75rem', sm: '0.85rem' },
+                                whiteSpace: 'nowrap',
+                                minWidth: 'max-content',
+                                bgcolor: 'rgba(255,255,255,0.95)',
                                 color: 'black',
-                                backdropFilter: 'blur(4px)',
+                                backdropFilter: 'blur(8px)',
                                 boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
-                                px: 3,
-                                py: 1,
-                                minWidth: 'auto',
+                                px: { xs: 1.5, sm: 2.5 },
+                                py: { xs: 0.8, sm: 1.2 },
                                 '&:hover': {
                                     bgcolor: 'white',
                                     transform: 'scale(1.05)'
+                                },
+                                '& .MuiButton-startIcon': {
+                                    mr: 0.5
                                 }
                             }}
                         >

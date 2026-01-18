@@ -198,7 +198,7 @@ const AllOrders: React.FC = () => {
                                                         Total Price
                                                     </Typography>
                                                     <Typography variant="h5" fontWeight="1000" color="primary.main">
-                                                        ${order.totalOrderPrice?.toFixed(2)}
+                                                        {order.totalOrderPrice?.toFixed(2)} EGP
                                                     </Typography>
                                                 </Grid>
 
@@ -250,7 +250,7 @@ const AllOrders: React.FC = () => {
                                                                             </Typography>
                                                                         </Box>
                                                                         <Typography variant="subtitle2" fontWeight="900" color="primary">
-                                                                            ${(item.count * item.price).toFixed(2)}
+                                                                            {(item.count * item.price).toFixed(2)} EGP
                                                                         </Typography>
                                                                     </Card>
                                                                 );

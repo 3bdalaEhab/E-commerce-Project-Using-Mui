@@ -1,25 +1,25 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
     Box,
-    TextField,
-    InputAdornment,
-    MenuItem,
-    Slider,
     Typography,
     Stack,
     IconButton,
     Paper,
     useTheme,
     Collapse,
+    Slider,
+    MenuItem,
+    Menu,
+    Button,
+    Fade
 } from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import SortIcon from "@mui/icons-material/Sort";
 import CloseIcon from "@mui/icons-material/Close";
-import { motion, AnimatePresence } from "framer-motion";
+import CheckIcon from "@mui/icons-material/Check";
+import { motion } from "framer-motion";
 
 interface ProductFilterBarProps {
-    onSearch: (query: string) => void;
     onSort: (sortOption: string) => void;
     onPriceChange: (range: number[]) => void;
     minPrice?: number;
@@ -27,25 +27,24 @@ interface ProductFilterBarProps {
 }
 
 const ProductFilterBar: React.FC<ProductFilterBarProps> = ({
-    onSearch,
     onSort,
     onPriceChange,
     minPrice = 0,
     maxPrice = 5000,
 }) => {
     const theme = useTheme();
-    const [searchValue, setSearchValue] = useState("");
     const [showFilters, setShowFilters] = useState(false);
     const [priceRange, setPriceRange] = useState<number[]>([minPrice, maxPrice]);
-    const [sortValue, setSortValue] = useState("");
+    const [sortAnchorEl, setSortAnchorEl] = useState<null | HTMLElement>(null);
+    const [selectedSort, setSelectedSort] = useState("Best Match");
 
-    // Debounce search
-    useEffect(() => {
-        const handler = setTimeout(() => {
-            onSearch(searchValue);
-        }, 500);
-        return () => clearTimeout(handler);
-    }, [searchValue, onSearch]);
+    const sortOptions = [
+        { label: "Best Match", value: "" },
+        { label: "Price: Low to High", value: "price" },
+        { label: "Price: High to Low", value: "-price" },
+        { label: "Top Rated", value: "-ratingsAverage" },
+        { label: "Best Selling", value: "-sold" },
+    ];
 
     const handlePriceChange = (_event: Event, newValue: number | number[]) => {
         setPriceRange(newValue as number[]);
@@ -55,163 +54,182 @@ const ProductFilterBar: React.FC<ProductFilterBarProps> = ({
         onPriceChange(priceRange);
     };
 
+    const handleSortClick = (event: React.MouseEvent<HTMLElement>) => {
+        setSortAnchorEl(event.currentTarget);
+    };
+
+    const handleSortClose = (option?: { label: string, value: string }) => {
+        setSortAnchorEl(null);
+        if (option) {
+            setSelectedSort(option.label);
+            onSort(option.value);
+        }
+    };
+
     return (
-        <Box sx={{ mb: 6, position: 'relative', zIndex: 10 }}>
-            <Paper
-                elevation={0}
+        <Box sx={{ mb: 4, position: 'relative', zIndex: 10 }}>
+            <Box
                 component={motion.div}
-                initial={{ opacity: 0, y: -20 }}
+                initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-                sx={{
-                    p: 2,
-                    borderRadius: "20px",
-                    background: theme.palette.mode === 'dark'
-                        ? "rgba(30, 41, 59, 0.7)"
-                        : "rgba(255, 255, 255, 0.8)",
-                    backdropFilter: "blur(12px)",
-                    border: `1px solid ${theme.palette.divider}`,
-                    boxShadow: theme.palette.mode === 'dark'
-                        ? "0 8px 32px rgba(0,0,0,0.3)"
-                        : "0 8px 32px rgba(100,100,111,0.1)",
-                }}
+                transition={{ duration: 0.4 }}
+                sx={{ display: 'flex', justifyContent: 'center' }}
             >
-                <Stack direction={{ xs: "column", md: "row" }} spacing={2} alignItems="center">
-                    {/* Search Field */}
-                    <TextField
-                        fullWidth
-                        placeholder="Search for premium products..."
-                        value={searchValue}
-                        onChange={(e) => setSearchValue(e.target.value)}
-                        variant="outlined"
+                <Paper
+                    elevation={0}
+                    sx={{
+                        p: '4px 6px',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 1,
+                        borderRadius: "100px",
+                        background: theme.palette.mode === 'dark'
+                            ? "rgba(30, 41, 59, 0.8)"
+                            : "rgba(255, 255, 255, 0.9)",
+                        backdropFilter: "blur(12px)",
+                        border: `1px solid ${theme.palette.divider}`,
+                        boxShadow: theme.palette.mode === 'dark'
+                            ? "0 4px 20px rgba(0,0,0,0.4)"
+                            : "0 4px 20px rgba(0,0,0,0.06)",
+                    }}
+                >
+                    {/* Filter Toggle */}
+                    <Box
+                        onClick={() => setShowFilters(!showFilters)}
                         sx={{
-                            "& .MuiOutlinedInput-root": {
-                                borderRadius: "14px",
-                                backgroundColor: theme.palette.action.hover,
-                                "& fieldset": { border: "none" },
-                                "&:hover fieldset": { border: "none" },
-                                "&.Mui-focused fieldset": { border: `1px solid ${theme.palette.primary.main}` },
-                            },
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 1,
+                            cursor: 'pointer',
+                            px: 2,
+                            py: 1,
+                            borderRadius: '50px',
+                            transition: 'all 0.2s',
+                            bgcolor: showFilters ? 'primary.main' : 'transparent',
+                            color: showFilters ? 'white' : 'text.primary',
+                            '&:hover': {
+                                bgcolor: showFilters ? 'primary.dark' : 'action.hover'
+                            }
                         }}
-                        InputProps={{
-                            startAdornment: (
-                                <InputAdornment position="start">
-                                    <SearchIcon color="action" />
-                                </InputAdornment>
-                            ),
+                    >
+                        {showFilters ? <CloseIcon fontSize="small" /> : <FilterListIcon fontSize="small" />}
+                        <Typography variant="body2" fontWeight={600}>Filter</Typography>
+                    </Box>
+
+                    <Box sx={{ width: '1px', height: 24, bgcolor: 'divider' }} />
+
+                    {/* Sort Menu */}
+                    <Box
+                        onClick={handleSortClick}
+                        sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 1,
+                            cursor: 'pointer',
+                            px: 2,
+                            py: 1,
+                            borderRadius: '50px',
+                            transition: 'all 0.2s',
+                            '&:hover': { bgcolor: 'action.hover' }
                         }}
-                    />
+                    >
+                        <SortIcon fontSize="small" color="action" />
+                        <Typography variant="body2" fontWeight={600}>{selectedSort}</Typography>
+                    </Box>
+                </Paper>
+            </Box>
 
-                    {/* Filter Toggle Button (Mobile/Tablet) */}
-                    <Box sx={{ display: 'flex', gap: 1, width: { xs: '100%', md: 'auto' } }}>
-                        <IconButton
-                            onClick={() => setShowFilters(!showFilters)}
-                            sx={{
-                                borderRadius: "12px",
-                                bgcolor: showFilters ? 'primary.main' : 'action.hover',
-                                color: showFilters ? 'white' : 'text.primary',
-                                border: `1px solid ${theme.palette.divider}`,
-                                height: 56,
-                                width: 56,
-                                "&:hover": { bgcolor: showFilters ? 'primary.dark' : 'action.selected' }
-                            }}
-                        >
-                            {showFilters ? <CloseIcon /> : <FilterListIcon />}
-                        </IconButton>
+            {/* Filter Content */}
+            <Collapse in={showFilters} timeout={300}>
+                <Box
+                    sx={{
+                        mt: 2,
+                        width: '100%',
+                        maxWidth: '500px',
+                        mx: 'auto',
+                    }}
+                >
+                    <Paper
+                        elevation={0}
+                        sx={{
+                            p: 3,
+                            borderRadius: "24px",
+                            background: theme.palette.mode === 'dark'
+                                ? "rgba(30, 41, 59, 0.95)"
+                                : "rgba(255, 255, 255, 0.95)",
+                            backdropFilter: "blur(16px)",
+                            border: `1px solid ${theme.palette.divider}`,
+                            boxShadow: "0 10px 40px -10px rgba(0,0,0,0.2)"
+                        }}
+                    >
+                        <Typography variant="subtitle2" fontWeight="700" gutterBottom sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                            Price Range
+                            <Typography variant="caption" sx={{ bgcolor: 'primary.main', color: 'white', px: 1, borderRadius: '4px' }}>
+                                ${priceRange[0]} - ${priceRange[1]}
+                            </Typography>
+                        </Typography>
 
-                        {/* Sort Dropdown */}
-                        <TextField
-                            select
-                            value={sortValue}
-                            onChange={(e) => {
-                                setSortValue(e.target.value);
-                                onSort(e.target.value);
-                            }}
-                            SelectProps={{
-                                displayEmpty: true
-                            }}
+                        <Slider
+                            value={priceRange}
+                            onChange={handlePriceChange}
+                            onChangeCommitted={handlePriceCommit}
+                            valueLabelDisplay="off"
+                            min={0}
+                            max={5000}
+                            step={50}
                             sx={{
-                                minWidth: 160,
-                                flex: 1,
-                                "& .MuiOutlinedInput-root": {
-                                    borderRadius: "14px",
-                                    backgroundColor: theme.palette.action.hover,
-                                    height: 56,
-                                    "& fieldset": { border: "none" },
+                                color: 'primary.main',
+                                height: 6,
+                                '& .MuiSlider-track': { border: 'none' },
+                                '& .MuiSlider-thumb': {
+                                    height: 20,
+                                    width: 20,
+                                    backgroundColor: '#fff',
+                                    border: '2px solid currentColor',
+                                    '&:hover, &.Mui-focusVisible, &.Mui-active': {
+                                        boxShadow: 'none',
+                                    },
                                 },
                             }}
-                            InputProps={{
-                                startAdornment: (
-                                    <InputAdornment position="start">
-                                        <SortIcon fontSize="small" />
-                                    </InputAdornment>
-                                ),
-                            }}
-                        >
-                            <MenuItem value="" disabled>Sort By</MenuItem>
-                            <MenuItem value="-sold">Best Selling</MenuItem>
-                            <MenuItem value="-ratingsAverage">Top Rated</MenuItem>
-                            <MenuItem value="price">Price: Low to High</MenuItem>
-                            <MenuItem value="-price">Price: High to Low</MenuItem>
-                        </TextField>
-                    </Box>
-                </Stack>
+                        />
+                    </Paper>
+                </Box>
+            </Collapse>
 
-                {/* Collapsible Filters */}
-                <Collapse in={showFilters}>
-                    <Box sx={{ mt: 3, p: 2, borderTop: `1px solid ${theme.palette.divider}` }}>
-                        <Typography variant="subtitle2" fontWeight="800" gutterBottom>
-                            Price Range (${priceRange[0]} - ${priceRange[1]})
-                        </Typography>
-                        <Box sx={{ px: 2 }}>
-                            <Slider
-                                getAriaLabel={() => "Price range"}
-                                value={priceRange}
-                                onChange={handlePriceChange}
-                                onChangeCommitted={handlePriceCommit}
-                                valueLabelDisplay="auto"
-                                min={0}
-                                max={5000}
-                                step={50}
-                                sx={{
-                                    color: 'primary.main',
-                                    height: 8,
-                                    '& .MuiSlider-track': { border: 'none' },
-                                    '& .MuiSlider-thumb': {
-                                        height: 24,
-                                        width: 24,
-                                        backgroundColor: '#fff',
-                                        border: '2px solid currentColor',
-                                        '&:focus, &:hover, &.Mui-active, &.Mui-focusVisible': {
-                                            boxShadow: 'inherit',
-                                        },
-                                        '&:before': { display: 'none' },
-                                    },
-                                    '& .MuiSlider-valueLabel': {
-                                        lineHeight: 1.2,
-                                        fontSize: 12,
-                                        background: 'unset',
-                                        padding: 0,
-                                        width: 32,
-                                        height: 32,
-                                        borderRadius: '50% 50% 50% 0',
-                                        backgroundColor: theme.palette.primary.main,
-                                        transformOrigin: 'bottom left',
-                                        transform: 'translate(50%, -100%) rotate(-45deg) scale(0)',
-                                        '&:before': { display: 'none' },
-                                        '&.MuiSlider-valueLabelOpen': {
-                                            transform: 'translate(50%, -100%) rotate(-45deg) scale(1)',
-                                        },
-                                        '& > *': {
-                                            transform: 'rotate(45deg)',
-                                        },
-                                    },
-                                }}
-                            />
-                        </Box>
-                    </Box>
-                </Collapse>
-            </Paper>
+            {/* Sort Menu Dropdown */}
+            <Menu
+                anchorEl={sortAnchorEl}
+                open={Boolean(sortAnchorEl)}
+                onClose={() => handleSortClose()}
+                TransitionComponent={Fade}
+                PaperProps={{
+                    elevation: 0,
+                    sx: {
+                        mt: 1.5,
+                        borderRadius: "16px",
+                        minWidth: 180,
+                        border: `1px solid ${theme.palette.divider}`,
+                        boxShadow: "0 10px 40px -10px rgba(0,0,0,0.2)",
+                    }
+                }}
+            >
+                {sortOptions.map((option) => (
+                    <MenuItem
+                        key={option.value}
+                        onClick={() => handleSortClose(option)}
+                        selected={selectedSort === option.label}
+                        sx={{
+                            fontSize: '0.9rem',
+                            fontWeight: 500,
+                            py: 1,
+                            gap: 1
+                        }}
+                    >
+                        {selectedSort === option.label && <CheckIcon fontSize="small" color="primary" />}
+                        <span style={{ flex: 1 }}>{option.label}</span>
+                    </MenuItem>
+                ))}
+            </Menu>
         </Box>
     );
 };

@@ -77,8 +77,20 @@ const CartItem = React.memo(({ item, onUpdateQuantity, onRemove }: CartItemProps
                 <CardContent sx={{ flex: 1, p: { xs: 2.5, sm: 3.5 } }}>
                     <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 2 }}>
                         <Box>
-                            <Typography variant="h6" fontWeight="900" sx={{ mb: 1, letterSpacing: '-0.5px' }}>
-                                {product.title.split(" ").slice(0, 5).join(" ")}
+                            <Typography
+                                variant="h6"
+                                fontWeight="900"
+                                title={product.title}
+                                sx={{
+                                    mb: 1,
+                                    letterSpacing: '-0.5px',
+                                    whiteSpace: 'nowrap',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    maxWidth: { xs: '200px', sm: '300px', md: '400px' }
+                                }}
+                            >
+                                {product.title}
                             </Typography>
                             <Box sx={{ display: "flex", gap: 1, mb: 3 }}>
                                 <Chip label={product.category?.name} size="small" variant="outlined" color="primary"
@@ -87,7 +99,7 @@ const CartItem = React.memo(({ item, onUpdateQuantity, onRemove }: CartItemProps
                                     sx={{ borderRadius: '8px', fontWeight: 600, fontSize: '0.7rem' }} />}
                             </Box>
                         </Box>
-                        <Typography variant="h5" color="primary" fontWeight="900">
+                        <Typography variant="h5" color="primary" fontWeight="900" sx={{ whiteSpace: 'nowrap' }}>
                             {item.price} <Box component="span" sx={{ fontSize: '0.9rem', color: 'text.secondary' }}>EGP</Box>
                         </Typography>
                     </Box>
