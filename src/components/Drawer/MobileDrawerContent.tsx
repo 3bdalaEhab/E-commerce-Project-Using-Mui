@@ -1,0 +1,137 @@
+import React, { useContext } from "react";
+import {
+    Box,
+    Typography,
+    Divider,
+    List,
+    ListItem,
+    ListItemButton,
+    ListItemIcon,
+    ListItemText,
+    Badge,
+    useTheme,
+} from "@mui/material";
+import { Link, useNavigate } from "react-router-dom";
+import {
+    Logout,
+    Lock as LockIcon,
+} from "@mui/icons-material";
+import { useThemeContext } from "../../Context/ThemeContext";
+import { tokenContext } from "../../Context/tokenContext";
+import { useToast } from "../../Context/ToastContext";
+import { NavItem } from "./types";
+
+interface MobileDrawerContentProps {
+    navItems: NavItem[];
+    handleDrawerToggle: () => void;
+}
+
+const MobileDrawerContent: React.FC<MobileDrawerContentProps> = ({
+    navItems,
+    handleDrawerToggle,
+}) => {
+    const theme = useTheme();
+    const { mode } = useThemeContext();
+    const { userToken, setUserToken } = useContext<any>(tokenContext);
+    const navigate = useNavigate();
+    const { showToast } = useToast();
+
+    const logOut = () => {
+        try {
+            localStorage.removeItem("userToken");
+        } catch (err) {
+            console.error("Logout error:", err);
+        }
+        setUserToken(null);
+        handleDrawerToggle(); // Close drawer
+        showToast("Logged out successfully 👋", "success");
+        setTimeout(() => navigate("/login"), 1500);
+    };
+
+    return (
+        <Box onClick={handleDrawerToggle} sx={{ textAlign: "center", p: 2 }}>
+            <Typography
+                variant="h5"
+                sx={{
+                    my: 2,
+                    fontWeight: 900,
+                    background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                }}
+            >
+                E-COMMERCE
+            </Typography>
+            <Divider sx={{ mb: 2 }} />
+            <List>
+                {navItems.map((item) => (
+                    <ListItem key={item.name} disablePadding sx={{ mb: 1 }}>
+                        <ListItemButton
+                            component={Link}
+                            to={item.path || "#"}
+                            sx={{
+                                borderRadius: 2,
+                                "&:hover": {
+                                    bgcolor:
+                                        mode === "light"
+                                            ? "rgba(37, 99, 235, 0.08)"
+                                            : "rgba(96, 165, 250, 0.12)",
+                                },
+                            }}
+                        >
+                            <ListItemIcon sx={{ minWidth: "40px", color: theme.palette.primary.main }}>
+                                <Badge
+                                    badgeContent={
+                                        item.name === "Cart"
+                                            ? item.numItem
+                                            : item.name === "Wishlist"
+                                                ? item.numWishItem
+                                                : 0
+                                    }
+                                    color={item.name === "Cart" ? "primary" : "secondary"}
+                                >
+                                    {item.icon}
+                                </Badge>
+                            </ListItemIcon>
+                            <ListItemText
+                                primary={item.name}
+                                primaryTypographyProps={{ fontWeight: 600 }}
+                            />
+                        </ListItemButton>
+                    </ListItem>
+                ))}
+
+                {userToken && (
+                    <>
+                        <Divider sx={{ my: 2 }} />
+                        <ListItem disablePadding>
+                            <ListItemButton
+                                component={Link}
+                                to="/change-password"
+                                sx={{ borderRadius: 2 }}
+                            >
+                                <ListItemIcon sx={{ minWidth: "40px" }}>
+                                    <LockIcon />
+                                </ListItemIcon>
+                                <ListItemText primary="Settings" />
+                            </ListItemButton>
+                        </ListItem>
+                        <ListItem disablePadding>
+                            <ListItemButton
+                                onClick={logOut}
+                                sx={{ borderRadius: 2, color: "error.main" }}
+                            >
+                                <ListItemIcon sx={{ minWidth: "40px", color: "inherit" }}>
+                                    <Logout />
+                                </ListItemIcon>
+                                <ListItemText primary="Logout" />
+                            </ListItemButton>
+                        </ListItem>
+                    </>
+                )}
+            </List>
+        </Box>
+    );
+};
+
+export default MobileDrawerContent;
