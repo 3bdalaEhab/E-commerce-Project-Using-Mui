@@ -1,16 +1,27 @@
 import React, { useState, useEffect } from "react";
-import { Fab, useTheme, Zoom } from "@mui/material";
+import { Fab, useTheme, Zoom, Box } from "@mui/material";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 
 const ScrollToTop = () => {
     const theme = useTheme();
+    const [scrollProgress, setScrollProgress] = useState(0);
     const [isVisible, setIsVisible] = useState(false);
 
-    const toggleVisibility = () => {
-        if (window.pageYOffset > 300) {
+    const handleScroll = () => {
+        const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+        const currentScroll = window.pageYOffset;
+
+        // Show button after 300px
+        if (currentScroll > 300) {
             setIsVisible(true);
         } else {
             setIsVisible(false);
+        }
+
+        // Calculate progress percentage
+        if (totalHeight > 0) {
+            const progress = (currentScroll / totalHeight) * 100;
+            setScrollProgress(progress);
         }
     };
 
@@ -22,34 +33,80 @@ const ScrollToTop = () => {
     };
 
     useEffect(() => {
-        window.addEventListener("scroll", toggleVisibility);
-        return () => window.removeEventListener("scroll", toggleVisibility);
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
     }, []);
+
+    // Stroke circumference for the circle
+    const circumference = 2 * Math.PI * 24;
 
     return (
         <Zoom in={isVisible}>
-            <Fab
+            <Box
                 onClick={scrollToTop}
-                color="primary"
-                size="medium"
-                aria-label="scroll back to top"
                 sx={{
                     position: "fixed",
                     bottom: 32,
                     right: 32,
                     zIndex: 99,
-                    boxShadow: theme.shadows[10],
-                    background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
-                    color: "white",
-                    "&:hover": {
-                        transform: "translateY(-4px)",
-                        boxShadow: `0 10px 20px ${theme.palette.primary.main}60`,
-                    },
-                    transition: "all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+                    cursor: 'pointer',
+                    width: 56,
+                    height: 56,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderRadius: '50%',
+                    boxShadow: theme.shadows[6],
+                    bgcolor: 'background.paper',
+                    transition: 'all 0.3s ease',
+                    '&:hover': {
+                        transform: 'translateY(-4px)',
+                        boxShadow: theme.shadows[14],
+                        '& .arrow-icon': {
+                            color: theme.palette.primary.main
+                        }
+                    }
                 }}
             >
-                <KeyboardArrowUpIcon />
-            </Fab>
+                {/* Progress Circle SVG */}
+                <svg
+                    width="56"
+                    height="56"
+                    viewBox="0 0 56 56"
+                    style={{ position: 'absolute', top: 0, left: 0, transform: 'rotate(-90deg)' }}
+                >
+                    <circle
+                        cx="28"
+                        cy="28"
+                        r="24"
+                        fill="none"
+                        stroke={theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}
+                        strokeWidth="3"
+                    />
+                    <circle
+                        cx="28"
+                        cy="28"
+                        r="24"
+                        fill="none"
+                        stroke={theme.palette.primary.main}
+                        strokeWidth="3"
+                        strokeDasharray={circumference}
+                        strokeDashoffset={circumference - (scrollProgress / 100) * circumference}
+                        strokeLinecap="round"
+                        style={{ transition: 'stroke-dashoffset 0.1s linear' }}
+                    />
+                </svg>
+
+                {/* Arrow Icon */}
+                <KeyboardArrowUpIcon
+                    className="arrow-icon"
+                    sx={{
+                        color: theme.palette.text.primary,
+                        fontSize: 28,
+                        transition: 'color 0.3s ease'
+                    }}
+                />
+            </Box>
         </Zoom>
     );
 };

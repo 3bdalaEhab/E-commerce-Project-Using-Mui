@@ -31,6 +31,11 @@ import Loading from "../../components/Loading/Loading";
 import { CartContext, WishlistContext, useToast } from "../../Context";
 import PageMeta from "../../components/PageMeta/PageMeta";
 import { productService } from "../../services";
+import ProductSlider from "../../components/Common/ProductSlider";
+import { useRecentlyViewed } from "../../hooks/useRecentlyViewed";
+import ImageZoom from "../../components/Common/ImageZoom";
+import { LocalFireDepartment } from "@mui/icons-material";
+import StickyBuyBar from "../../components/Common/StickyBuyBar";
 
 const Details: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -70,6 +75,20 @@ const Details: React.FC = () => {
         enabled: !!id,
         select: (data) => data.data
     });
+
+    // Related Products Query
+    const { data: relatedProducts } = useQuery({
+        queryKey: ["relatedProducts", data?.category?._id, id],
+        queryFn: () => productService.getProducts({
+            category: data?.category?._id,
+            limit: 10
+        }),
+        enabled: !!data?.category?._id,
+        select: (data) => data.data.filter((p: any) => p._id !== id) // Client-side fallback exclusion
+    });
+
+    // Track History
+    const recentProducts = useRecentlyViewed(data || null);
 
     async function addCart() {
         if (!id) return;
@@ -152,11 +171,10 @@ const Details: React.FC = () => {
                                 >
                                     {allImages.map((img, index) => (
                                         <SwiperSlide key={index}>
-                                            <Box sx={{ height: { xs: 350, md: 500 }, bgcolor: 'action.hover' }}>
-                                                <img
+                                            <Box sx={{ height: { xs: 350, md: 500 }, bgcolor: 'white', borderRadius: '16px', overflow: 'hidden' }}>
+                                                <ImageZoom
                                                     src={img}
                                                     alt={data.title}
-                                                    style={{ width: "100%", height: "100%", objectFit: "contain" }}
                                                 />
                                             </Box>
                                         </SwiperSlide>
@@ -198,6 +216,12 @@ const Details: React.FC = () => {
                                         <Typography variant="h3" fontWeight="1000" color="primary">
                                             ${data.price}
                                         </Typography>
+                                        <Stack direction="row" alignItems="center" spacing={0.5} sx={{ mt: 1, color: 'error.main' }}>
+                                            <LocalFireDepartment fontSize="small" sx={{ animation: 'pulse 1.5s infinite' }} />
+                                            <Typography variant="caption" fontWeight="800" sx={{ textTransform: 'uppercase' }}>
+                                                High Demand - Only 3 left!
+                                            </Typography>
+                                        </Stack>
                                     </Box>
 
                                     <Stack direction="row" spacing={2} sx={{ width: '100%' }}>
@@ -250,7 +274,31 @@ const Details: React.FC = () => {
                         </Grid>
                     </Grid>
                 </Paper>
+
+                {/* Intelligent Discovery Section */}
+                <Box sx={{ mt: 10 }}>
+                    {relatedProducts && relatedProducts.length > 0 && (
+                        <ProductSlider
+                            title="You May Also Like"
+                            products={relatedProducts}
+                        />
+                    )}
+
+                    {recentProducts.length > 0 && (
+                        <ProductSlider
+                            title="Recently Viewed"
+                            products={recentProducts}
+                        />
+                    )}
+                </Box>
             </Container>
+
+            {/* Sticky Action Bar */}
+            <StickyBuyBar
+                product={data}
+                onAddToCart={addCart}
+                loading={addingToCart}
+            />
         </Box>
     );
 };

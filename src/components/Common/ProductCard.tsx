@@ -9,12 +9,12 @@ import {
     Typography,
     IconButton,
     Button,
-    Theme,
     useTheme,
     Stack,
 } from "@mui/material";
-import { Star, Favorite } from "@mui/icons-material";
+import { Star, Favorite, FavoriteBorder, Visibility } from "@mui/icons-material";
 import { Product } from "../../types";
+import { useQuickView } from "../../Context/QuickViewContext";
 
 interface ProductCardProps {
     product: Product;
@@ -35,6 +35,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
         isWishlisted,
     }) => {
         const theme = useTheme();
+        const { openQuickView } = useQuickView();
 
         const cardVariants = {
             hidden: { opacity: 0, y: 30 },
@@ -214,28 +215,63 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
                             position: "absolute",
                             top: 15,
                             right: 15,
-                            backgroundColor:
-                                theme.palette.mode === "dark"
-                                    ? "rgba(15, 23, 42, 0.7)"
-                                    : "rgba(255,255,255,0.8)",
+                            zIndex: 2,
+                            backgroundColor: "rgba(255,255,255,0.1)",
                             backdropFilter: "blur(8px)",
-                            color: isWishlisted
-                                ? theme.palette.error.main
-                                : theme.palette.text.secondary,
-                            boxShadow: theme.shadows[2],
+                            color: isWishlisted ? theme.palette.error.main : "white",
+                            boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                            border: '1px solid rgba(255,255,255,0.2)',
                             "&:hover": {
-                                backgroundColor: isWishlisted
-                                    ? theme.palette.error.main
-                                    : theme.palette.primary.main,
-                                color: "#fff",
+                                backgroundColor: isWishlisted ? theme.palette.error.main : "white",
+                                color: isWishlisted ? "white" : theme.palette.text.primary,
                                 transform: "scale(1.1)",
                             },
-                            transition: "all 0.3s ease",
                         }}
                         onClick={(e) => onWishlistToggle(e, product._id)}
                     >
-                        <Favorite fontSize="small" />
+                        {isWishlisted ? <Favorite fontSize="small" /> : <FavoriteBorder fontSize="small" />}
                     </IconButton>
+
+                    {/* Quick View Trigger (Eye Icon) */}
+                    <Box
+                        className="action-overlay"
+                        sx={{
+                            position: 'absolute',
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%) translateY(20px)',
+                            opacity: 0,
+                            zIndex: 3,
+                            transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+                        }}
+                    >
+                        <Button
+                            variant="contained"
+                            startIcon={<Visibility />}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                openQuickView(product);
+                            }}
+                            sx={{
+                                borderRadius: '30px',
+                                textTransform: 'none',
+                                fontWeight: 700,
+                                bgcolor: 'rgba(255,255,255,0.9)',
+                                color: 'black',
+                                backdropFilter: 'blur(4px)',
+                                boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+                                px: 3,
+                                py: 1,
+                                minWidth: 'auto',
+                                '&:hover': {
+                                    bgcolor: 'white',
+                                    transform: 'scale(1.05)'
+                                }
+                            }}
+                        >
+                            Quick View
+                        </Button>
+                    </Box>
                 </Card>
             </motion.div>
         );
