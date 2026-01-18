@@ -16,9 +16,7 @@ import {
     Logout,
     Lock as LockIcon,
 } from "@mui/icons-material";
-import { useThemeContext } from "../../Context/ThemeContext";
-import { tokenContext } from "../../Context/tokenContext";
-import { useToast } from "../../Context/ToastContext";
+import { useThemeContext, tokenContext, useToast } from "../../Context";
 import { NavItem } from "./types";
 
 interface MobileDrawerContentProps {

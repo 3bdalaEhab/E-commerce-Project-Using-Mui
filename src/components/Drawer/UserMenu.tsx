@@ -13,9 +13,7 @@ import {
 } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 import { Lock as LockIcon, Logout } from "@mui/icons-material";
-import { tokenContext } from "../../Context/tokenContext";
-import { useThemeContext } from "../../Context/ThemeContext";
-import { useToast } from "../../Context/ToastContext";
+import { tokenContext, useThemeContext, useToast } from "../../Context";
 
 const UserMenu: React.FC = () => {
     const theme = useTheme();

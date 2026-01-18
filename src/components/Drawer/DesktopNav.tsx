@@ -1,7 +1,7 @@
 import React from "react";
 import { Box, Button, Badge, useTheme } from "@mui/material";
 import { Link } from "react-router-dom";
-import { useThemeContext } from "../../Context/ThemeContext";
+import { useThemeContext } from "../../Context";
 import { NavItem } from "./types";
 
 interface DesktopNavProps {

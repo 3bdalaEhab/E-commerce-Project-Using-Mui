@@ -1,0 +1,155 @@
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+import {
+    Button,
+    CircularProgress,
+    useTheme,
+    Box,
+    Typography,
+    Stack
+} from "@mui/material";
+import { Email, ArrowBack } from "@mui/icons-material";
+import { Link, useNavigate } from "react-router-dom";
+import { useToast } from "../../Context";
+import { useThemeContext } from "../../Context/ThemeContext";
+import AuthLayout from "../../components/Common/AuthLayout";
+import CustomTextField from "../../components/Common/CustomTextField";
+import { authService } from "../../services";
+import { ForgotPasswordCredentials } from "../../types";
+
+const ForgotPass: React.FC = () => {
+    const navigate = useNavigate();
+    const { primaryColor } = useThemeContext();
+    const theme = useTheme();
+    const { showToast } = useToast();
+    const [loading, setLoading] = useState(false);
+
+    const {
+        register,
+        handleSubmit,
+        formState: { errors, isValid },
+    } = useForm<ForgotPasswordCredentials>({ mode: "onChange" });
+
+    const onSubmit = async (formData: ForgotPasswordCredentials) => {
+        setLoading(true);
+        try {
+            const res = await authService.forgotPassword({ email: formData.email.trim() });
+
+            if (res.statusMsg === "success") {
+                showToast("✅ Secure code emitted! Check your inbox.", "success");
+                setTimeout(() => navigate("/VerifyResetCode"), 1500);
+            }
+        } catch (err: any) {
+            const msg = err.response?.data?.message || err.response?.data?.error || "❌ Verification failed. Check your email.";
+            showToast(msg, "error");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <AuthLayout
+            title="Account Recovery"
+            subtitle="Enter your verified email to initiate the secure password restoration sequence."
+        >
+            <Box sx={{ width: '100%', maxWidth: 450 }}>
+                <Typography variant="h4" fontWeight="1000" sx={{ mb: 1, letterSpacing: '-1px' }}>
+                    Forgot Password
+                </Typography>
+                <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
+                    We will send a unique verification code to your email.
+                </Typography>
+
+                <form onSubmit={handleSubmit(onSubmit)}>
+                    <CustomTextField
+                        label="Email Address"
+                        type="email"
+                        icon={Email}
+                        {...register("email", {
+                            required: "Email is required",
+                            pattern: {
+                                value: /^[^@ ]+@[^@ ]+\.[^@ .]{2,}$/,
+                                message: "Invalid email address",
+                            },
+                        })}
+                        error={!!errors.email}
+                        helperText={errors.email?.message}
+                        disabled={loading}
+                    />
+
+                    <Box
+                        sx={{
+                            mb: 4,
+                            p: 2.5,
+                            bgcolor: `${primaryColor}08`,
+                            borderRadius: '16px',
+                            border: `1px solid ${primaryColor}20`,
+                            display: 'flex',
+                            gap: 2,
+                            alignItems: 'center'
+                        }}
+                    >
+                        <Box
+                            sx={{
+                                width: 40,
+                                height: 40,
+                                borderRadius: '12px',
+                                bgcolor: primaryColor,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                flexShrink: 0
+                            }}
+                        >
+                            <Email sx={{ color: '#fff', fontSize: 20 }} />
+                        </Box>
+                        <Typography variant="body2" color="text.secondary" fontWeight={500}>
+                            Please check your spam folder if the code doesn't appear within 60 seconds.
+                        </Typography>
+                    </Box>
+
+                    <Button
+                        type="submit"
+                        fullWidth
+                        disabled={loading || !isValid}
+                        variant="contained"
+                        sx={{
+                            py: 2,
+                            fontWeight: 900,
+                            borderRadius: "16px",
+                            fontSize: "1.1rem",
+                            background: `linear-gradient(135deg, ${primaryColor} 0%, ${primaryColor}dd 100%)`,
+                            boxShadow: `0 8px 25px ${primaryColor}40`,
+                            "&:hover": {
+                                transform: "translateY(-4px)",
+                                boxShadow: `0 12px 30px ${primaryColor}60`,
+                            },
+                            transition: "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+                        }}
+                    >
+                        {loading ? <CircularProgress size={24} color="inherit" /> : "Send Verification Code"}
+                    </Button>
+
+                    <Box sx={{ mt: 4, textAlign: 'center' }}>
+                        <Link
+                            to="/login"
+                            style={{
+                                textDecoration: "none",
+                                color: primaryColor,
+                                fontWeight: 900,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: 1
+                            }}
+                        >
+                            <ArrowBack fontSize="small" /> Back to Login
+                        </Link>
+                    </Box>
+                </form>
+            </Box>
+        </AuthLayout>
+    );
+};
+
+export default ForgotPass;

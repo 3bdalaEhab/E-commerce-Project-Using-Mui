@@ -1,0 +1,142 @@
+import React, { createContext, useEffect, useState, useCallback, useMemo, ReactNode } from 'react';
+import { cartService } from '../services';
+import { Cart, CartResponse } from '../types';
+
+// Types
+interface CartContextType {
+    numOfCartItems: number;
+    cartData: Cart | null;
+    loading: boolean;
+    addToCart: (productId: string) => Promise<any>;
+    updateItem: (productId: string, count: number) => Promise<any>;
+    removeSpecificItem: (productId: string) => Promise<any>;
+    removeAllItems: () => Promise<any>;
+    getCart: () => Promise<any>;
+}
+
+interface CartProviderProps {
+    children: ReactNode;
+}
+
+// Create Context with proper typing
+export const CartContext = createContext<CartContextType>({
+    numOfCartItems: 0,
+    cartData: null,
+    loading: false,
+    addToCart: async () => { },
+    updateItem: async () => { },
+    removeSpecificItem: async () => { },
+    removeAllItems: async () => { },
+    getCart: async () => { },
+});
+
+export default function CartContextProvider({ children }: CartProviderProps) {
+    const [numOfCartItems, setNumOfCartItems] = useState<number>(0);
+    const [cartData, setCartData] = useState<Cart | null>(null);
+    const [loading, setLoading] = useState<boolean>(false);
+
+    const token = localStorage.getItem('userToken');
+
+    const getCart = useCallback(async () => {
+        if (!token) return null;
+        try {
+            setLoading(true);
+            const data = await cartService.getCart();
+            setNumOfCartItems(data.numOfCartItems ?? 0);
+            setCartData(data.data ?? null);
+            return data;
+        } catch (error) {
+            console.error('Error fetching cart:', error);
+            throw error;
+        } finally {
+            setLoading(false);
+        }
+    }, [token]);
+
+    const addToCart = useCallback(async (productId: string) => {
+        try {
+            const data = await cartService.addToCart(productId);
+            setNumOfCartItems(data.numOfCartItems ?? 0);
+            // After adding, we might want to refresh the full cart data if needed, 
+            // but the response usually contains the basic info.
+            // For a better UX, we can trigger a full fetch or update the data.
+            await getCart();
+            return data;
+        } catch (error) {
+            console.error('Error adding to cart:', error);
+            throw error;
+        }
+    }, [getCart]);
+
+    const updateItem = useCallback(async (productId: string, count: number) => {
+        try {
+            const data = await cartService.updateCartItem(productId, count);
+            setNumOfCartItems(data.numOfCartItems ?? 0);
+            // Refresh full cart data to ensure product objects are populated (not just IDs)
+            await getCart();
+            return data;
+        } catch (error) {
+            console.error('Error updating item:', error);
+            throw error;
+        }
+    }, [getCart]);
+
+    const removeSpecificItem = useCallback(async (productId: string) => {
+        try {
+            const data = await cartService.removeFromCart(productId);
+            setNumOfCartItems(data.numOfCartItems ?? 0);
+            // Refresh full cart data to ensure product objects are populated
+            await getCart();
+            return data;
+        } catch (error) {
+            console.error('Error removing item:', error);
+            throw error;
+        }
+    }, [getCart]);
+
+    const removeAllItems = useCallback(async () => {
+        try {
+            const res = await cartService.clearCart();
+            setNumOfCartItems(0);
+            setCartData(null);
+            return res;
+        } catch (error) {
+            console.error('Error clearing cart:', error);
+            throw error;
+        }
+    }, []);
+
+    useEffect(() => {
+        if (token) getCart();
+    }, [token, getCart]);
+
+    // Memoize context value to prevent unnecessary re-renders
+    const contextValue = useMemo<CartContextType>(
+        () => ({
+            numOfCartItems,
+            cartData,
+            loading,
+            addToCart,
+            updateItem,
+            removeSpecificItem,
+            removeAllItems,
+            getCart,
+        }),
+        [numOfCartItems, cartData, loading, addToCart, updateItem, removeSpecificItem, removeAllItems, getCart]
+    );
+
+    return (
+        <CartContext.Provider value={contextValue}>
+            {children}
+        </CartContext.Provider>
+    );
+}
+
+// Custom hook for type-safe context usage
+export const useCart = () => {
+    const context = React.useContext(CartContext);
+    if (!context) {
+        throw new Error('useCart must be used within a CartContextProvider');
+    }
+    return context;
+};

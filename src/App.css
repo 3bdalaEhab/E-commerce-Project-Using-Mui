@@ -1,3 +1,1 @@
-.MuiInputBase-root {
-  background-color: #fff !important;
-}
+/* App.css is now redundant. Core styles are in index.css and MUI theme. */

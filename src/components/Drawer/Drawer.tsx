@@ -22,10 +22,7 @@ import {
 
 import { Link } from "react-router-dom";
 import { useContext } from "react";
-import { tokenContext } from "../../Context/tokenContext";
-import { CartContext } from "../../Context/CartContext";
-import { WishlistContext } from "../../Context/WishlistContext";
-import { useThemeContext } from "../../Context/ThemeContext";
+import { tokenContext, CartContext, WishlistContext, useThemeContext } from "../../Context";
 
 import UserMenu from "./UserMenu";
 import DesktopNav from "./DesktopNav";
