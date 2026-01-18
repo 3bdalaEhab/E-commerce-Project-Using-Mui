@@ -5,6 +5,7 @@ import Footer from "../Footer/Footer";
 import { Box } from "@mui/material";
 import TopProgressBar from "../Common/TopProgressBar";
 import ThemeCustomizer from "../Common/ThemeCustomizer";
+import ScrollToTop from "../Common/ScrollToTop";
 
 export default function LayOut() {
     return (
@@ -15,6 +16,7 @@ export default function LayOut() {
             <Box component="main" sx={{ flexGrow: 1 }}>
                 <Outlet />
             </Box>
+            <ScrollToTop />
             <Footer />
         </Box>
     );

@@ -1,4 +1,4 @@
-import React, { useContext, useCallback } from "react";
+import React, { useContext, useCallback, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
     Box,
@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 import { CartContext, WishlistContext, useToast } from "../../Context";
 import PageMeta from "../../components/PageMeta/PageMeta";
 import ProductCard from "../../components/Common/ProductCard";
+import ProductFilterBar from "../../components/Common/ProductFilterBar";
 import { motion } from "framer-motion";
 import { productService } from "../../services";
 import { Product } from "../../types";
@@ -41,15 +42,26 @@ const Products: React.FC = () => {
     const navigate = useNavigate();
     const { showToast } = useToast();
     const { addToCart } = useContext(CartContext);
-    const { addToWishlist, wishListItemId, removeFromWishlist } = useContext(
-        WishlistContext
-    );
+    const { addToWishlist, wishListItemId, removeFromWishlist } = useContext(WishlistContext);
 
-    const { data, isLoading, isError, error } = useQuery({
-        queryKey: ["products"],
-        queryFn: () => productService.getProducts(),
-        select: (res) => res.data
+    // Filter States
+    const [searchQuery, setSearchQuery] = useState("");
+    const [sortOption, setSortOption] = useState("price");
+    const [priceRange, setPriceRange] = useState<number[]>([0, 50000]);
+
+    const { data: productsData, isLoading, isError, error } = useQuery({
+        queryKey: ["products", searchQuery, sortOption, priceRange],
+        queryFn: () => productService.getProducts({
+            keyword: searchQuery || undefined,
+            sort: sortOption,
+            'price[gte]': priceRange[0],
+            'price[lte]': priceRange[1],
+            limit: 50
+        }),
+        keepPreviousData: true
     });
+
+    const products = productsData?.data || [];
 
     const addCart = useCallback(
         async (productId: string) => {
@@ -130,33 +142,50 @@ const Products: React.FC = () => {
                 </Typography>
             </Box>
 
-            <Box sx={{ px: { xs: 2, sm: 4, md: 6 } }}>
-                <Box
-                    component={motion.div}
-                    variants={containerVariants}
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: true, margin: "-100px" }}
-                    sx={{
-                        display: "grid",
-                        gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-                        gap: 4,
-                    }}
-                >
-                    {data?.map((product: Product) => (
-                        <motion.div key={product._id} variants={itemVariants}>
-                            <ProductCard
-                                product={product}
-                                index={0} // Index delay handled by staggerChildren
-                                onNavigate={handleNavigate}
-                                onAddToCart={addCart}
-                                onWishlistToggle={handleWishlistToggle}
-                                isWishlisted={wishListItemId.includes(product._id)}
-                            />
-                        </motion.div>
-                    ))}
+            <Container maxWidth="xl">
+                <ProductFilterBar
+                    onSearch={setSearchQuery}
+                    onSort={setSortOption}
+                    onPriceChange={setPriceRange}
+                    maxPrice={50000}
+                />
+
+                <Box sx={{ px: { xs: 0, sm: 2 } }}>
+                    {products.length === 0 && !isLoading ? (
+                        <Box sx={{ textAlign: 'center', py: 10 }}>
+                            <Typography variant="h5" color="text.secondary">
+                                No products found matching your criteria.
+                            </Typography>
+                        </Box>
+                    ) : (
+                        <Box
+                            component={motion.div}
+                            variants={containerVariants}
+                            initial="hidden"
+                            whileInView="visible"
+                            viewport={{ once: true, margin: "-100px" }}
+                            sx={{
+                                display: "grid",
+                                gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+                                gap: 4,
+                            }}
+                        >
+                            {products.map((product: Product) => (
+                                <motion.div key={product._id} variants={itemVariants}>
+                                    <ProductCard
+                                        product={product}
+                                        index={0} // Index delay handled by staggerChildren
+                                        onNavigate={handleNavigate}
+                                        onAddToCart={addCart}
+                                        onWishlistToggle={handleWishlistToggle}
+                                        isWishlisted={wishListItemId.includes(product._id)}
+                                    />
+                                </motion.div>
+                            ))}
+                        </Box>
+                    )}
                 </Box>
-            </Box>
+            </Container>
         </Box>
     );
 };

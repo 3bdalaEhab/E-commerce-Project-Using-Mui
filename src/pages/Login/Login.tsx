@@ -39,7 +39,13 @@ const Login: React.FC = () => {
         register,
         handleSubmit,
         formState: { errors, isValid },
-    } = useForm<LoginCredentials>({ mode: 'onChange' });
+    } = useForm<LoginCredentials>({
+        mode: 'onChange',
+        defaultValues: {
+            email: "ahmed@example.com",
+            password: "Password123!"
+        }
+    });
 
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);

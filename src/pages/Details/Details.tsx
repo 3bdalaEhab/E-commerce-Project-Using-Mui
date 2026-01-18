@@ -19,6 +19,9 @@ import {
 } from "@mui/material";
 import { FavoriteBorder as FavoriteBorderIcon, Favorite as FavoriteIcon } from "@mui/icons-material";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import NavigateNextIcon from "@mui/icons-material/NavigateNext";
+import { Link as RouterLink } from "react-router-dom";
+import { Breadcrumbs, Link as MuiLink } from "@mui/material";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Autoplay } from "swiper/modules";
 import "swiper/css";
@@ -102,9 +105,29 @@ const Details: React.FC = () => {
 
     return (
         <Box sx={{ bgcolor: "background.default", minHeight: "100vh", pb: 10 }}>
-            <PageMeta title={data.title} description={data.description.slice(0, 160)} />
+            <PageMeta
+                title={data.title}
+                description={data.description}
+                image={data.imageCover}
+                type="product"
+            />
 
             <Container maxWidth="lg" sx={{ pt: { xs: 5, md: 10 } }}>
+                {/* Breadcrumbs */}
+                <Breadcrumbs
+                    separator={<NavigateNextIcon fontSize="small" />}
+                    aria-label="breadcrumb"
+                    sx={{ mb: 4, '& .MuiBreadcrumbs-li': { fontWeight: 600 } }}
+                >
+                    <MuiLink component={RouterLink} underline="hover" color="inherit" to="/">
+                        Home
+                    </MuiLink>
+                    <MuiLink component={RouterLink} underline="hover" color="inherit" to="/products">
+                        Products
+                    </MuiLink>
+                    <Typography color="text.primary" fontWeight="700">{data.category?.name}</Typography>
+                </Breadcrumbs>
+
                 <Paper
                     elevation={0}
                     sx={{

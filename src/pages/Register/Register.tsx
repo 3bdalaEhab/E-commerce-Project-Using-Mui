@@ -45,6 +45,13 @@ const Register: React.FC = () => {
         watch,
     } = useForm<RegisterCredentials>({
         mode: "onChange",
+        defaultValues: {
+            name: "New Elite User",
+            email: "new_user@example.com",
+            phone: "01012345678",
+            password: "Password123!",
+            rePassword: "Password123!"
+        }
     });
 
     const [showPassword, setShowPassword] = useState(false);

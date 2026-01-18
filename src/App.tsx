@@ -30,6 +30,7 @@ const ForgotPass = lazy(() => import('./pages/ForgotPass/ForgotPass'));
 const VerifyResetCode = lazy(() => import('./pages/VerifyResetCode/VerifyResetCode'));
 const ResetPassword = lazy(() => import('./pages/ResetPassword/ResetPassword'));
 const ChangePassword = lazy(() => import('./pages/ChangePassword/ChangePassword'));
+const Profile = lazy(() => import('./pages/Profile/Profile'));
 
 // Suspense wrapper for lazy components with animations
 const SuspenseWrapper = ({ children }: { children: React.ReactNode }) => (
@@ -142,6 +143,16 @@ function App() {
                         <ProtectedRoutes>
                             <SuspenseWrapper>
                                 <ChangePassword />
+                            </SuspenseWrapper>
+                        </ProtectedRoutes>
+                    ),
+                },
+                {
+                    path: '/profile',
+                    element: (
+                        <ProtectedRoutes>
+                            <SuspenseWrapper>
+                                <Profile />
                             </SuspenseWrapper>
                         </ProtectedRoutes>
                     ),
