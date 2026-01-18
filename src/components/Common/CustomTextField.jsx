@@ -33,15 +33,15 @@ const CustomTextField = React.memo(React.forwardRef(({
                 mb: 3,
                 '& .MuiInputBase-root': {
                     borderRadius: '16px',
-                    backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : 'rgba(0, 0, 0, 0.01)',
+                    backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.9)' : 'rgba(0, 0, 0, 0.01)', // Light background in dark mode
                     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                     border: '1px solid transparent',
                     '&:hover': {
-                        backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.07)' : 'rgba(0, 0, 0, 0.02)',
+                        backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 1)' : 'rgba(0, 0, 0, 0.02)',
                         borderColor: theme.palette.primary.main + '40',
                     },
                     '&.Mui-focused': {
-                        backgroundColor: theme.palette.mode === 'dark' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255, 255, 255, 1)',
+                        backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 1)' : 'rgba(255, 255, 255, 1)',
                         borderColor: theme.palette.primary.main,
                         boxShadow: `0 0 0 4px ${theme.palette.primary.main}15`,
                     },
@@ -50,11 +50,11 @@ const CustomTextField = React.memo(React.forwardRef(({
                     }
                 },
                 '& .MuiInputBase-input': {
-                    color: theme.palette.text.primary,
+                    color: theme.palette.mode === 'dark' ? '#000000' : theme.palette.text.primary, // Black text in dark mode
                     padding: '14px 16px',
                     fontWeight: 500,
                     '&::placeholder': {
-                        color: theme.palette.text.disabled,
+                        color: theme.palette.mode === 'dark' ? 'rgba(0, 0, 0, 0.5)' : theme.palette.text.disabled,
                         opacity: 1,
                     },
                 },
@@ -70,6 +70,16 @@ const CustomTextField = React.memo(React.forwardRef(({
                 },
                 '& .MuiOutlinedInput-notchedOutline': {
                     border: 'none', // We use the container border for a cleaner look
+                },
+                // 🔹 Ensure Icons are Dark in Dark Mode (Since background is light)
+                '& .MuiInputAdornment-root': {
+                    color: theme.palette.mode === 'dark' ? 'rgba(0, 0, 0, 0.7)' : theme.palette.text.secondary,
+                },
+                '& .MuiIconButton-root': {
+                    color: theme.palette.mode === 'dark' ? 'rgba(0, 0, 0, 0.7)' : theme.palette.text.secondary,
+                    '&:hover': {
+                        backgroundColor: theme.palette.mode === 'dark' ? 'rgba(0,0,0,0.05)' : 'rgba(0,0,0,0.05)'
+                    }
                 },
                 ...sx
             }}
