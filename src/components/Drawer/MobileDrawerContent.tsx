@@ -17,6 +17,8 @@ import {
     Lock as LockIcon,
 } from "@mui/icons-material";
 import { useThemeContext, useAuth, useToast } from "../../Context";
+import { storage } from "../../utils/storage";
+import { logger } from "../../utils/logger";
 import GlobalSearch from "../Common/GlobalSearch";
 import { NavItem } from "./types";
 
@@ -37,9 +39,10 @@ const MobileDrawerContent: React.FC<MobileDrawerContentProps> = ({
 
     const logOut = () => {
         try {
-            localStorage.removeItem("userToken");
+            storage.remove("userToken");
+            logger.info('User logged out', 'MobileDrawerContent');
         } catch (err) {
-            console.error("Logout error:", err);
+            logger.error("Logout error", 'MobileDrawerContent', err);
         }
         setUserToken(null);
         handleDrawerToggle(); // Close drawer

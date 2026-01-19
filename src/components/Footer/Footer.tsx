@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
-import { Box, Container, Typography, Link as MuiLink, Stack, IconButton, Divider, useTheme, Grid2 as Grid, TextField, Button, Snackbar, Alert } from '@mui/material';
+import { Box, Container, Typography, Link as MuiLink, Stack, IconButton, Divider, useTheme, TextField, Button, Grid } from '@mui/material';
 import { Facebook, Twitter, Instagram, LinkedIn, GitHub, MailOutline, Phone, LocationOn } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 import { Link as RouterLink } from 'react-router-dom';
 import { useToast } from '../../Context';
+
 
 export default function Footer() {
     const theme = useTheme();
     const { showToast } = useToast();
     const currentYear = new Date().getFullYear();
     const [email, setEmail] = useState('');
+
 
     const footerLinks = {
         shop: [
@@ -32,6 +34,7 @@ export default function Footer() {
         ]
     };
 
+
     const handleNewsletterSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (!email || !email.includes('@')) {
@@ -42,6 +45,7 @@ export default function Footer() {
         setEmail('');
     };
 
+
     const socialLinks = [
         { Icon: Facebook, label: 'Visit our Facebook page', url: '#' },
         { Icon: Twitter, label: 'Follow us on Twitter', url: '#' },
@@ -49,6 +53,7 @@ export default function Footer() {
         { Icon: LinkedIn, label: 'Connect with us on LinkedIn', url: '#' },
         { Icon: GitHub, label: 'View our GitHub profile', url: '#' },
     ];
+
 
     return (
         <Box
@@ -68,7 +73,7 @@ export default function Footer() {
             <Container maxWidth="lg">
                 <Grid container spacing={6}>
                     {/* Brand & Newsletter Column */}
-                    <Grid xs={12} lg={4}>
+                    <Grid size={{ xs: 12, lg: 4 }}>
                         <Box mb={4}>
                             <Typography
                                 variant="h4"
@@ -86,6 +91,7 @@ export default function Footer() {
                             <Typography variant="body1" color="text.secondary" sx={{ mb: 4, lineHeight: 1.8 }}>
                                 Experience the pinnacle of online shopping with our curated selection of premium electronics and fashion. Quality guaranteed, every time.
                             </Typography>
+
 
                             <Typography variant="subtitle2" sx={{ fontWeight: 800, mb: 2, textTransform: 'uppercase', letterSpacing: '1px' }} component="h3">
                                 Join our newsletter
@@ -118,8 +124,9 @@ export default function Footer() {
                         </Box>
                     </Grid>
 
+
                     {/* Links Columns */}
-                    <Grid xs={12} sm={4} lg={2}>
+                    <Grid size={{ xs: 12, sm: 4, lg: 2 }}>
                         <Typography variant="subtitle1" component="h3" sx={{ fontWeight: 900, mb: 3 }}>Shop</Typography>
                         <Stack spacing={1.5} component="nav" aria-label="Shop navigation">
                             {footerLinks.shop.map((link) => (
@@ -138,7 +145,8 @@ export default function Footer() {
                         </Stack>
                     </Grid>
 
-                    <Grid xs={12} sm={4} lg={2}>
+
+                    <Grid size={{ xs: 12, sm: 4, lg: 2 }}>
                         <Typography variant="subtitle1" component="h3" sx={{ fontWeight: 900, mb: 3 }}>Support</Typography>
                         <Stack spacing={1.5} component="nav" aria-label="Support navigation">
                             {footerLinks.support.map((link) => (
@@ -157,7 +165,8 @@ export default function Footer() {
                         </Stack>
                     </Grid>
 
-                    <Grid xs={12} sm={4} lg={4}>
+
+                    <Grid size={{ xs: 12, sm: 4, lg: 4 }}>
                         <Typography variant="subtitle1" component="h3" sx={{ fontWeight: 900, mb: 3 }}>Get in Touch</Typography>
                         <Stack spacing={3} component="address" sx={{ fontStyle: 'normal' }}>
                             <Stack direction="row" spacing={2} alignItems="center">
@@ -188,7 +197,9 @@ export default function Footer() {
                     </Grid>
                 </Grid>
 
+
                 <Divider sx={{ my: 6, opacity: 0.5 }} />
+
 
                 <Stack
                     direction={{ xs: 'column-reverse', md: 'row' }}
@@ -199,6 +210,7 @@ export default function Footer() {
                     <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
                         © {currentYear} E-COMMERCE. Developed with expertise for a world-class experience.
                     </Typography>
+
 
                     <Stack direction="row" spacing={1.5} component="nav" aria-label="Social media links">
                         {socialLinks.map(({ Icon, label, url }, idx) => (

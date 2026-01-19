@@ -14,6 +14,8 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import { Lock as LockIcon, Logout } from "@mui/icons-material";
 import { useAuth, useThemeContext, useToast } from "../../Context";
+import { storage } from "../../utils/storage";
+import { logger } from "../../utils/logger";
 
 const UserMenu: React.FC = () => {
     const theme = useTheme();
@@ -35,9 +37,10 @@ const UserMenu: React.FC = () => {
 
     const logOut = () => {
         try {
-            localStorage.removeItem("userToken");
+            storage.remove("userToken");
+            logger.info('User logged out', 'UserMenu');
         } catch (err) {
-            console.error("Logout error:", err);
+            logger.error("Logout error", 'UserMenu', err);
         }
         setUserToken(null);
         handleMenuClose();

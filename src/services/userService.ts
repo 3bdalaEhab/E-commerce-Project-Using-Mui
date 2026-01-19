@@ -1,20 +1,12 @@
 import api from './api';
 import { ApiResponse, User } from '../types';
-import { jwtDecode } from 'jwt-decode';
+import { decodeToken } from '../utils/security';
+import { logger } from '../utils/logger';
 
 interface UserData {
     name: string;
     email: string;
     phone: string;
-}
-
-interface DecodedToken {
-    id: string;
-    name: string;
-    email?: string;
-    role: string;
-    iat: number;
-    exp: number;
 }
 
 export const userService = {
@@ -27,17 +19,16 @@ export const userService = {
     // Get current user data from token
     getMe: (): User | null => {
         try {
-            const token = localStorage.getItem('userToken');
-            if (!token) return null;
+            const decoded = decodeToken();
+            if (!decoded) return null;
 
-            const decoded = jwtDecode<DecodedToken>(token);
             return {
                 name: decoded.name || 'User',
                 email: decoded.email || '',
                 role: decoded.role || 'user'
             };
         } catch (error) {
-            console.error('Error decoding token:', error);
+            logger.error('Error decoding token', 'userService', error);
             return null;
         }
     }

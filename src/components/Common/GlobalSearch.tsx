@@ -34,6 +34,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { productService, categoryService } from "../../services";
 import { Product, Category } from "../../types";
 import { useQuery } from "@tanstack/react-query";
+import { storage } from "../../utils/storage";
+import { logger } from "../../utils/logger";
 
 // Debounce hook for performance
 function useDebounce<T>(value: T, delay: number): T {
@@ -91,13 +93,9 @@ const GlobalSearch: React.FC = () => {
 
     // Load recent searches on mount
     useEffect(() => {
-        const saved = localStorage.getItem("recent_searches");
-        if (saved) {
-            try {
-                setRecentSearches(JSON.parse(saved).slice(0, 8));
-            } catch (e) {
-                console.error("Error parsing recent searches:", e);
-            }
+        const saved = storage.get<string[]>('recent_searches', []);
+        if (saved && Array.isArray(saved)) {
+            setRecentSearches(saved.slice(0, 8));
         }
     }, []);
 
@@ -173,7 +171,7 @@ const GlobalSearch: React.FC = () => {
             ...recentSearches.filter(s => s.toLowerCase() !== query.toLowerCase())
         ].slice(0, 8);
         setRecentSearches(updatedRecent);
-        localStorage.setItem("recent_searches", JSON.stringify(updatedRecent));
+        storage.set("recent_searches", updatedRecent);
     }, [recentSearches]);
 
     const handleSearchSubmit = useCallback((query: string) => {
@@ -216,7 +214,7 @@ const GlobalSearch: React.FC = () => {
     const removeFromHistory = useCallback((term: string) => {
         const updated = recentSearches.filter(s => s !== term);
         setRecentSearches(updated);
-        localStorage.setItem("recent_searches", JSON.stringify(updated));
+        storage.set('recent_searches', updated);
     }, [recentSearches]);
 
     const showSuggestions = isFocused && (searchValue.length > 0 || recentSearches.length > 0 || matchingCategories.length > 0);
@@ -568,7 +566,7 @@ const GlobalSearch: React.FC = () => {
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             setRecentSearches([]);
-                                            localStorage.removeItem("recent_searches");
+                                            storage.remove("recent_searches");
                                         }}
                                     >
                                         Clear all

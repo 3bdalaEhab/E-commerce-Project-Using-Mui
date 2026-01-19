@@ -2,6 +2,8 @@ import React, { createContext, useContext, useMemo, useState, useEffect, ReactNo
 import { ThemeProvider, createTheme, Theme, PaletteMode } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import { storage } from '../utils/storage';
+import { logger } from '../utils/logger';
 
 // Types
 interface ThemeContextType {
@@ -169,7 +171,7 @@ export default function ThemeContextProvider({ children }: ThemeContextProviderP
     const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
 
     const [mode, setMode] = useState<PaletteMode>(() => {
-        const savedMode = localStorage.getItem('themeMode') as PaletteMode | null;
+        const savedMode = storage.get<PaletteMode>('themeMode');
         if (savedMode && (savedMode === 'light' || savedMode === 'dark')) {
             return savedMode;
         }
@@ -177,17 +179,19 @@ export default function ThemeContextProvider({ children }: ThemeContextProviderP
     });
 
     const [primaryColor, setPrimaryColor] = useState<string>(() => {
-        return localStorage.getItem('primaryColor') || '#2563eb';
+        return storage.get<string>('primaryColor') || '#2563eb';
     });
 
     useEffect(() => {
-        localStorage.setItem('themeMode', mode);
+        storage.set('themeMode', mode);
         document.body.setAttribute('data-theme', mode);
+        logger.debug(`Theme mode changed to: ${mode}`, 'ThemeContext');
     }, [mode]);
 
     useEffect(() => {
-        localStorage.setItem('primaryColor', primaryColor);
+        storage.set('primaryColor', primaryColor);
         document.documentElement.style.setProperty('--primary-color', primaryColor);
+        logger.debug(`Primary color changed to: ${primaryColor}`, 'ThemeContext');
     }, [primaryColor]);
 
     const toggleTheme = () => {

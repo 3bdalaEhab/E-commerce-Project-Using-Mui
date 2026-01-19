@@ -8,7 +8,8 @@ import Loading from './components/Loading/Loading';
 import PageTransitions from './components/Common/PageTransitions';
 
 // Context
-import { tokenContext } from './Context/tokenContext';
+import { useAuth } from './Context';
+import { storage } from './utils/storage';
 
 // Route Guards
 import UnProtectedRoutes from './components/DirectingUsers/UnProtectedRoutes';
@@ -42,10 +43,10 @@ const SuspenseWrapper = ({ children }: { children: React.ReactNode }) => (
 );
 
 function App() {
-    const { setUserToken } = useContext(tokenContext);
+    const { setUserToken } = useAuth();
 
     useEffect(() => {
-        const token = localStorage.getItem('userToken');
+        const token = storage.get<string>('userToken');
         if (token) {
             setUserToken(token);
         }

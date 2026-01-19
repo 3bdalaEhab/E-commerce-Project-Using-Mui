@@ -1,4 +1,7 @@
-import React, { createContext, useState, useContext, useMemo, ReactNode } from 'react';
+import React, { createContext, useState, useContext, useMemo, ReactNode, useCallback } from 'react';
+import { storage } from '../utils/storage';
+import { logger } from '../utils/logger';
+import { validateToken } from '../utils/security';
 
 // Types
 interface TokenContextType {
@@ -22,13 +25,25 @@ export const tokenContext = createContext<TokenContextType>({
 
 export default function TokenContextProvider({ children }: TokenContextProviderProps) {
   const [userToken, setUserToken] = useState<string | null>(() => {
-    return localStorage.getItem('userToken');
+    const token = storage.get<string>('userToken');
+    // Validate token on initialization
+    if (token && validateToken(token)) {
+      return token;
+    }
+    // Remove invalid token
+    if (token) {
+      storage.remove('userToken');
+      logger.warn('Invalid token removed on initialization', 'TokenContext');
+    }
+    return null;
   });
 
-  const logout = () => {
-    localStorage.removeItem('userToken');
+  // Enhanced logout with logging
+  const logout = useCallback(() => {
+    logger.info('User logged out', 'TokenContext');
+    storage.remove('userToken');
     setUserToken(null);
-  };
+  }, []);
 
   // Memoize context value
   const contextValue = useMemo<TokenContextType>(

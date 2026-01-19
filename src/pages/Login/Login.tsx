@@ -27,6 +27,7 @@ import AuthLayout from "../../components/Common/AuthLayout";
 import CustomTextField from "../../components/Common/CustomTextField";
 import { authService } from "../../services";
 import { LoginCredentials } from "../../types";
+import storage from "@/utils/storage";
 
 const Login: React.FC = () => {
     const { setUserToken } = useAuth();
@@ -65,7 +66,7 @@ const Login: React.FC = () => {
                 showToast("✅ Welcome back! Logged in successfully.", "success");
                 const token = res.token;
                 setTimeout(() => {
-                    localStorage.setItem("userToken", token);
+                    storage.set("userToken", token);
                     setUserToken(token);
                     navigate("/");
                 }, 1200);

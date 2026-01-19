@@ -11,8 +11,8 @@ import {
     Typography,
     LinearProgress,
     Stack,
-    Grid
 } from "@mui/material";
+import Grid from "@mui/material/Grid";
 import {
     Email,
     Person,
@@ -146,7 +146,7 @@ const Register: React.FC = () => {
                         </Grid>
 
                         {/* 📧 Email Field */}
-                        <Grid size={{ xs: 12 }}>
+                        <Grid xs={12}>
                             <CustomTextField
                                 label="Email Address"
                                 type="email"
@@ -165,7 +165,7 @@ const Register: React.FC = () => {
                         </Grid>
 
                         {/* 📞 Phone Field */}
-                        <Grid size={{ xs: 12 }}>
+                        <Grid xs={12}>
                             <CustomTextField
                                 label="Phone Number"
                                 icon={PhoneIcon}
@@ -183,7 +183,7 @@ const Register: React.FC = () => {
                         </Grid>
 
                         {/* 🔒 Password Field */}
-                        <Grid size={{ xs: 12, sm: 6 }}>
+                        <Grid xs={12} sm={6}>
                             <CustomTextField
                                 label="Password"
                                 type={showPassword ? "text" : "password"}
@@ -211,7 +211,7 @@ const Register: React.FC = () => {
                         </Grid>
 
                         {/* 🔒 Confirm Password Field */}
-                        <Grid size={{ xs: 12, sm: 6 }}>
+                        <Grid xs={12} sm={6}>
                             <CustomTextField
                                 label="Confirm"
                                 type={showPassword ? "text" : "password"}

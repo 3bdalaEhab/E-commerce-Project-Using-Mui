@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
+import { getUserId } from "../../utils/security";
+import { logger } from "../../utils/logger";
 import { motion, AnimatePresence } from "framer-motion";
 import PageMeta from "../../components/PageMeta/PageMeta";
 import {
@@ -33,33 +34,23 @@ import Loading from "../../components/Loading/Loading";
 import EmptyState from "../../components/Common/EmptyState";
 import { orderService } from "../../services";
 import { Order, Product } from "../../types";
-
-interface DecodedToken {
-    id: string;
-    _id?: string;
-    name: string;
-    role: string;
-    iat: number;
-    exp: number;
-}
+import { getUserId } from "../../utils/security";
+import { logger } from "../../utils/logger";
 
 const AllOrders: React.FC = () => {
     const theme = useTheme();
     const navigate = useNavigate();
     const [userId, setUserId] = useState<string | null>(null);
     const [expandedRows, setExpandedRows] = useState<Record<string, boolean>>({});
-    const token = localStorage.getItem("userToken");
 
     useEffect(() => {
-        if (token) {
-            try {
-                const decoded = jwtDecode<DecodedToken>(token);
-                setUserId(decoded._id || decoded.id);
-            } catch (error) {
-                console.error("Failed to decode token", error);
-            }
+        const userIdFromToken = getUserId();
+        if (userIdFromToken) {
+            setUserId(userIdFromToken);
+        } else {
+            logger.warn('No valid user ID found', 'AllOrders');
         }
-    }, [token]);
+    }, []);
 
     const { data: ordersData, isLoading, isError, error } = useQuery<Order[]>({
         queryKey: ["orders", userId],
