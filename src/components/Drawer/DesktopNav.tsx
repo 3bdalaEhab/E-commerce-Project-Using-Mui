@@ -4,7 +4,7 @@ import { Link, useLocation } from "react-router-dom";
 import { useThemeContext } from "../../Context";
 import GlobalSearch from "../Common/GlobalSearch";
 import { NavItem } from "./types";
-import { pages } from "../../App";
+import { pages } from "../../constants/pages";
 
 interface DesktopNavProps {
     navItems: NavItem[];

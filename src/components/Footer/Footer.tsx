@@ -5,7 +5,9 @@ import { motion } from 'framer-motion';
 import { Link as RouterLink } from 'react-router-dom';
 import { useToast } from '../../Context';
 
-import { pages } from '../../App';
+import { pages } from '../../constants/pages';
+
+const MotionIconButton = motion(IconButton);
 
 
 export default function Footer() {
@@ -239,9 +241,8 @@ export default function Footer() {
 
                     <Stack direction="row" spacing={1.5} component="nav" aria-label="Social media links">
                         {socialLinks.map(({ Icon, label, url }, idx) => (
-                            <IconButton
+                            <MotionIconButton
                                 key={idx}
-                                {...({ component: motion.button } as any)}
                                 whileHover={{ y: -4, color: theme.palette.primary.main }}
                                 size="medium"
                                 href={url}
@@ -256,7 +257,7 @@ export default function Footer() {
                                 }}
                             >
                                 <Icon fontSize="small" />
-                            </IconButton>
+                            </MotionIconButton>
                         ))}
                     </Stack>
                 </Stack>

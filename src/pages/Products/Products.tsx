@@ -64,7 +64,7 @@ const Products: React.FC = () => {
         setSelectedCategory(urlCategory);
     }, [urlKeyword, urlCategory]);
 
-    const { data: productsData, isLoading, isError, error, isFetching } = useQuery({
+    const { data: productsData, isLoading, isError, isFetching } = useQuery({
         queryKey: ["products", searchQuery, selectedCategory, sortOption, priceRange],
         queryFn: () => productService.getProducts({
             keyword: searchQuery || undefined,
@@ -72,7 +72,7 @@ const Products: React.FC = () => {
             sort: sortOption,
             'price[gte]': priceRange[0],
             'price[lte]': priceRange[1],
-            limit: 50, // Increased limit to show more products
+            limit: 50,
         }),
         placeholderData: keepPreviousData
     });

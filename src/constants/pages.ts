@@ -1,0 +1,18 @@
+export const pages = {
+    Home: () => import('../pages/Home/Home'),
+    Products: () => import('../pages/Products/Products'),
+    Categories: () => import('../pages/Categories/Categories'),
+    Wishlist: () => import('../pages/Wishlist/Wishlist'),
+    Cart: () => import('../pages/Cart/Cart'),
+    Details: () => import('../pages/Details/Details'),
+    Register: () => import('../pages/Register/Register'),
+    Login: () => import('../pages/Login/Login'),
+    NotFound: () => import('../pages/NotFound/NotFound'),
+    AllOrders: () => import('../pages/AllOrders/AllOrders'),
+    Checkout: () => import('../pages/Checkout/Checkout'),
+    ForgotPass: () => import('../pages/ForgotPass/ForgotPass'),
+    VerifyResetCode: () => import('../pages/VerifyResetCode/VerifyResetCode'),
+    ResetPassword: () => import('../pages/ResetPassword/ResetPassword'),
+    ChangePassword: () => import('../pages/ChangePassword/ChangePassword'),
+    Profile: () => import('../pages/Profile/Profile'),
+} as const;

@@ -21,7 +21,7 @@ import { storage } from "../../utils/storage";
 import { logger } from "../../utils/logger";
 import GlobalSearch from "../Common/GlobalSearch";
 import { NavItem } from "./types";
-import { pages } from "../../App";
+import { pages } from "../../constants/pages";
 
 interface MobileDrawerContentProps {
     navItems: NavItem[];
