@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import {
     Box,
@@ -24,6 +24,7 @@ import { Link as RouterLink } from "react-router-dom";
 import { Breadcrumbs, Link as MuiLink } from "@mui/material";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Autoplay } from "swiper/modules";
+import { useTranslation } from "react-i18next";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
@@ -45,29 +46,30 @@ const Details: React.FC = () => {
     const { showToast } = useToast();
     const [addingToCart, setAddingToCart] = useState(false);
     const [wishlistLoading, setWishlistLoading] = useState(false);
+    const { t } = useTranslation();
 
     const isInWishlist = React.useMemo(() => {
         if (!id) return false;
         return wishListItemId.includes(id);
     }, [id, wishListItemId]);
 
-    const handleWishlistToggle = async () => {
+    const handleWishlistToggle = useCallback(async () => {
         if (!id) return;
         setWishlistLoading(true);
         try {
             if (isInWishlist) {
                 await removeFromWishlist(id);
-                showToast("💔 Removed from your wishlist", "success");
+                showToast(t("toasts.removedFromWishlist"), "success");
             } else {
                 await addToWishlist(id);
-                showToast("❤️ Added to your wishlist", "success");
+                showToast(t("toasts.addedToWishlist"), "success");
             }
         } catch {
-            showToast("❌ An error occurred. Please try again.", "error");
+            showToast(t("toasts.error"), "error");
         } finally {
             setWishlistLoading(false);
         }
-    };
+    }, [id, isInWishlist, removeFromWishlist, addToWishlist, showToast, t]);
 
     const { data, isLoading, isError, error } = useQuery({
         queryKey: ["productDetails", id],
@@ -90,22 +92,22 @@ const Details: React.FC = () => {
     // Track History
     const recentProducts = useRecentlyViewed(data || null);
 
-    async function addCart() {
+    const addCart = useCallback(async () => {
         if (!id) return;
         try {
             setAddingToCart(true);
             const res = await addToCart(id);
             if (res?.status === "success") {
-                showToast("✨ Product added to your premium collection!", "success");
+                showToast(t("toasts.addedToCart"), "success");
             } else {
-                showToast(res?.message || "Failed to add product.", "error");
+                showToast(res?.message || t("toasts.failedToAddToCart"), "error");
             }
         } catch {
-            showToast("❌ Connection error. Please try again.", "error");
+            showToast(t("toasts.error"), "error");
         } finally {
             setAddingToCart(false);
         }
-    }
+    }, [id, addToCart, showToast, t]);
 
     if (isLoading) return <DetailsSkeleton />;
 
@@ -139,10 +141,10 @@ const Details: React.FC = () => {
                     sx={{ mb: 4, '& .MuiBreadcrumbs-li': { fontWeight: 600 } }}
                 >
                     <MuiLink component={RouterLink} underline="hover" color="inherit" to="/">
-                        Home
+                        {t("nav.home")}
                     </MuiLink>
                     <MuiLink component={RouterLink} underline="hover" color="inherit" to="/products">
-                        Products
+                        {t("nav.products")}
                     </MuiLink>
                     <Typography color="text.primary" fontWeight="700">{data.category?.name}</Typography>
                 </Breadcrumbs>
@@ -181,7 +183,7 @@ const Details: React.FC = () => {
                                     ))}
                                 </Swiper>
                                 <Chip
-                                    label="PREMIUM"
+                                    label={t("common.premium")}
                                     sx={{ position: 'absolute', top: 20, left: 20, zIndex: 2, bgcolor: 'rgba(0,0,0,0.6)', color: 'white', backdropFilter: 'blur(8px)', fontWeight: 900, borderRadius: '8px' }}
                                 />
                             </Box>
@@ -200,7 +202,7 @@ const Details: React.FC = () => {
                                     </Typography>
                                     <Stack direction="row" spacing={1} alignItems="center">
                                         <Rating value={data.ratingsAverage} precision={0.1} readOnly sx={{ color: 'primary.main' }} />
-                                        <Typography variant="body2" fontWeight="700">({data.ratingsAverage.toFixed(1)} Rating)</Typography>
+                                        <Typography variant="body2" fontWeight="700">({data.ratingsAverage.toFixed(1)} {t("common.rating")})</Typography>
                                     </Stack>
                                 </Stack>
 
@@ -212,15 +214,15 @@ const Details: React.FC = () => {
 
                                 <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3} alignItems={{ xs: 'flex-start', sm: 'center' }}>
                                     <Box>
-                                        <Typography variant="caption" color="text.secondary" fontWeight="800" sx={{ textTransform: 'uppercase' }}>Price</Typography>
+                                        <Typography variant="caption" color="text.secondary" fontWeight="800" sx={{ textTransform: 'uppercase' }}>{t("common.price")}</Typography>
                                         <Typography variant="h3" fontWeight="1000" color="primary">
-                                            {data.price} EGP
+                                            {data.price} {t("common.egp")}
                                         </Typography>
                                         {data.quantity <= 10 && (
                                             <Stack direction="row" alignItems="center" spacing={0.5} sx={{ mt: 1, color: 'error.main' }}>
                                                 <LocalFireDepartment fontSize="small" sx={{ animation: 'pulse 1.5s infinite' }} />
                                                 <Typography variant="caption" fontWeight="800" sx={{ textTransform: 'uppercase' }}>
-                                                    {data.quantity === 0 ? 'Out of Stock!' : `High Demand - Only ${data.quantity} left!`}
+                                                    {data.quantity === 0 ? t("common.outOfStock") : t("common.highDemand", { count: data.quantity })}
                                                 </Typography>
                                             </Stack>
                                         )}
@@ -241,10 +243,9 @@ const Details: React.FC = () => {
                                                 textTransform: "none",
                                                 fontSize: "1.1rem",
                                                 background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-                                                "&:hover": { transform: "translateY(-4px)", boxShadow: theme.shadows[10] }
                                             }}
                                         >
-                                            {addingToCart ? <CircularProgress size={24} color="inherit" /> : "Add to Cart"}
+                                            {addingToCart ? <CircularProgress size={24} color="inherit" /> : t("common.addToCart")}
                                         </Button>
                                         <IconButton
                                             onClick={handleWishlistToggle}
@@ -281,14 +282,14 @@ const Details: React.FC = () => {
                 <Box sx={{ mt: 10 }}>
                     {relatedProducts && relatedProducts.length > 0 && (
                         <ProductSlider
-                            title="You May Also Like"
+                            title={t("common.youMayAlsoLike")}
                             products={relatedProducts}
                         />
                     )}
 
                     {recentProducts.length > 0 && (
                         <ProductSlider
-                            title="Recently Viewed"
+                            title={t("common.recentlyViewed")}
                             products={recentProducts}
                         />
                     )}

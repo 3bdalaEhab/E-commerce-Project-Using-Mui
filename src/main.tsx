@@ -11,6 +11,7 @@ import {
 } from './Context';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import ErrorBoundary from './components/Common/ErrorBoundary';
+import './i18n/i18n';
 
 // Optimized Query Client Configuration
 const queryClient = new QueryClient({

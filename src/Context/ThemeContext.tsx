@@ -1,9 +1,14 @@
-import React, { createContext, useContext, useMemo, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useMemo, useState, useEffect, useCallback, ReactNode } from 'react';
 import { ThemeProvider, createTheme, Theme, PaletteMode } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { storage } from '../utils/storage';
 import { logger } from '../utils/logger';
+import { useTranslation } from 'react-i18next';
+import { Direction } from '@mui/material';
+import { CacheProvider } from '@emotion/react';
+import createCache from '@emotion/cache';
+import rtlPlugin from 'stylis-plugin-rtl';
 
 // Types
 interface ThemeContextType {
@@ -11,6 +16,8 @@ interface ThemeContextType {
     toggleTheme: () => void;
     primaryColor: string;
     setPrimaryColor: (color: string) => void;
+    direction: Direction;
+    changeLanguage: (lng: string) => void;
 }
 
 interface ThemeContextProviderProps {
@@ -21,7 +28,8 @@ interface ThemeContextProviderProps {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 // Design tokens function with proper typing
-const getDesignTokens = (mode: PaletteMode, primaryColor: string) => ({
+const getDesignTokens = (mode: PaletteMode, primaryColor: string, direction: Direction) => ({
+    direction,
     palette: {
         mode,
         primary: {
@@ -167,6 +175,8 @@ const getDesignTokens = (mode: PaletteMode, primaryColor: string) => ({
     },
 });
 
+// Cache instances are now created inside the component to ensure stability and re-use
+
 export default function ThemeContextProvider({ children }: ThemeContextProviderProps) {
     const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
 
@@ -182,6 +192,20 @@ export default function ThemeContextProvider({ children }: ThemeContextProviderP
         return storage.get<string>('primaryColor') || '#2563eb';
     });
 
+    const { i18n } = useTranslation();
+    const [direction, setDirection] = useState<Direction>(i18n.language === 'ar' ? 'rtl' : 'ltr');
+
+    useEffect(() => {
+        const dir = i18n.language === 'ar' ? 'rtl' : 'ltr';
+        setDirection(dir);
+        document.dir = dir;
+        document.documentElement.lang = i18n.language;
+    }, [i18n.language]);
+
+    const changeLanguage = useCallback((lng: string) => {
+        i18n.changeLanguage(lng);
+    }, [i18n]);
+
     useEffect(() => {
         storage.set('themeMode', mode);
         document.body.setAttribute('data-theme', mode);
@@ -194,24 +218,36 @@ export default function ThemeContextProvider({ children }: ThemeContextProviderP
         logger.debug(`Primary color changed to: ${primaryColor}`, 'ThemeContext');
     }, [primaryColor]);
 
-    const toggleTheme = () => {
+    const toggleTheme = useCallback(() => {
         setMode((prev) => (prev === 'light' ? 'dark' : 'light'));
-    };
+    }, []);
 
-    const theme = useMemo<Theme>(() => createTheme(getDesignTokens(mode, primaryColor)), [mode, primaryColor]);
+    // Memoize the emotion caches
+    const cacheRtl = useMemo(() => createCache({
+        key: 'muirtl',
+        stylisPlugins: [rtlPlugin],
+    }), []);
+
+    const cacheLtr = useMemo(() => createCache({
+        key: 'muiltr',
+    }), []);
+
+    const theme = useMemo<Theme>(() => createTheme(getDesignTokens(mode, primaryColor, direction)), [mode, primaryColor, direction]);
 
     // Memoize context value
     const contextValue = useMemo<ThemeContextType>(
-        () => ({ mode, toggleTheme, primaryColor, setPrimaryColor }),
-        [mode, primaryColor]
+        () => ({ mode, toggleTheme, primaryColor, setPrimaryColor, direction, changeLanguage }),
+        [mode, primaryColor, direction, changeLanguage, toggleTheme]
     );
 
     return (
         <ThemeContext.Provider value={contextValue}>
-            <ThemeProvider theme={theme}>
-                <CssBaseline />
-                {children}
-            </ThemeProvider>
+            <CacheProvider value={direction === 'rtl' ? cacheRtl : cacheLtr}>
+                <ThemeProvider theme={theme}>
+                    <CssBaseline />
+                    {children}
+                </ThemeProvider>
+            </CacheProvider>
         </ThemeContext.Provider>
     );
 }

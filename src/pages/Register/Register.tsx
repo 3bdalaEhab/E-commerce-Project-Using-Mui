@@ -24,6 +24,7 @@ import {
     Apple
 } from "@mui/icons-material";
 import { Link, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useToast } from "../../Context";
 import { useThemeContext } from "../../Context/ThemeContext";
 import AuthLayout from "../../components/Common/AuthLayout";
@@ -37,6 +38,7 @@ const Register: React.FC = () => {
     const { primaryColor } = useThemeContext();
     const navigate = useNavigate();
     const { showToast } = useToast();
+    const { t } = useTranslation();
 
     const {
         register,
@@ -60,7 +62,7 @@ const Register: React.FC = () => {
     const togglePassword = useCallback(() => setShowPassword((s) => !s), []);
 
     const handleSocialLogin = (platform: string) => {
-        showToast(`🚀 ${platform} registration is coming soon! This part of the elite experience is currently in development.`, "info");
+        showToast(`🚀 ${platform} ${t("auth.socialComingSoon")}`, "info");
     };
 
     const onSubmit = async (formData: RegisterCredentials) => {
@@ -69,12 +71,12 @@ const Register: React.FC = () => {
             const res = await authService.register(formData);
 
             if (res.message === "success") {
-                showToast("✅ Account created successfully! Welcome to the elite community.", "success");
+                showToast(t("auth.registerSuccess"), "success");
                 setTimeout(() => navigate("/login"), 1500);
             }
         } catch (err) {
             const error = err as AxiosError<{ message?: string; error?: string }>;
-            const msg = error.response?.data?.message || error.response?.data?.error || "❌ Registration failed. Try again.";
+            const msg = error.response?.data?.message || error.response?.data?.error || t("auth.registerError");
             showToast(msg, "error");
         } finally {
             setLoading(false);
@@ -83,15 +85,15 @@ const Register: React.FC = () => {
 
     return (
         <AuthLayout
-            title="Join the Elite"
-            subtitle="Become part of an exclusive world of premium products and unparalleled shopping experiences."
+            title={t("auth.joinEliteTitle")}
+            subtitle={t("auth.registerSubtitle")}
         >
             <Box sx={{ width: '100%' }}>
                 <Typography variant="h4" fontWeight="1000" sx={{ mb: 1, letterSpacing: '-1px' }}>
-                    Create Account
+                    {t("auth.createAccount")}
                 </Typography>
                 <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-                    Enter your details to start your journey.
+                    {t("auth.startJourney")}
                 </Typography>
 
                 {/* 🌐 Social Registration (Elite Aesthetics) */}
@@ -125,7 +127,7 @@ const Register: React.FC = () => {
 
                 <Divider sx={{ mb: 4 }}>
                     <Typography variant="caption" sx={{ px: 2, color: 'text.disabled', fontWeight: 700, letterSpacing: '1px' }}>
-                        OR FILL IN YOUR DETAILS
+                        {t("auth.fillDetails")}
                     </Typography>
                 </Divider>
 
@@ -134,11 +136,11 @@ const Register: React.FC = () => {
                         {/* 👤 Name Field */}
                         <Grid size={{ xs: 12 }}>
                             <CustomTextField
-                                label="Full Name"
+                                label={t("auth.fullNameLabel")}
                                 icon={Person}
                                 {...register("name", {
-                                    required: "Name is required",
-                                    minLength: { value: 3, message: "Min 3 characters" },
+                                    required: t("auth.nameReq"),
+                                    minLength: { value: 3, message: t("auth.min3Char") },
                                 })}
                                 error={!!errors.name}
                                 helperText={errors.name?.message}
@@ -149,14 +151,14 @@ const Register: React.FC = () => {
                         {/* 📧 Email Field */}
                         <Grid size={{ xs: 12 }}>
                             <CustomTextField
-                                label="Email Address"
+                                label={t("auth.emailLabel")}
                                 type="email"
                                 icon={Email}
                                 {...register("email", {
-                                    required: "Email is required",
+                                    required: t("auth.emailReq"),
                                     pattern: {
                                         value: /^[^@ ]+@[^@ ]+\.[^@ .]{2,}$/,
-                                        message: "Invalid email",
+                                        message: t("auth.invalidEmail"),
                                     },
                                 })}
                                 error={!!errors.email}
@@ -168,13 +170,13 @@ const Register: React.FC = () => {
                         {/* 📞 Phone Field */}
                         <Grid size={{ xs: 12 }}>
                             <CustomTextField
-                                label="Phone Number"
+                                label={t("auth.phoneLabel")}
                                 icon={PhoneIcon}
                                 {...register("phone", {
-                                    required: "Phone is required",
+                                    required: t("auth.phoneReq"),
                                     pattern: {
                                         value: /^01[0125][0-9]{8}$/,
-                                        message: "Invalid Egyptian phone number",
+                                        message: t("auth.invalidPhone"),
                                     },
                                 })}
                                 error={!!errors.phone}
@@ -186,14 +188,14 @@ const Register: React.FC = () => {
                         {/* 🔒 Password Field */}
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <CustomTextField
-                                label="Password"
+                                label={t("auth.passwordLabel")}
                                 type={showPassword ? "text" : "password"}
                                 icon={Lock}
                                 {...register("password", {
-                                    required: "Password is required",
+                                    required: t("auth.passwordReq"),
                                     pattern: {
                                         value: /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[#?!@$%^&*-]).{8,}$/,
-                                        message: "Complexity required",
+                                        message: t("auth.complexityReq"),
                                     },
                                 })}
                                 error={!!errors.password}
@@ -214,12 +216,12 @@ const Register: React.FC = () => {
                         {/* 🔒 Confirm Password Field */}
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <CustomTextField
-                                label="Confirm"
+                                label={t("auth.confirmPasswordLabel")}
                                 type={showPassword ? "text" : "password"}
                                 icon={Lock}
                                 {...register("rePassword", {
-                                    required: "Confirm required",
-                                    validate: (value) => value === watch("password") || "Mismatch",
+                                    required: t("auth.confirmReq"),
+                                    validate: (value) => value === watch("password") || t("auth.mismatch"),
                                 })}
                                 error={!!errors.rePassword}
                                 helperText={errors.rePassword?.message}
@@ -249,7 +251,7 @@ const Register: React.FC = () => {
                             transition: "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
                         }}
                     >
-                        {loading ? <CircularProgress size={24} color="inherit" /> : "Create Your Account"}
+                        {loading ? <CircularProgress size={24} color="inherit" /> : t("auth.createAccountButton")}
                     </Button>
 
                     {/* 📝 Login Link */}
@@ -262,7 +264,7 @@ const Register: React.FC = () => {
                             fontWeight: 600
                         }}
                     >
-                        Already have an account?{" "}
+                        {t("auth.hasAccount")}{" "}
                         <Link
                             to="/login"
                             style={{
@@ -271,7 +273,7 @@ const Register: React.FC = () => {
                                 fontWeight: 900,
                             }}
                         >
-                            Sign In to Dashboard
+                            {t("auth.signInDash")}
                         </Link>
                     </Typography>
                 </form>

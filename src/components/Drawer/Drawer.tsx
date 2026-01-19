@@ -28,7 +28,9 @@ import { useAuth, CartContext, WishlistContext, useThemeContext } from "../../Co
 import UserMenu from "./UserMenu";
 import DesktopNav from "./DesktopNav";
 import MobileDrawerContent from "./MobileDrawerContent";
+import LanguageSwitcher from "../Common/LanguageSwitcher";
 import { NavItem } from "./types";
+import { useTranslation } from "react-i18next";
 
 const drawerWidth = 240;
 
@@ -45,31 +47,32 @@ const DrawerAppBar: React.FC<DrawerAppBarProps> = (props) => {
   const { numOfCartItems } = useContext(CartContext);
   const { numWishItemList } = useContext(WishlistContext);
   const { mode, toggleTheme } = useThemeContext();
+  const { t } = useTranslation();
 
   const handleDrawerToggle = () => setMobileOpen((prev) => !prev);
 
   const navItems: NavItem[] = userToken
     ? [
-      { name: "Home", path: "/", icon: <Home /> },
-      { name: "Products", path: "/products", icon: <Storefront /> },
-      { name: "Categories", path: "/categories", icon: <Category /> },
+      { name: t("nav.home"), path: "/", icon: <Home /> },
+      { name: t("nav.products"), path: "/products", icon: <Storefront /> },
+      { name: t("nav.categories"), path: "/categories", icon: <Category /> },
       {
-        name: "Wishlist",
+        name: t("nav.wishlist"),
         path: "/wishlist",
         icon: <Favorite />,
         numWishItem: numWishItemList,
       },
       {
-        name: "Cart",
+        name: t("nav.cart"),
         path: "/cart",
         icon: <ShoppingCart />,
         numItem: numOfCartItems,
       },
-      { name: "All Orders", path: "/allOrders", icon: <ListAlt /> },
+      { name: t("nav.orders"), path: "/allOrders", icon: <ListAlt /> },
     ]
     : [
-      { name: "Login", path: "/login", icon: <Login /> },
-      { name: "Register", path: "/register", icon: <AppRegistration /> },
+      { name: t("nav.login"), path: "/login", icon: <Login /> },
+      { name: t("nav.register"), path: "/register", icon: <AppRegistration /> },
     ];
 
   const container =
@@ -123,11 +126,13 @@ const DrawerAppBar: React.FC<DrawerAppBarProps> = (props) => {
               },
             }}
           >
-            E-COMMERCE
+            {t("footer.brandName")}
           </Typography>
 
+          <LanguageSwitcher />
+
           <Tooltip
-            title={mode === "light" ? "Switch to Dark Mode" : "Switch to Light Mode"}
+            title={mode === "light" ? t("auth.switchToDark") : t("auth.switchToLight")}
           >
             <IconButton
               onClick={toggleTheme}
@@ -136,7 +141,8 @@ const DrawerAppBar: React.FC<DrawerAppBarProps> = (props) => {
                   mode === "light"
                     ? "rgba(0,0,0,0.04)"
                     : "rgba(255,255,255,0.05)",
-                ml: 2,
+                ml: 1,
+                mr: 2,
                 transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
                 "&:hover": {
                   transform: "rotate(20deg) scale(1.1)",

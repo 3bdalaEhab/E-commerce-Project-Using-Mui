@@ -21,6 +21,7 @@ import {
     Apple
 } from "@mui/icons-material";
 import { Link, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useAuth, useToast } from "../../Context";
 import { useThemeContext } from "../../Context/ThemeContext";
 import AuthLayout from "../../components/Common/AuthLayout";
@@ -36,6 +37,7 @@ const Login: React.FC = () => {
     const theme = useTheme();
     const navigate = useNavigate();
     const { showToast } = useToast();
+    const { t } = useTranslation();
 
     const {
         register,
@@ -55,7 +57,7 @@ const Login: React.FC = () => {
     const togglePassword = useCallback(() => setShowPassword((s) => !s), []);
 
     const handleSocialLogin = (platform: string) => {
-        showToast(`🚀 ${platform} integration is coming soon! This part of the elite experience is currently in development.`, "info");
+        showToast(`🚀 ${platform} ${t("auth.socialComingSoon")}`, "info");
     };
 
     const onSubmit = async (formData: LoginCredentials) => {
@@ -64,7 +66,7 @@ const Login: React.FC = () => {
             const res = await authService.login({ email: formData.email.trim(), password: formData.password });
 
             if (res.message === "success" && res.token) {
-                showToast("✅ Welcome back! Logged in successfully.", "success");
+                showToast(t("auth.loginSuccess"), "success");
                 const token = res.token;
                 setTimeout(() => {
                     storage.set("userToken", token);
@@ -74,7 +76,7 @@ const Login: React.FC = () => {
             }
         } catch (err) {
             const error = err as AxiosError<{ message?: string }>;
-            const msg = error.response?.data?.message || "❌ Login failed. Please check your credentials.";
+            const msg = error.response?.data?.message || t("auth.loginError");
             showToast(msg, "error");
         } finally {
             setLoading(false);
@@ -83,15 +85,15 @@ const Login: React.FC = () => {
 
     return (
         <AuthLayout
-            title="Sign In"
-            subtitle="Access your premium dashboard and explore the global catalog of extraordinary products."
+            title={t("auth.signInTitle")}
+            subtitle={t("auth.signInSubtitle")}
         >
             <Box sx={{ width: '100%' }}>
                 <Typography variant="h4" fontWeight="1000" sx={{ mb: 1, letterSpacing: '-1px' }}>
-                    Welcome Back
+                    {t("auth.welcomeBack")}
                 </Typography>
                 <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-                    Please enter your details to continue.
+                    {t("auth.enterDetails")}
                 </Typography>
 
                 {/* 🌐 Social Logins (Enterprise Aesthetics) */}
@@ -125,21 +127,21 @@ const Login: React.FC = () => {
 
                 <Divider sx={{ mb: 4 }}>
                     <Typography variant="caption" sx={{ px: 2, color: 'text.disabled', fontWeight: 700, letterSpacing: '1px' }}>
-                        OR CONTINUE WITH EMAIL
+                        {t("auth.continueWithEmail")}
                     </Typography>
                 </Divider>
 
                 <form onSubmit={handleSubmit(onSubmit)}>
                     {/* 📧 Email Field */}
                     <CustomTextField
-                        label="Email Address"
+                        label={t("auth.emailLabel")}
                         type="email"
                         icon={Email}
                         {...register("email", {
-                            required: "Email is required",
+                            required: t("auth.emailReq"),
                             pattern: {
                                 value: /^[^@ ]+@[^@ ]+\.[^@ .]{2,}$/,
-                                message: "Invalid email address",
+                                message: t("auth.invalidEmail"),
                             },
                         })}
                         error={!!errors.email}
@@ -149,12 +151,12 @@ const Login: React.FC = () => {
 
                     {/* 🔒 Password Field */}
                     <CustomTextField
-                        label="Password"
+                        label={t("auth.passwordLabel")}
                         type={showPassword ? "text" : "password"}
                         icon={Lock}
                         {...register("password", {
-                            required: "Password is required",
-                            minLength: { value: 8, message: "At least 8 characters" },
+                            required: t("auth.passwordReq"),
+                            minLength: { value: 8, message: t("auth.minChar") },
                         })}
                         error={!!errors.password}
                         helperText={errors.password?.message}
@@ -181,7 +183,7 @@ const Login: React.FC = () => {
                                 fontWeight: 700,
                             }}
                         >
-                            Forgot Password?
+                            {t("auth.forgotPassword")}
                         </Link>
                     </Box>
 
@@ -205,7 +207,7 @@ const Login: React.FC = () => {
                             transition: "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
                         }}
                     >
-                        {loading ? <CircularProgress size={24} color="inherit" /> : "Sign In to Account"}
+                        {loading ? <CircularProgress size={24} color="inherit" /> : t("auth.signInButton")}
                     </Button>
 
                     {/* 📝 Sign Up Link */}
@@ -218,7 +220,7 @@ const Login: React.FC = () => {
                             fontWeight: 600
                         }}
                     >
-                        Don't have an account yet?{" "}
+                        {t("auth.noAccount")}{" "}
                         <Link
                             to="/register"
                             style={{
@@ -227,7 +229,7 @@ const Login: React.FC = () => {
                                 fontWeight: 900,
                             }}
                         >
-                            Join the Experience
+                            {t("auth.joinExperience")}
                         </Link>
                     </Typography>
                 </form>

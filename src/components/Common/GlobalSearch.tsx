@@ -26,6 +26,7 @@ import {
     KeyboardArrowRight
 } from "@mui/icons-material";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import { productService, categoryService } from "../../services";
 import { Product, Category } from "../../types";
@@ -48,6 +49,7 @@ const GlobalSearch: React.FC = () => {
     const location = useLocation();
     const inputRef = useRef<HTMLInputElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
+    const { t } = useTranslation();
 
     const [searchValue, setSearchValue] = useState("");
     const [isFocused, setIsFocused] = useState(false);
@@ -259,7 +261,7 @@ const GlobalSearch: React.FC = () => {
                     />
                     <InputBase
                         inputRef={inputRef}
-                        placeholder="Search products, categories..."
+                        placeholder={t("search.placeholder")}
                         value={searchValue}
                         onChange={(e) => {
                             setSearchValue(e.target.value);
@@ -304,7 +306,7 @@ const GlobalSearch: React.FC = () => {
                                 animate={{ opacity: 1, scale: 1 }}
                                 exit={{ opacity: 0, scale: 0.8 }}
                             >
-                                <Tooltip title="Clear search">
+                                <Tooltip title={t("search.clearTooltip")}>
                                     <IconButton size="small" onClick={handleClear} sx={{ p: 0.5 }}>
                                         <CloseIcon fontSize="small" />
                                     </IconButton>
@@ -364,7 +366,7 @@ const GlobalSearch: React.FC = () => {
                                     }}
                                 >
                                     <CategoryIcon fontSize="inherit" />
-                                    CATEGORIES
+                                    {t("search.categories")}
                                 </Typography>
                                 {matchingCategories.map((category: Category, index: number) => {
                                     const itemIndex = index;
@@ -406,7 +408,7 @@ const GlobalSearch: React.FC = () => {
                                                     {category.name}
                                                 </Typography>
                                                 <Typography variant="caption" color="text.secondary">
-                                                    Browse category
+                                                    {t("search.browseCategory")}
                                                 </Typography>
                                             </Box>
                                             <KeyboardArrowRight sx={{ color: 'text.disabled', fontSize: '1.2rem' }} />
@@ -435,7 +437,7 @@ const GlobalSearch: React.FC = () => {
                                     }}
                                 >
                                     <TrendingUp fontSize="inherit" />
-                                    PRODUCTS
+                                    {t("search.products")}
                                 </Typography>
                                 {suggestions.map((product: Product, index: number) => {
                                     const itemIndex = matchingCategories.length + index;
@@ -516,7 +518,7 @@ const GlobalSearch: React.FC = () => {
                                                 )}
                                                 {product.quantity === 0 && (
                                                     <Chip
-                                                        label="Out of Stock"
+                                                        label={t("common.outOfStock")}
                                                         size="small"
                                                         sx={{
                                                             height: 18,
@@ -539,10 +541,10 @@ const GlobalSearch: React.FC = () => {
                             <Box sx={{ p: 4, textAlign: 'center' }}>
                                 <Storefront sx={{ fontSize: '3rem', color: 'text.disabled', mb: 2, opacity: 0.5 }} />
                                 <Typography variant="body1" fontWeight="600" color="text.primary" gutterBottom>
-                                    No results found
+                                    {t("search.noResults")}
                                 </Typography>
                                 <Typography variant="body2" color="text.secondary">
-                                    Try searching with different keywords
+                                    {t("search.noResultsDesc")}
                                 </Typography>
                             </Box>
                         )}
@@ -552,7 +554,7 @@ const GlobalSearch: React.FC = () => {
                             <Box sx={{ py: 1.5 }}>
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', px: 2.5, py: 1 }}>
                                     <Typography variant="caption" fontWeight="700" color="text.disabled" sx={{ textTransform: 'uppercase', letterSpacing: '1px' }}>
-                                        RECENT SEARCHES
+                                        {t("search.recentSearches")}
                                     </Typography>
                                     <Typography
                                         variant="caption"
@@ -564,7 +566,7 @@ const GlobalSearch: React.FC = () => {
                                             storage.remove("recent_searches");
                                         }}
                                     >
-                                        Clear all
+                                        {t("search.clearAll")}
                                     </Typography>
                                 </Box>
                                 {recentSearches.map((term, idx) => (
@@ -635,7 +637,7 @@ const GlobalSearch: React.FC = () => {
                                 }}
                             >
                                 <Typography variant="body2" color="primary" fontWeight="600">
-                                    View all results for "{searchValue}"
+                                    {t("search.viewAll", { query: searchValue })}
                                     <KeyboardArrowRight sx={{ verticalAlign: 'middle', ml: 0.5, fontSize: '1.2rem' }} />
                                 </Typography>
                             </Box>

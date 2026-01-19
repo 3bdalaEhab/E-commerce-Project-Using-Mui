@@ -7,6 +7,7 @@ import {
 } from "@mui/material";
 import { ProductSkeleton } from "../../components/Common/Skeletons";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { CartContext, WishlistContext, useToast, useAuth } from "../../Context";
 import PageMeta from "../../components/PageMeta/PageMeta";
 import EmptyState from "../../components/Common/EmptyState";
@@ -41,6 +42,7 @@ const itemVariants: Variants = {
 };
 
 const Products: React.FC = () => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
 
@@ -82,45 +84,45 @@ const Products: React.FC = () => {
     const addCart = useCallback(
         async (productId: string) => {
             if (!userToken) {
-                showToast("👋 Please login to add items to your cart", "warning");
+                showToast(t("products.loginWarning"), "warning");
                 setTimeout(() => navigate('/login'), 1500);
                 return;
             }
             try {
                 const res = await addToCart(productId);
                 if (res?.status === "success") {
-                    showToast("✅ Product added to cart", "success");
+                    showToast(t("toasts.addedToCart"), "success");
                 } else {
-                    showToast("❌ Failed to add to cart", "error");
+                    showToast(t("toasts.failedToAddToCart"), "error");
                 }
             } catch {
-                showToast("❌ Server error", "error");
+                showToast(t("toasts.serverError"), "error");
             }
         },
-        [addToCart, showToast, userToken, navigate]
+        [addToCart, showToast, userToken, navigate, t]
     );
 
     const handleWishlistToggle = useCallback(
         async (e: React.MouseEvent, productId: string) => {
             e.stopPropagation();
             if (!userToken) {
-                showToast("❤ Please login to save items to your wishlist", "warning");
+                showToast(t("products.wishlistLoginWarning"), "warning");
                 setTimeout(() => navigate('/login'), 1500);
                 return;
             }
             try {
                 if (wishListItemId.includes(productId)) {
                     await removeFromWishlist(productId);
-                    showToast("💔 Removed from wishlist", "success");
+                    showToast(t("toasts.removedFromWishlist"), "success");
                 } else {
                     await addToWishlist(productId);
-                    showToast("❤️ Added to wishlist", "success");
+                    showToast(t("toasts.addedToWishlist"), "success");
                 }
             } catch {
-                showToast("❌ Wishlist update failed", "error");
+                showToast(t("toasts.wishlistUpdateFailed"), "error");
             }
         },
-        [wishListItemId, removeFromWishlist, addToWishlist, showToast, userToken, navigate]
+        [wishListItemId, removeFromWishlist, addToWishlist, showToast, userToken, navigate, t]
     );
 
     const handleNavigate = useCallback(
@@ -133,9 +135,9 @@ const Products: React.FC = () => {
     if (isError) {
         return (
             <EmptyState
-                title="Failed to load products"
-                description="We encountered an error while fetching the products. Please check your connection and try again."
-                actionText="Refresh Page"
+                title={t("products.failedToLoad")}
+                description={t("products.failedToLoadDesc")}
+                actionText={t("common.refreshPage")}
                 onAction={() => window.location.reload()}
                 icon={<Box sx={{ color: 'error.main' }}>⚠️</Box>}
             />
@@ -145,8 +147,8 @@ const Products: React.FC = () => {
     return (
         <Box sx={{ bgcolor: "background.default", minHeight: "100vh", pb: 10 }}>
             <PageMeta
-                title="Shop Products"
-                description="Discover premium products at best prices."
+                title={t("PageMeta.productsTitle")}
+                description={t("PageMeta.productsDesc")}
             />
 
             <Box sx={{ pt: 8, pb: 4, textAlign: "center" }}>
@@ -157,11 +159,11 @@ const Products: React.FC = () => {
                 >
                     Premium{" "}
                     <Box component="span" sx={{ color: "primary.main" }}>
-                        Catalog
+                        {t("products.catalog")}
                     </Box>
                 </Typography>
                 <Typography variant="body1" color="text.secondary">
-                    Handpicked items tailored for your lifestyle
+                    {t("products.subtitle")}
                 </Typography>
             </Box>
 
@@ -175,9 +177,9 @@ const Products: React.FC = () => {
                 <Box sx={{ px: { xs: 0, sm: 2 } }}>
                     {products.length === 0 && !isLoading ? (
                         <EmptyState
-                            title="No matching products"
-                            description={`We couldn't find any products matching your search "${searchQuery}". Try different keywords or browse our categories.`}
-                            actionText="Clear Filters"
+                            title={t("products.noItems")}
+                            description={t("products.noItemsDesc", { search: searchQuery })}
+                            actionText={t("products.clearFilters")}
                             onAction={() => {
                                 setSearchQuery("");
                                 setSelectedCategory("");

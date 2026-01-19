@@ -5,13 +5,15 @@ import Products from '../Products/Products';
 import HomeHero from '../../components/Home/HomeHero';
 import { Box, Typography, Container } from '@mui/material';
 import ErrorBoundary from '../../components/Common/ErrorBoundary';
+import { useTranslation } from 'react-i18next';
 
 const Home: React.FC = () => {
+    const { t } = useTranslation();
     return (
         <Box sx={{ bgcolor: 'background.default', minHeight: '100vh', pb: 10 }}>
             <PageMeta
-                title="Elite Store | Premium Shopping Experience"
-                description="Welcome to our store. Explore the best products available with elite service."
+                title={t("PageMeta.homeTitle") || "Elite Store | Premium Shopping Experience"}
+                description={t("PageMeta.homeDesc") || "Welcome to our store. Explore the best products available with elite service."}
             />
 
             {/* 🛡️ Hero Section & Global Search */}
@@ -25,7 +27,7 @@ const Home: React.FC = () => {
                         fontWeight="1000"
                         sx={{ mb: 4, px: { xs: 2, md: 4 }, letterSpacing: -1 }}
                     >
-                        Trending Categories
+                        {t("home.trendingCategories")}
                     </Typography>
                 </Container>
                 <ErrorBoundary>
@@ -41,7 +43,7 @@ const Home: React.FC = () => {
                         fontWeight="1000"
                         sx={{ mb: 4, px: { xs: 2, md: 4 }, letterSpacing: -1 }}
                     >
-                        Explore Our Collection
+                        {t("home.exploreCollection")}
                     </Typography>
                 </Container>
                 <ErrorBoundary>

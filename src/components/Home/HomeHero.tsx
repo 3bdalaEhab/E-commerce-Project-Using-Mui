@@ -12,6 +12,7 @@ import { ArrowForward, LocalOffer } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Helmet } from 'react-helmet';
+import { useTranslation } from 'react-i18next';
 
 // Placeholder for the hero image. In a real scenario, this would be an asset imported or in public folder.
 const HERO_IMAGE_URL = "https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=2070&auto=format&fit=crop";
@@ -19,6 +20,7 @@ const HERO_IMAGE_URL = "https://images.unsplash.com/photo-1550745165-9bc0b252726
 const HomeHero: React.FC = () => {
     const theme = useTheme();
     const navigate = useNavigate();
+    const { t } = useTranslation();
     const _isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
     const containerVariants = {
@@ -131,7 +133,7 @@ const HomeHero: React.FC = () => {
                                     color: 'primary.main'
                                 }}
                             >
-                                New Collection 2026
+                                {t("hero.collection")}
                             </Typography>
                         </Stack>
                     </Box>
@@ -147,7 +149,7 @@ const HomeHero: React.FC = () => {
                                 color: 'text.primary',
                             }}
                         >
-                            Future of <br />
+                            {t("hero.title")} <br />
                             <Box
                                 component="span"
                                 sx={{
@@ -157,7 +159,7 @@ const HomeHero: React.FC = () => {
                                     backgroundImage: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
                                 }}
                             >
-                                Technology
+                                {t("hero.tech")}
                             </Box>
                         </Typography>
                     </Box>
@@ -173,8 +175,7 @@ const HomeHero: React.FC = () => {
                                 fontSize: { xs: '1rem', md: '1.25rem' }
                             }}
                         >
-                            Experience the next generation of smart living.
-                            Curated devices that blend seamlessly into your lifestyle.
+                            {t("hero.desc")}
                         </Typography>
                     </Box>
 
@@ -208,7 +209,7 @@ const HomeHero: React.FC = () => {
                                 }
                             }}
                         >
-                            Shop Now
+                            {t("hero.shopNow")}
                         </Button>
                         <Button
                             variant="outlined"
@@ -229,7 +230,7 @@ const HomeHero: React.FC = () => {
                                 }
                             }}
                         >
-                            Best Sellers
+                            {t("hero.bestSellers")}
                         </Button>
                     </Stack>
                 </Stack>

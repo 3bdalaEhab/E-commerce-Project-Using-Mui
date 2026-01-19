@@ -12,6 +12,7 @@ import {
     useTheme,
 } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
     Logout,
     Lock as LockIcon,
@@ -37,6 +38,7 @@ const MobileDrawerContent: React.FC<MobileDrawerContentProps> = ({
     const { userToken, setUserToken } = useAuth();
     const navigate = useNavigate();
     const { showToast } = useToast();
+    const { t } = useTranslation();
 
     const logOut = () => {
         try {
@@ -47,7 +49,7 @@ const MobileDrawerContent: React.FC<MobileDrawerContentProps> = ({
         }
         setUserToken(null);
         handleDrawerToggle(); // Close drawer
-        showToast("Logged out successfully 👋", "success");
+        showToast(t("toasts.loggedOut"), "success");
         setTimeout(() => navigate("/login"), 1500);
     };
 
@@ -99,13 +101,13 @@ const MobileDrawerContent: React.FC<MobileDrawerContentProps> = ({
                             <ListItemIcon sx={{ minWidth: "40px", color: theme.palette.primary.main }}>
                                 <Badge
                                     badgeContent={
-                                        item.name === "Cart"
+                                        item.name === t("nav.cart")
                                             ? item.numItem
-                                            : item.name === "Wishlist"
+                                            : item.name === t("nav.wishlist")
                                                 ? item.numWishItem
                                                 : 0
                                     }
-                                    color={item.name === "Cart" ? "primary" : "secondary"}
+                                    color={item.name === t("nav.cart") ? "primary" : "secondary"}
                                 >
                                     {item.icon}
                                 </Badge>
@@ -130,7 +132,7 @@ const MobileDrawerContent: React.FC<MobileDrawerContentProps> = ({
                                 <ListItemIcon sx={{ minWidth: "40px" }}>
                                     <LockIcon />
                                 </ListItemIcon>
-                                <ListItemText primary="Settings" />
+                                <ListItemText primary={t("nav.settings")} />
                             </ListItemButton>
                         </ListItem>
                         <ListItem disablePadding>
@@ -141,7 +143,7 @@ const MobileDrawerContent: React.FC<MobileDrawerContentProps> = ({
                                 <ListItemIcon sx={{ minWidth: "40px", color: "inherit" }}>
                                     <Logout />
                                 </ListItemIcon>
-                                <ListItemText primary="Logout" />
+                                <ListItemText primary={t("nav.logout")} />
                             </ListItemButton>
                         </ListItem>
                     </>

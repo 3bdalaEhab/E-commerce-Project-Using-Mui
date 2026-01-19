@@ -13,6 +13,7 @@ import { AnimatePresence } from "framer-motion";
 import { WishlistSkeleton } from "../../components/Common/Skeletons";
 import PageMeta from "../../components/PageMeta/PageMeta";
 import EmptyState from "../../components/Common/EmptyState";
+import { useTranslation } from "react-i18next";
 
 
 export default function Wishlist() {
@@ -20,6 +21,7 @@ export default function Wishlist() {
     const { addToCart } = useContext(CartContext);
     const navigate = useNavigate();
     const { showToast } = useToast();
+    const { t } = useTranslation();
 
     useEffect(() => {
         getWishlist();
@@ -28,15 +30,15 @@ export default function Wishlist() {
     const handleAddToCart = useCallback(async (id: string) => {
         try {
             const res = await addToCart(id);
-            if (res?.status === "success") {
-                showToast("✨ Added to cart", "success");
+            if (res && (res.status === "success" || res.message === "success")) {
+                showToast(t("toasts.addedToCart"), "success");
             } else {
-                showToast("Failed to add to cart", "error");
+                showToast(t("toasts.failedToAddToCart"), "error");
             }
         } catch {
-            showToast("Error adding to cart", "error");
+            showToast(t("toasts.error"), "error");
         }
-    }, [addToCart, showToast]);
+    }, [addToCart, showToast, t]);
 
     const handleWishlistToggle = useCallback(async (e: React.MouseEvent, id: string) => {
         e.stopPropagation();
@@ -44,11 +46,11 @@ export default function Wishlist() {
         // matches ProductCard expectation
         try {
             await removeFromWishlist(id);
-            showToast("💔 Removed from wishlist", "success");
+            showToast(t("toasts.removedFromWishlist"), "success");
         } catch {
-            showToast("Failed to remove", "error");
+            showToast(t("toasts.failedToRemove"), "error");
         }
-    }, [removeFromWishlist, showToast]);
+    }, [removeFromWishlist, showToast, t]);
 
     const handleNavigate = useCallback((id: string) => navigate(`/details/${id}`), [navigate]);
 
@@ -56,11 +58,11 @@ export default function Wishlist() {
 
     if (!wishlist.length) return (
         <Box sx={{ bgcolor: "background.default", minHeight: "100vh" }}>
-            <PageMeta title="My Wishlist" description="Your wishlist is empty." />
+            <PageMeta title={t("PageMeta.wishlistTitle")} description={t("PageMeta.wishlistDesc")} />
             <EmptyState
-                title="Your Wishlist is Empty"
-                description="Save the products you love to your wishlist and they'll be here waiting for you. Don't let your favorites slip away!"
-                actionText="Explore Products"
+                title={t("wishlist.empty")}
+                description={t("wishlist.emptyDesc")}
+                actionText={t("wishlist.exploreProducts")}
                 onAction={() => navigate("/")}
                 icon={<FavoriteIcon sx={{ fontSize: "3.5rem" }} />}
             />
@@ -69,14 +71,14 @@ export default function Wishlist() {
 
     return (
         <Box sx={{ bgcolor: "background.default", minHeight: "100vh", py: 8 }}>
-            <PageMeta title="My Wishlist" description="All your favorite items in one place." />
+            <PageMeta title={t("PageMeta.wishlistTitle")} description={t("PageMeta.wishlistDesc")} />
 
             <Container maxWidth="lg">
                 <Box sx={{ textAlign: "center", mb: 8 }}>
                     <Typography variant="h3" fontWeight="900" sx={{ mb: 1, letterSpacing: -1 }}>
-                        My <Box component="span" sx={{ color: "primary.main" }}>Wishlist</Box>
+                        {t("wishlist.title")}
                     </Typography>
-                    <Typography variant="body1" color="text.secondary">Items you've saved for later</Typography>
+                    <Typography variant="body1" color="text.secondary">{t("wishlist.subtitle")}</Typography>
                 </Box>
 
                 <Grid container spacing={3} justifyContent="center">

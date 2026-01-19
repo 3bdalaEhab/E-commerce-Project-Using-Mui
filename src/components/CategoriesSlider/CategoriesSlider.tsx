@@ -5,47 +5,47 @@ import { Navigation, Pagination, Autoplay, EffectFade, Parallax } from "swiper/m
 import { motion } from "framer-motion";
 import { ArrowForward } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css/effect-fade";
 
-// Using our generated images or high-quality placeholders if local assets aren't moved yet.
-// Ensuring we have a robust fallback.
-const SLIDER_DATA = [
-    {
-        id: 1,
-        title: "Modern Minimalist",
-        subtitle: "Interior Collection",
-        image: "https://images.unsplash.com/photo-1616486338812-3dadae4b4f9d?q=80&w=2670&auto=format&fit=crop", // Decor
-        link: "/products?category=decor"
-    },
-    {
-        id: 2,
-        title: "Gentleman's Choice",
-        subtitle: "Luxury Accessories",
-        image: "https://images.unsplash.com/photo-1622434641406-a158123450f9?q=80&w=2574&auto=format&fit=crop", // Men's Watch
-        link: "/products?category=clothing"
-    },
-    {
-        id: 3,
-        title: "Next-Gen Tech",
-        subtitle: "Smart Home Revolution",
-        image: "https://images.unsplash.com/photo-1550009158-9ebf69173e03?q=80&w=2701&auto=format&fit=crop", // Tech
-        link: "/products?category=electronics"
-    },
-    {
-        id: 4,
-        title: "Professional Lens",
-        subtitle: "Capture The Moment",
-        image: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?q=80&w=2564&auto=format&fit=crop", // Professional Camera
-        link: "/products?category=electronics"
-    }
-];
-
 export default function CategoriesSlider() {
     const theme = useTheme();
     const navigate = useNavigate();
+    const { t } = useTranslation();
+
+    const SLIDER_DATA = [
+        {
+            id: 1,
+            title: t("slides.minimalist.title"),
+            subtitle: t("slides.minimalist.subtitle"),
+            image: "https://images.unsplash.com/photo-1616486338812-3dadae4b4f9d?q=80&w=2670&auto=format&fit=crop",
+            link: "/products?category=decor"
+        },
+        {
+            id: 2,
+            title: t("slides.gentleman.title"),
+            subtitle: t("slides.gentleman.subtitle"),
+            image: "https://images.unsplash.com/photo-1622434641406-a158123450f9?q=80&w=2574&auto=format&fit=crop",
+            link: "/products?category=clothing"
+        },
+        {
+            id: 3,
+            title: t("slides.tech.title"),
+            subtitle: t("slides.tech.subtitle"),
+            image: "https://images.unsplash.com/photo-1550009158-9ebf69173e03?q=80&w=2701&auto=format&fit=crop",
+            link: "/products?category=electronics"
+        },
+        {
+            id: 4,
+            title: t("slides.lens.title"),
+            subtitle: t("slides.lens.subtitle"),
+            image: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?q=80&w=2564&auto=format&fit=crop",
+            link: "/products?category=electronics"
+        }
+    ];
 
     return (
         <Box
@@ -88,8 +88,6 @@ export default function CategoriesSlider() {
                     }}
                     autoplay={{ delay: 6000, disableOnInteraction: false }}
                     loop
-                    // effect="fade" // Parallax works best with slide effect, checking preference
-                    // Let's stick to slide for parallax feel
                     style={{ height: "100%" }}
                     className="hero-slider"
                 >
@@ -103,10 +101,9 @@ export default function CategoriesSlider() {
                                     display: "flex",
                                     alignItems: "center",
                                     justifyContent: "flex-start",
-                                    bgcolor: "black" // fallback
+                                    bgcolor: "black"
                                 }}
                             >
-                                {/* Background Image with Parallax */}
                                 <Box
                                     data-swiper-parallax="50%"
                                     data-swiper-parallax-scale="1.1"
@@ -132,7 +129,6 @@ export default function CategoriesSlider() {
                                     }}
                                 />
 
-                                {/* Content */}
                                 <Box
                                     sx={{
                                         position: "relative",
@@ -194,7 +190,7 @@ export default function CategoriesSlider() {
                                             }
                                         }}
                                     >
-                                        Discover Now
+                                        {t("common.discoverNow")}
                                     </Button>
                                 </Box>
                             </Box>
@@ -203,7 +199,6 @@ export default function CategoriesSlider() {
                 </Swiper>
             </Box>
 
-            {/* Custom Styles for Swiper Pagination */}
             <style>
                 {`
                     .hero-slider .swiper-pagination-bullet {

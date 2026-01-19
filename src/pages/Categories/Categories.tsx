@@ -14,6 +14,7 @@ import { CategoriesSkeleton } from "../../components/Common/Skeletons";
 import PageMeta from "../../components/PageMeta/PageMeta";
 import EmptyState from "../../components/Common/EmptyState";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { categoryService } from "../../services";
 import { Category } from "../../types";
 
@@ -41,6 +42,7 @@ const itemVariants: Variants = {
 };
 
 const Categories: React.FC = () => {
+    const { t } = useTranslation();
     const theme = useTheme();
     const navigate = useNavigate();
 
@@ -55,9 +57,9 @@ const Categories: React.FC = () => {
     if (isError)
         return (
             <EmptyState
-                title="Something went wrong"
-                description="We couldn't load the categories. This might be a temporary connection issue."
-                actionText="Try Again"
+                title={t("common.somethingWentWrong")}
+                description={t("categories.errorDesc")}
+                actionText={t("common.retry")}
                 onAction={() => window.location.reload()}
                 icon={<Box sx={{ color: 'error.main' }}>⚠️</Box>}
             />
@@ -66,16 +68,16 @@ const Categories: React.FC = () => {
     return (
         <Box sx={{ bgcolor: "background.default", minHeight: "100vh", pb: 10 }}>
             <PageMeta
-                title="Browse Categories"
-                description="Premium shopping categories tailored for you."
+                title={t("PageMeta.categoriesTitle")}
+                description={t("PageMeta.categoriesDesc")}
             />
 
             <Box sx={{ pt: 10, pb: 6, textAlign: "center" }}>
                 <Typography variant="h3" fontWeight="1000" sx={{ mb: 1, letterSpacing: -1.5 }}>
-                    Product <Box component="span" sx={{ color: "primary.main" }}>Categories</Box>
+                    {t("categories.title")}
                 </Typography>
                 <Typography variant="body1" color="text.secondary">
-                    Find exactly what you're looking for by browsing our curated collections
+                    {t("categories.subtitle")}
                 </Typography>
             </Box>
 
@@ -176,7 +178,7 @@ const Categories: React.FC = () => {
                                                 opacity: 0.6
                                             }}
                                         >
-                                            BROWSE COLLECTION
+                                            {t("categories.browseCollection")}
                                         </Typography>
                                     </CardContent>
                                 </Card>

@@ -1,5 +1,5 @@
 import React from "react";
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import {
     Box,
@@ -15,6 +15,7 @@ import {
 import { Star, Favorite, FavoriteBorder, Visibility } from "@mui/icons-material";
 import { Product } from "../../types";
 import { useQuickView } from "../../Context/QuickViewContext";
+import { useTranslation } from "react-i18next";
 
 interface ProductCardProps {
     product: Product;
@@ -36,8 +37,9 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
     }) => {
         const theme = useTheme();
         const { openQuickView } = useQuickView();
+        const { t } = useTranslation();
 
-        const cardVariants = {
+        const cardVariants: Variants = {
             hidden: { opacity: 0, y: 30 },
             visible: (i: number) => ({
                 opacity: 1,
@@ -118,7 +120,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
                                         letterSpacing: '1px',
                                         border: '1px solid rgba(255,255,255,0.1)'
                                     }}>
-                                        NEW ARRIVAL
+                                        {t("common.newArrival")}
                                     </Box>
                                 </Box>
                             ) : null;
@@ -205,7 +207,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
                                         whiteSpace: 'nowrap'
                                     }}
                                 >
-                                    {product.price} EGP
+                                    {product.price} {t("common.egp")}
                                 </Typography>
                             </Box>
 
@@ -296,7 +298,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
                                 }
                             }}
                         >
-                            Quick View
+                            {t("common.quickView")}
                         </Button>
                     </Box>
                 </Card>

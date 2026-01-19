@@ -25,6 +25,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { userService, addressService } from "../../services";
 import { useToast, useAuth } from "../../Context";
 import PageMeta from "../../components/PageMeta/PageMeta";
@@ -48,6 +49,7 @@ function TabPanel(props: TabPanelProps) {
 }
 
 const Profile: React.FC = () => {
+    const { t } = useTranslation();
     const theme = useTheme();
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState(0);
@@ -91,7 +93,7 @@ const Profile: React.FC = () => {
     // Handle logout
     const handleLogout = () => {
         logout();
-        showToast("👋 تم تسجيل الخروج بنجاح", "success");
+        showToast(t("toasts.loggedOut"), "success");
         navigate('/login');
     };
 
@@ -104,10 +106,10 @@ const Profile: React.FC = () => {
                 email: formData.email,
                 phone: formData.phone
             });
-            showToast("✅ تم حفظ التغييرات بنجاح", "success");
+            showToast(t("toasts.changesSaved"), "success");
         } catch (err) {
             const error = err as AxiosError<{ message?: string }>;
-            const msg = error.response?.data?.message || "❌ فشل في حفظ التغييرات";
+            const msg = error.response?.data?.message || t("toasts.saveError");
             showToast(msg, "error");
         } finally {
             setSaving(false);
@@ -126,11 +128,11 @@ const Profile: React.FC = () => {
         mutationFn: addressService.addAddress,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['addresses'] });
-            showToast("✅ تم إضافة العنوان بنجاح", "success");
+            showToast(t("toasts.addressAdded"), "success");
             setNewAddress({ name: '', details: '', phone: '', city: '' });
             setShowAddAddress(false);
         },
-        onError: () => showToast("❌ فشل في إضافة العنوان", "error")
+        onError: () => showToast(t("toasts.addressError"), "error")
     });
 
     // Remove Address Mutation
@@ -138,7 +140,7 @@ const Profile: React.FC = () => {
         mutationFn: addressService.removeAddress,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['addresses'] });
-            showToast("🗑️ تم حذف العنوان", "success");
+            showToast(t("toasts.addressRemoved"), "success");
         }
     });
 
@@ -155,7 +157,7 @@ const Profile: React.FC = () => {
 
     return (
         <Box sx={{ bgcolor: "background.default", minHeight: "100vh", pb: 10 }}>
-            <PageMeta title="My Profile" description="Manage your account settings" />
+            <PageMeta title={t("PageMeta.profileTitle")} description={t("PageMeta.profileDesc")} />
 
             {/* Header */}
             <Box sx={{
@@ -180,9 +182,9 @@ const Profile: React.FC = () => {
                             {userInitial}
                         </Avatar>
                         <Box>
-                            <Typography variant="h3" fontWeight="900">My Account</Typography>
+                            <Typography variant="h3" fontWeight="900">{t("profile.title")}</Typography>
                             <Typography variant="h6" sx={{ opacity: 0.8 }}>
-                                Welcome back, {userData?.name || 'User'}
+                                {t("profile.welcome", { name: userData?.name || 'User' })}
                             </Typography>
                         </Box>
                     </Stack>
@@ -225,24 +227,24 @@ const Profile: React.FC = () => {
                                 '& .Mui-selected': { bgcolor: 'action.selected', color: 'primary.main' }
                             }}
                         >
-                            <Tab icon={<PersonIcon />} iconPosition="start" label="Personal Info" />
-                            <Tab icon={<LocationOnIcon />} iconPosition="start" label="Addresses" />
-                            <Tab icon={<ShoppingBagIcon />} iconPosition="start" label="My Orders" />
-                            <Tab icon={<LogoutIcon />} iconPosition="start" label="Logout" sx={{ color: 'error.main', mt: 'auto' }} />
+                            <Tab icon={<PersonIcon />} iconPosition="start" label={t("profile.personalInfo")} />
+                            <Tab icon={<LocationOnIcon />} iconPosition="start" label={t("profile.addressBook")} />
+                            <Tab icon={<ShoppingBagIcon />} iconPosition="start" label={t("nav.orders")} />
+                            <Tab icon={<LogoutIcon />} iconPosition="start" label={t("nav.logout")} sx={{ color: 'error.main', mt: 'auto' }} />
                         </Tabs>
                     </Box>
 
                     {/* Content Area */}
                     <Box sx={{ flex: 1 }}>
                         <TabPanel value={activeTab} index={0}>
-                            <Typography variant="h5" fontWeight="800" gutterBottom>Personal Information</Typography>
-                            <Typography color="text.secondary" mb={4}>Update your personal details here.</Typography>
+                            <Typography variant="h5" fontWeight="800" gutterBottom>{t("profile.personalInfo")}</Typography>
+                            <Typography color="text.secondary" mb={4}>{t("profile.personalInfoDesc")}</Typography>
 
                             <Grid container spacing={3}>
                                 <Grid size={{ xs: 12, md: 6 }}>
                                     <TextField
                                         fullWidth
-                                        label="Full Name"
+                                        label={t("auth.fullNameLabel")}
                                         value={formData.name}
                                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                         variant="outlined"
@@ -252,7 +254,7 @@ const Profile: React.FC = () => {
                                 <Grid size={{ xs: 12, md: 6 }}>
                                     <TextField
                                         fullWidth
-                                        label="Email Address"
+                                        label={t("auth.emailLabel")}
                                         value={formData.email}
                                         disabled
                                         variant="outlined"
@@ -263,7 +265,7 @@ const Profile: React.FC = () => {
                                 <Grid size={{ xs: 12, md: 6 }}>
                                     <TextField
                                         fullWidth
-                                        label="Phone Number"
+                                        label={t("auth.phoneLabel")}
                                         value={formData.phone}
                                         onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                                         variant="outlined"
@@ -279,7 +281,7 @@ const Profile: React.FC = () => {
                                         disabled={saving}
                                         sx={{ borderRadius: "12px", px: 4, py: 1.5, fontWeight: 900 }}
                                     >
-                                        {saving ? <CircularProgress size={24} color="inherit" /> : "Save Changes"}
+                                        {saving ? <CircularProgress size={24} color="inherit" /> : t("profile.saveChanges")}
                                     </Button>
                                 </Grid>
                             </Grid>
@@ -288,8 +290,8 @@ const Profile: React.FC = () => {
                         <TabPanel value={activeTab} index={1}>
                             <Stack direction="row" justifyContent="space-between" alignItems="center" mb={4}>
                                 <Box>
-                                    <Typography variant="h5" fontWeight="800">Address Book</Typography>
-                                    <Typography color="text.secondary">Manage your shipping destinations</Typography>
+                                    <Typography variant="h5" fontWeight="800">{t("profile.addressBook")}</Typography>
+                                    <Typography color="text.secondary">{t("profile.addressBookDesc")}</Typography>
                                 </Box>
                                 <Button
                                     startIcon={<AddIcon />}
@@ -297,7 +299,7 @@ const Profile: React.FC = () => {
                                     sx={{ borderRadius: "12px", fontWeight: 800 }}
                                     onClick={() => setShowAddAddress(!showAddAddress)}
                                 >
-                                    Add New
+                                    {t("profile.addAddress")}
                                 </Button>
                             </Stack>
 
@@ -311,33 +313,33 @@ const Profile: React.FC = () => {
                                                     <Grid container spacing={2}>
                                                         <Grid size={{ xs: 12 }}>
                                                             <TextField
-                                                                fullWidth label="Alias (e.g., Home, Work)" required
+                                                                fullWidth label={t("profile.aliasLabel")} required
                                                                 value={newAddress.name} onChange={e => setNewAddress({ ...newAddress, name: e.target.value })}
                                                             />
                                                         </Grid>
                                                         <Grid size={{ xs: 12 }}>
                                                             <TextField
-                                                                fullWidth label="Detailed Address" required
+                                                                fullWidth label={t("profile.detailedAddress")} required
                                                                 value={newAddress.details} onChange={e => setNewAddress({ ...newAddress, details: e.target.value })}
                                                             />
                                                         </Grid>
                                                         <Grid size={{ xs: 12, sm: 6 }}>
                                                             <TextField
-                                                                fullWidth label="Phone" required
+                                                                fullWidth label={t("auth.phoneLabel")} required
                                                                 value={newAddress.phone} onChange={e => setNewAddress({ ...newAddress, phone: e.target.value })}
                                                             />
                                                         </Grid>
                                                         <Grid size={{ xs: 12, sm: 6 }}>
                                                             <TextField
-                                                                fullWidth label="City" required
+                                                                fullWidth label={t("profile.city")} required
                                                                 value={newAddress.city} onChange={e => setNewAddress({ ...newAddress, city: e.target.value })}
                                                             />
                                                         </Grid>
                                                         <Grid size={{ xs: 12 }}>
                                                             <Stack direction="row" spacing={2} justifyContent="flex-end">
-                                                                <Button onClick={() => setShowAddAddress(false)} color="inherit">Cancel</Button>
+                                                                <Button onClick={() => setShowAddAddress(false)} color="inherit">{t("profile.cancel")}</Button>
                                                                 <Button type="submit" variant="contained" disabled={addAddressMutation.isPending}>
-                                                                    {addAddressMutation.isPending ? <CircularProgress size={20} /> : "Save Address"}
+                                                                    {addAddressMutation.isPending ? <CircularProgress size={20} /> : t("profile.saveAddress")}
                                                                 </Button>
                                                             </Stack>
                                                         </Grid>
@@ -355,7 +357,7 @@ const Profile: React.FC = () => {
                                         <CircularProgress />
                                     </Box>
                                 ) : addressesData?.length === 0 ? (
-                                    <Typography color="text.secondary" align="center" py={4}>No addresses saved yet.</Typography>
+                                    <Typography color="text.secondary" align="center" py={4}>{t("profile.noAddresses")}</Typography>
                                 ) : (
                                     addressesData?.map((addr: Address) => (
                                         <Paper key={addr._id} variant="outlined" sx={{ p: 3, borderRadius: "16px", display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -383,8 +385,8 @@ const Profile: React.FC = () => {
 
                         {/* Orders tab now redirects, but keep empty panel for structure */}
                         <TabPanel value={activeTab} index={2}>
-                            <Typography variant="h5" fontWeight="800" gutterBottom>Order History</Typography>
-                            <Typography color="text.secondary">Redirecting to orders page...</Typography>
+                            <Typography variant="h5" fontWeight="800" gutterBottom>{t("orders.title")}</Typography>
+                            <Typography color="text.secondary">{t("profile.orderHistoryDesc")}</Typography>
                         </TabPanel>
                     </Box>
                 </Paper>

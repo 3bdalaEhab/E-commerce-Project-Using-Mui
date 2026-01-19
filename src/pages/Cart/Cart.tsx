@@ -25,6 +25,7 @@ import PageMeta from "../../components/PageMeta/PageMeta";
 import EmptyState from "../../components/Common/EmptyState";
 import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined';
 import { Product, CartItem as CartItemType } from "../../types";
+import { useTranslation } from "react-i18next";
 
 // 🔹 Memoized Cart Item Component
 interface CartItemProps {
@@ -35,6 +36,7 @@ interface CartItemProps {
 
 const CartItem = React.memo(({ item, onUpdateQuantity, onRemove }: CartItemProps) => {
     const theme = useTheme();
+    const { t } = useTranslation();
 
     // Guard against cases where item.product might be a string ID due to API response differences
     const product = typeof item.product === 'string' ? null : (item.product as Product);
@@ -98,7 +100,7 @@ const CartItem = React.memo(({ item, onUpdateQuantity, onRemove }: CartItemProps
                             </Box>
                         </Box>
                         <Typography variant="h5" color="primary" fontWeight="900" sx={{ whiteSpace: 'nowrap' }}>
-                            {item.price} <Box component="span" sx={{ fontSize: '0.9rem', color: 'text.secondary' }}>EGP</Box>
+                            {item.price} <Box component="span" sx={{ fontSize: '0.9rem', color: 'text.secondary' }}>{t("common.egp")}</Box>
                         </Typography>
                     </Box>
 
@@ -140,7 +142,7 @@ const CartItem = React.memo(({ item, onUpdateQuantity, onRemove }: CartItemProps
                                 "&:hover": { bgcolor: 'error.lighter' }
                             }}
                         >
-                            Remove
+                            {t("cart.remove")}
                         </Button>
                     </Box>
                 </CardContent>
@@ -156,45 +158,46 @@ export default function Cart() {
     const theme = useTheme();
     const navigate = useNavigate();
     const { showToast } = useToast();
+    const { t } = useTranslation();
 
     const updateQuantity = useCallback(async (productId: string, newCount: number) => {
         try {
             await updateItem(productId, newCount);
-            showToast("✅ Quantity updated", "success");
+            showToast(t("toasts.quantityUpdated"), "success");
         } catch {
-            showToast("❌ Update failed", "error");
+            showToast(t("toasts.error"), "error");
         }
-    }, [updateItem, showToast]);
+    }, [updateItem, showToast, t]);
 
     const removeItem = useCallback(async (id: string) => {
         try {
             await removeSpecificItem(id);
-            showToast("🗑️ Item removed", "success");
+            showToast(t("toasts.removedFromCart"), "success");
         } catch {
-            showToast("❌ Removal failed", "error");
+            showToast(t("toasts.error"), "error");
         }
-    }, [removeSpecificItem, showToast]);
+    }, [removeSpecificItem, showToast, t]);
 
     const handleClearAll = useCallback(async () => {
         try {
             const res = await removeAllItems();
-            if (res.message === "success" || res.status === "success" || !res.error) {
-                showToast("🧹 Cart cleared", "success");
+            if (res && (res.message === "success" || res.status === "success" || !res.error)) {
+                showToast(t("toasts.cartCleared"), "success");
             }
         } catch {
-            showToast("❌ Clear failed", "error");
+            showToast(t("toasts.error"), "error");
         }
-    }, [removeAllItems, showToast]);
+    }, [removeAllItems, showToast, t]);
 
     if (loading && !cartData) return <CartSkeleton />;
 
     if (!cartData || cartData.products.length === 0) return (
         <Box sx={{ bgcolor: "background.default", minHeight: "100vh" }}>
-            <PageMeta title="My Cart" description="Your shopping cart is currently empty." />
+            <PageMeta title={t("PageMeta.cartTitle")} description={t("PageMeta.cartDesc")} />
             <EmptyState
-                title="Your Cart is Empty"
-                description="Looks like you haven't added anything to your cart yet. Explore our premium collections and find something extraordinary!"
-                actionText="Explore Collections"
+                title={t("cart.empty")}
+                description={t("cart.emptyDesc")}
+                actionText={t("cart.exploreCollections")}
                 onAction={() => navigate("/")}
                 icon={<ShoppingBagOutlinedIcon sx={{ fontSize: "3.5rem" }} />}
             />
@@ -203,16 +206,16 @@ export default function Cart() {
 
     return (
         <Box sx={{ bgcolor: "background.default", minHeight: "100vh", py: 8 }}>
-            <PageMeta title="My Cart" description="Review and checkout your items." />
+            <PageMeta title={t("PageMeta.cartTitle")} description={t("PageMeta.cartDesc")} />
 
             <Box sx={{ maxWidth: 1000, mx: "auto", px: 2 }}>
                 <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", mb: 4 }}>
                     <Box>
-                        <Typography variant="h3" fontWeight="900" sx={{ mb: 1 }}>Cart</Typography>
-                        <Typography variant="body1" color="text.secondary">Review your selection</Typography>
+                        <Typography variant="h3" fontWeight="900" sx={{ mb: 1 }}>{t("cart.title")}</Typography>
+                        <Typography variant="body1" color="text.secondary">{t("cart.subtitle")}</Typography>
                     </Box>
                     <Button variant="outlined" color="error" onClick={handleClearAll} sx={{ borderRadius: "10px" }}>
-                        Clear All
+                        {t("cart.clearAll")}
                     </Button>
                 </Box>
 
@@ -242,20 +245,20 @@ export default function Cart() {
                                 boxShadow: theme.palette.mode === 'dark' ? "0 20px 50px rgba(0,0,0,0.5)" : "0 20px 50px rgba(0,0,0,0.05)"
                             }}
                         >
-                            <Typography variant="h5" fontWeight="900" sx={{ mb: 3, letterSpacing: '-1px' }}>Order Summary</Typography>
+                            <Typography variant="h5" fontWeight="900" sx={{ mb: 3, letterSpacing: '-1px' }}>{t("cart.summary")}</Typography>
                             <Stack spacing={2.5}>
                                 <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                                    <Typography color="text.secondary" fontWeight="500">Products count</Typography>
+                                    <Typography color="text.secondary" fontWeight="500">{t("cart.productCount")}</Typography>
                                     <Typography fontWeight="900" variant="body1">{cartData.products.length}</Typography>
                                 </Box>
                                 <Divider sx={{ opacity: 0.6 }} />
                                 <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: 'center' }}>
-                                    <Typography variant="h6" fontWeight="900">Total Amount</Typography>
+                                    <Typography variant="h6" fontWeight="900">{t("cart.total")}</Typography>
                                     <Box sx={{ textAlign: 'right' }}>
                                         <Typography variant="h4" fontWeight="1000" color="primary.main" sx={{ lineHeight: 1 }}>
                                             {cartData.totalCartPrice}
                                         </Typography>
-                                        <Typography variant="caption" color="text.secondary" fontWeight="700">EGP (Incl. VAT)</Typography>
+                                        <Typography variant="caption" color="text.secondary" fontWeight="700">{t("common.egp")} (Incl. VAT)</Typography>
                                     </Box>
                                 </Box>
 
@@ -279,11 +282,11 @@ export default function Cart() {
                                         "&:hover": { transform: "translateY(-3px)", boxShadow: theme.shadows[12] }
                                     }}
                                 >
-                                    Checkout Securely
+                                    {t("cart.checkout")}
                                 </Button>
 
                                 <Typography variant="caption" color="text.secondary" textAlign="center" display="block" sx={{ mt: 1 }}>
-                                    🔒 Secure transaction via SSL
+                                    🔒 {t("cart.secureTransaction")}
                                 </Typography>
                             </Stack>
                         </Card>

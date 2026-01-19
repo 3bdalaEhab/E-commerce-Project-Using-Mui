@@ -13,6 +13,7 @@ import PaymentIcon from "@mui/icons-material/Payment";
 import { motion } from "framer-motion";
 import { useForm, Controller } from "react-hook-form";
 import { useParams, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import PageMeta from "../../components/PageMeta/PageMeta";
 import { useToast } from "../../Context";
 import CustomTextField from "../../components/Common/CustomTextField";
@@ -29,6 +30,7 @@ interface CheckoutFormData {
 }
 
 const Checkout: React.FC = () => {
+    const { t } = useTranslation();
     const theme = useTheme();
     const { sessionId } = useParams<{ sessionId: string }>();
     const navigate = useNavigate();
@@ -63,20 +65,20 @@ const Checkout: React.FC = () => {
             } else {
                 const res = await orderService.createCashOrder(sessionId, shippingData);
                 if (res.data) {
-                    showToast("🎉 Order placed successfully with Cash!", "success");
+                    showToast(t("toasts.successCash"), "success");
                     navigate("/allOrders");
                 }
             }
         } catch {
-            showToast("❌ Checkout failed. Please try again.", "error");
+            showToast(t("toasts.checkoutFail"), "error");
         } finally {
             setLoading(false);
         }
-    }, [sessionId, showToast, navigate]);
+    }, [sessionId, showToast, navigate, t]);
 
     return (
         <Box sx={{ bgcolor: "background.default", minHeight: "100vh", py: 10, display: "flex", alignItems: "center" }}>
-            <PageMeta title="Checkout" description="Secure payment and delivery details." />
+            <PageMeta title={t("PageMeta.checkoutTitle")} description={t("PageMeta.checkoutDesc")} />
 
             <Container maxWidth="sm">
                 <motion.div
@@ -98,10 +100,10 @@ const Checkout: React.FC = () => {
                     >
                         <Box sx={{ textAlign: "center", mb: 5 }}>
                             <Typography variant="h3" fontWeight="900" sx={{ mb: 1, letterSpacing: -1 }}>
-                                Checkout
+                                {t("checkout.title")}
                             </Typography>
                             <Typography variant="body1" color="text.secondary">
-                                Complete your order details below
+                                {t("checkout.subtitle")}
                             </Typography>
                         </Box>
 
@@ -109,12 +111,12 @@ const Checkout: React.FC = () => {
                             <Controller
                                 name="details"
                                 control={control}
-                                rules={{ required: "Address details are required" }}
+                                rules={{ required: t("checkout.detailsReq") }}
                                 render={({ field }) => (
                                     <CustomTextField
                                         {...field}
-                                        label="Shipping Address"
-                                        placeholder="Street name, building number, etc."
+                                        label={t("checkout.shippingAddress")}
+                                        placeholder={t("checkout.shippingPlaceholder")}
                                         icon={LocalShippingIcon}
                                         error={!!errors.details}
                                         helperText={errors.details?.message}
@@ -126,13 +128,13 @@ const Checkout: React.FC = () => {
                                 name="phone"
                                 control={control}
                                 rules={{
-                                    required: "Phone number is required",
-                                    pattern: { value: /^\d{11}$/, message: "Please enter a valid 11-digit phone number" }
+                                    required: t("checkout.phoneReq"),
+                                    pattern: { value: /^\d{11}$/, message: t("checkout.phoneInvalid") }
                                 }}
                                 render={({ field }) => (
                                     <CustomTextField
                                         {...field}
-                                        label="Phone Number"
+                                        label={t("auth.phoneLabel")}
                                         placeholder="01xxxxxxxxx"
                                         icon={PhoneIphoneIcon}
                                         error={!!errors.phone}
@@ -144,7 +146,7 @@ const Checkout: React.FC = () => {
                             <Controller
                                 name="city"
                                 control={control}
-                                rules={{ required: "Selecting a city is required" }}
+                                rules={{ required: t("checkout.cityReq") }}
                                 render={({ field }) => (
                                     <Autocomplete
                                         {...field}
@@ -153,7 +155,7 @@ const Checkout: React.FC = () => {
                                         renderInput={(params) => (
                                             <CustomTextField
                                                 {...params}
-                                                label="City"
+                                                label={t("checkout.cityLabel")}
                                                 icon={LocationCityIcon}
                                                 error={!!errors.city}
                                                 helperText={errors.city?.message}
@@ -164,7 +166,7 @@ const Checkout: React.FC = () => {
                             />
 
                             <Typography variant="subtitle2" fontWeight="800" sx={{ mt: 3, mb: 1, color: 'text.secondary' }}>
-                                Payment Method
+                                {t("checkout.paymentMethod")}
                             </Typography>
                             <Controller
                                 name="paymentMethod"
@@ -172,8 +174,8 @@ const Checkout: React.FC = () => {
                                 render={({ field }) => (
                                     <Box sx={{ display: 'flex', gap: 2, mb: 4 }}>
                                         {[
-                                            { value: 'cash', label: 'Cash on Delivery', icon: LocalShippingIcon },
-                                            { value: 'card', label: 'Credit Card', icon: PaymentIcon }
+                                            { value: 'cash', label: t("checkout.cash"), icon: LocalShippingIcon },
+                                            { value: 'card', label: t("checkout.card"), icon: PaymentIcon }
                                         ].map((method) => {
                                             const active = field.value === method.value;
                                             return (
@@ -225,13 +227,13 @@ const Checkout: React.FC = () => {
                                 }}
                             >
                                 {loading ? <CircularProgress size={24} color="inherit" /> : (
-                                    paymentMethod === 'cash' ? "Place Cash Order" : "Proceed to Secure Payment"
+                                    paymentMethod === 'cash' ? t("checkout.placeOrder") : t("checkout.proceedToPayment")
                                 )}
                             </Button>
                         </form>
 
                         <Typography variant="body2" color="text.secondary" textAlign="center" sx={{ mt: 4 }}>
-                            🔒 Secure SSL Encryption • Trusted Payment Gateway
+                            {t("checkout.secureSsl")}
                         </Typography>
                     </Paper>
                 </motion.div>

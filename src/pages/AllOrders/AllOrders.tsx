@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { getUserId } from "../../utils/security";
 import { logger } from "../../utils/logger";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import PageMeta from "../../components/PageMeta/PageMeta";
 import {
     Box,
@@ -37,6 +38,7 @@ import { Order, Product } from "../../types";
 
 
 const AllOrders: React.FC = () => {
+    const { t } = useTranslation();
     const theme = useTheme();
     const navigate = useNavigate();
     const [userId, setUserId] = useState<string | null>(null);
@@ -67,7 +69,7 @@ const AllOrders: React.FC = () => {
         return (
             <Container maxWidth="md" sx={{ py: 10 }}>
                 <Alert severity="error" sx={{ borderRadius: '16px' }}>
-                    <strong>Error loading orders:</strong> {error instanceof Error ? error.message : "Unknown error"}
+                    <strong>{t("orders.error")}</strong> {error instanceof Error ? error.message : "Unknown error"}
                 </Alert>
             </Container>
         );
@@ -80,11 +82,11 @@ const AllOrders: React.FC = () => {
     if (ordersList.length === 0) {
         return (
             <Box sx={{ bgcolor: "background.default", minHeight: "100vh" }}>
-                <PageMeta title="My Orders" description="View your order history." />
+                <PageMeta title={t("PageMeta.ordersTitle")} description={t("PageMeta.ordersDesc")} />
                 <EmptyState
-                    title="No Orders Yet"
-                    description="You haven't placed any orders yet. Start your shopping journey today and explore our world-class collections!"
-                    actionText="Start Shopping"
+                    title={t("orders.noOrders")}
+                    description={t("orders.noOrdersDesc")}
+                    actionText={t("orders.startShopping")}
                     onAction={() => navigate("/")}
                     icon={<Inventory2 sx={{ fontSize: "3.5rem" }} />}
                 />
@@ -103,15 +105,15 @@ const AllOrders: React.FC = () => {
 
     return (
         <Box sx={{ bgcolor: "background.default", minHeight: "100vh", pb: 10 }}>
-            <PageMeta title="My Orders" description="View all your previous and current orders in one place." />
+            <PageMeta title={t("PageMeta.ordersTitle")} description={t("PageMeta.ordersDesc")} />
 
 
             <Box sx={{ pt: 10, pb: 6, textAlign: "center" }}>
                 <Typography variant="h3" fontWeight="1000" sx={{ mb: 1, letterSpacing: -1.5 }}>
-                    Order <Box component="span" sx={{ color: "primary.main" }}>History</Box>
+                    {t("orders.title")}
                 </Typography>
                 <Typography variant="body1" color="text.secondary">
-                    Track and manage your {ordersList.length} premium purchases
+                    {t("orders.subtitle", { count: ordersList.length })}
                 </Typography>
             </Box>
 
@@ -153,11 +155,11 @@ const AllOrders: React.FC = () => {
                                                         </Box>
                                                         <Box>
                                                             <Typography variant="h6" fontWeight="900" sx={{ letterSpacing: '-0.5px' }}>
-                                                                Order #{order._id?.slice(-8).toUpperCase()}
+                                                                {t("orders.orderId", { id: order._id?.slice(-8).toUpperCase() })}
                                                             </Typography>
                                                             <Typography variant="caption" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                                                                 <CalendarMonth sx={{ fontSize: 14 }} />
-                                                                {order.createdAt ? new Date(order.createdAt).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }) : "N/A"}
+                                                                {order.createdAt ? new Date(order.createdAt).toLocaleDateString(t("nav.home") === "Home" ? "en-US" : "ar-EG", { year: "numeric", month: "long", day: "numeric" }) : "N/A"}
                                                             </Typography>
                                                         </Box>
                                                     </Stack>
@@ -168,13 +170,13 @@ const AllOrders: React.FC = () => {
                                                     <Stack direction="row" spacing={2} justifyContent={{ xs: 'flex-start', md: 'flex-end' }}>
                                                         <Chip
                                                             icon={<Payments sx={{ fontSize: '1rem !important' }} />}
-                                                            label={order.isPaid ? "Paid" : "Pending Payment"}
+                                                            label={order.isPaid ? t("orders.paid") : t("orders.pending")}
                                                             color={order.isPaid ? "success" : "warning"}
                                                             sx={{ fontWeight: 800, borderRadius: '10px' }}
                                                         />
                                                         <Chip
                                                             icon={<LocalShipping sx={{ fontSize: '1rem !important' }} />}
-                                                            label={order.isDelivered ? "Delivered" : "Processing"}
+                                                            label={order.isDelivered ? t("orders.delivered") : t("orders.processing")}
                                                             color={order.isDelivered ? "success" : "info"}
                                                             sx={{ fontWeight: 800, borderRadius: '10px' }}
                                                         />
@@ -199,10 +201,10 @@ const AllOrders: React.FC = () => {
                                             <Grid container spacing={4}>
                                                 <Grid size={{ xs: 12, sm: 4 }}>
                                                     <Typography variant="caption" color="text.secondary" fontWeight="800" sx={{ textTransform: 'uppercase', mb: 0.5, display: 'block' }}>
-                                                        Total Price
+                                                        {t("orders.totalPrice")}
                                                     </Typography>
                                                     <Typography variant="h5" fontWeight="1000" color="primary.main">
-                                                        {order.totalOrderPrice?.toFixed(2)} EGP
+                                                        {order.totalOrderPrice?.toFixed(2)} {t("common.egp")}
                                                     </Typography>
                                                 </Grid>
 
@@ -210,7 +212,7 @@ const AllOrders: React.FC = () => {
                                                 <Grid size={{ xs: 12, sm: 8 }}>
                                                     <Paper elevation={0} sx={{ p: 2, bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)', borderRadius: '16px', border: `1px solid ${theme.palette.divider}` }}>
                                                         <Typography variant="caption" color="text.secondary" fontWeight="800" sx={{ textTransform: 'uppercase', mb: 1, display: 'block' }}>
-                                                            Shipping to
+                                                            {t("orders.shippingTo")}
                                                         </Typography>
                                                         <Typography variant="body2" fontWeight="700">
                                                             {order.shippingAddress?.details}, {order.shippingAddress?.city}
@@ -226,7 +228,7 @@ const AllOrders: React.FC = () => {
 
                                         <Collapse in={isExpanded} timeout="auto" unmountOnExit>
                                             <Box sx={{ p: 4, pt: 0, bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.01)' : 'rgba(0,0,0,0.01)' }}>
-                                                <Typography variant="subtitle1" fontWeight="900" sx={{ mb: 3 }}>Order Items ({cartItems.length})</Typography>
+                                                <Typography variant="subtitle1" fontWeight="900" sx={{ mb: 3 }}>{t("orders.items", { count: cartItems.length })}</Typography>
                                                 <Grid container spacing={2}>
                                                     {cartItems.map((item, i) => (
                                                         <Grid size={12} key={item._id || i}>
@@ -252,11 +254,11 @@ const AllOrders: React.FC = () => {
                                                                         <Box sx={{ flex: 1 }}>
                                                                             <Typography variant="body2" fontWeight="800">{product.title}</Typography>
                                                                             <Typography variant="caption" color="text.secondary">
-                                                                                Qty: {item.count} • ${item.price} each
+                                                                                {t("orders.qty", { count: item.count, price: item.price })}
                                                                             </Typography>
                                                                         </Box>
                                                                         <Typography variant="subtitle2" fontWeight="900" color="primary">
-                                                                            {(item.count * item.price).toFixed(2)} EGP
+                                                                            {(item.count * item.price).toFixed(2)} {t("common.egp")}
                                                                         </Typography>
                                                                     </Card>
                                                                 );
