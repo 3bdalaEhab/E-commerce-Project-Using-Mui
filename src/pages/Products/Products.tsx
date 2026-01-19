@@ -7,7 +7,7 @@ import {
 } from "@mui/material";
 import SkeletonLoader from "../../components/Common/SkeletonLoader";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { CartContext, WishlistContext, useToast, tokenContext } from "../../Context";
+import { CartContext, WishlistContext, useToast, useAuth } from "../../Context";
 import PageMeta from "../../components/PageMeta/PageMeta";
 import ProductCard from "../../components/Common/ProductCard";
 import ProductFilterBar from "../../components/Common/ProductFilterBar";
@@ -26,14 +26,14 @@ const containerVariants = {
     }
 };
 
-const itemVariants: any = {
+const itemVariants = {
     hidden: { opacity: 0, y: 30 },
     visible: {
         opacity: 1,
         y: 0,
         transition: {
             duration: 0.6,
-            ease: [0.22, 1, 0.36, 1]
+            ease: [0.22, 1, 0.36, 1] as [number, number, number, number]
         }
     }
 };
@@ -48,7 +48,7 @@ const Products: React.FC = () => {
     const { showToast } = useToast();
     const { addToCart } = useContext(CartContext);
     const { addToWishlist, wishListItemId, removeFromWishlist } = useContext(WishlistContext);
-    const { userToken } = useContext<any>(tokenContext);
+    const { userToken } = useAuth();
 
     // Filter States
     const [searchQuery, setSearchQuery] = useState(urlKeyword);

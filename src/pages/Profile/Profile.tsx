@@ -26,7 +26,7 @@ import AddIcon from "@mui/icons-material/Add";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { userService, addressService } from "../../services";
-import { useToast, tokenContext } from "../../Context";
+import { useToast, useAuth } from "../../Context";
 import PageMeta from "../../components/PageMeta/PageMeta";
 import { Address, User } from "../../types";
 import { motion, AnimatePresence } from "framer-motion";
@@ -52,7 +52,7 @@ const Profile: React.FC = () => {
     const [activeTab, setActiveTab] = useState(0);
     const { showToast } = useToast();
     const queryClient = useQueryClient();
-    const { logout } = React.useContext(tokenContext);
+    const { logout } = useAuth();
 
     // User Data State
     const [userData, setUserData] = useState<User | null>(null);

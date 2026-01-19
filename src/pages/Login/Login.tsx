@@ -21,7 +21,7 @@ import {
     Apple
 } from "@mui/icons-material";
 import { Link, useNavigate } from "react-router-dom";
-import { tokenContext, useToast } from "../../Context";
+import { useAuth, useToast } from "../../Context";
 import { useThemeContext } from "../../Context/ThemeContext";
 import AuthLayout from "../../components/Common/AuthLayout";
 import CustomTextField from "../../components/Common/CustomTextField";
@@ -29,7 +29,7 @@ import { authService } from "../../services";
 import { LoginCredentials } from "../../types";
 
 const Login: React.FC = () => {
-    const { setUserToken } = useContext(tokenContext);
+    const { setUserToken } = useAuth();
     const { primaryColor } = useThemeContext();
     const theme = useTheme();
     const navigate = useNavigate();

@@ -20,7 +20,7 @@ const HomeHero: React.FC = () => {
     const navigate = useNavigate();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
-    const containerVariants: any = {
+    const containerVariants = {
         hidden: { opacity: 0 },
         visible: {
             opacity: 1,
@@ -31,12 +31,12 @@ const HomeHero: React.FC = () => {
         }
     };
 
-    const itemVariants: any = {
+    const itemVariants = {
         hidden: { opacity: 0, y: 30 },
         visible: {
             opacity: 1,
             y: 0,
-            transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] }
+            transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] }
         }
     };
 

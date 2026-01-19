@@ -73,7 +73,7 @@ const getDesignTokens = (mode: PaletteMode, primaryColor: string) => ({
         '0 35px 60px rgba(0,0,0,0.15)', // lg
         '0 50px 100px rgba(0,0,0,0.2)', // xl
         ...Array(17).fill('none'), // Mocking rest for safety
-    ] as any,
+    ] as Theme['shadows'],
     typography: {
         fontFamily: "'Outfit', 'Cairo', 'Inter', sans-serif",
         h1: { fontSize: '4rem', fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1.2 },

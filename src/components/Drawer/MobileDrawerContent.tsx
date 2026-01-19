@@ -16,7 +16,7 @@ import {
     Logout,
     Lock as LockIcon,
 } from "@mui/icons-material";
-import { useThemeContext, tokenContext, useToast } from "../../Context";
+import { useThemeContext, useAuth, useToast } from "../../Context";
 import GlobalSearch from "../Common/GlobalSearch";
 import { NavItem } from "./types";
 
@@ -31,7 +31,7 @@ const MobileDrawerContent: React.FC<MobileDrawerContentProps> = ({
 }) => {
     const theme = useTheme();
     const { mode } = useThemeContext();
-    const { userToken, setUserToken } = useContext<any>(tokenContext);
+    const { userToken, setUserToken } = useAuth();
     const navigate = useNavigate();
     const { showToast } = useToast();
 

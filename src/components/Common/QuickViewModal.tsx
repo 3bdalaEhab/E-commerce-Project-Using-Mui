@@ -20,7 +20,7 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import { useQuickView } from '../../Context/QuickViewContext';
 import { useNavigate } from 'react-router-dom';
-import { CartContext, WishlistContext, useToast, tokenContext } from '../../Context';
+import { CartContext, WishlistContext, useToast, useAuth } from '../../Context';
 import { Link } from 'react-router-dom';
 
 const QuickViewModal = () => {
@@ -29,7 +29,7 @@ const QuickViewModal = () => {
     const { activeProduct, isOpen, closeQuickView } = useQuickView();
     const { addToCart } = useContext(CartContext);
     const { addToWishlist, removeFromWishlist, wishListItemId } = useContext(WishlistContext);
-    const { userToken } = useContext<any>(tokenContext);
+    const { userToken } = useAuth();
     const { showToast } = useToast();
 
     const [addingToCart, setAddingToCart] = useState(false);

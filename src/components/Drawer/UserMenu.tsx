@@ -13,13 +13,13 @@ import {
 } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 import { Lock as LockIcon, Logout } from "@mui/icons-material";
-import { tokenContext, useThemeContext, useToast } from "../../Context";
+import { useAuth, useThemeContext, useToast } from "../../Context";
 
 const UserMenu: React.FC = () => {
     const theme = useTheme();
     const navigate = useNavigate();
     const { mode } = useThemeContext();
-    const { setUserToken } = useContext<any>(tokenContext);
+    const { setUserToken } = useAuth();
     const { showToast } = useToast();
 
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);

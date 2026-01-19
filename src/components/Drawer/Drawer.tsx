@@ -23,7 +23,7 @@ import {
 
 import { Link } from "react-router-dom";
 import { useContext } from "react";
-import { tokenContext, CartContext, WishlistContext, useThemeContext } from "../../Context";
+import { useAuth, CartContext, WishlistContext, useThemeContext } from "../../Context";
 
 import UserMenu from "./UserMenu";
 import DesktopNav from "./DesktopNav";
@@ -41,7 +41,7 @@ const DrawerAppBar: React.FC<DrawerAppBarProps> = (props) => {
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const theme = useTheme();
 
-  const { userToken } = useContext<any>(tokenContext);
+  const { userToken } = useAuth();
   const { numOfCartItems } = useContext(CartContext);
   const { numWishItemList } = useContext(WishlistContext);
   const { mode, toggleTheme } = useThemeContext();
