@@ -5,12 +5,35 @@ import { motion } from 'framer-motion';
 import { Link as RouterLink } from 'react-router-dom';
 import { useToast } from '../../Context';
 
+import { pages } from '../../App';
+
 
 export default function Footer() {
     const theme = useTheme();
     const { showToast } = useToast();
     const currentYear = new Date().getFullYear();
     const [email, setEmail] = useState('');
+
+    const handlePrefetch = (path: string) => {
+        // Map path to page key
+        const pathMap: Record<string, keyof typeof pages> = {
+            '/': 'Home',
+            '/products': 'Products',
+            '/categories': 'Categories',
+            '/cart': 'Cart',
+            '/wishlist': 'Wishlist',
+            '/profile': 'Profile',
+            '/allorders': 'AllOrders',
+            '/login': 'Login',
+            '/register': 'Register'
+        };
+
+        const pageKey = pathMap[path.toLowerCase()];
+        if (pageKey && pages[pageKey]) {
+            pages[pageKey]();
+            console.log(`🚀 Footer Prefetching: ${pageKey}`);
+        }
+    };
 
 
     const footerLinks = {
@@ -137,6 +160,7 @@ export default function Footer() {
                                     color="text.secondary"
                                     underline="none"
                                     aria-label={link.ariaLabel}
+                                    onMouseEnter={() => handlePrefetch(link.path)}
                                     sx={{ transition: '0.3s', '&:hover': { color: 'primary.main', pl: 0.5 } }}
                                 >
                                     {link.name}
@@ -157,6 +181,7 @@ export default function Footer() {
                                     color="text.secondary"
                                     underline="none"
                                     aria-label={link.ariaLabel}
+                                    onMouseEnter={() => handlePrefetch(link.path)}
                                     sx={{ transition: '0.3s', '&:hover': { color: 'primary.main', pl: 0.5 } }}
                                 >
                                     {link.name}
@@ -216,7 +241,7 @@ export default function Footer() {
                         {socialLinks.map(({ Icon, label, url }, idx) => (
                             <IconButton
                                 key={idx}
-                                component={motion.button}
+                                {...({ component: motion.button } as any)}
                                 whileHover={{ y: -4, color: theme.palette.primary.main }}
                                 size="medium"
                                 href={url}

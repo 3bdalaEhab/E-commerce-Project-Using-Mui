@@ -4,6 +4,7 @@ import PageMeta from '../../components/PageMeta/PageMeta';
 import Products from '../Products/Products';
 import HomeHero from '../../components/Home/HomeHero';
 import { Box, Typography, Container } from '@mui/material';
+import ErrorBoundary from '../../components/Common/ErrorBoundary';
 
 const Home: React.FC = () => {
     return (
@@ -27,7 +28,9 @@ const Home: React.FC = () => {
                         Trending Categories
                     </Typography>
                 </Container>
-                <CategoriesSlider />
+                <ErrorBoundary>
+                    <CategoriesSlider />
+                </ErrorBoundary>
             </Box>
 
             {/* 📦 All Products Listing */}
@@ -41,7 +44,9 @@ const Home: React.FC = () => {
                         Explore Our Collection
                     </Typography>
                 </Container>
-                <Products />
+                <ErrorBoundary>
+                    <Products />
+                </ErrorBoundary>
             </Box>
         </Box>
     );

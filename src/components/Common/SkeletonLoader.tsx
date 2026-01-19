@@ -18,21 +18,21 @@ const ProductSkeleton = () => {
                 backgroundColor: theme.palette.background.paper,
             }}
         >
-            <Skeleton variant="rectangular" height={280} animation="wave" />
+            <Skeleton variant="rectangular" height={260} animation="wave" />
             <CardContent sx={{ p: 3 }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                    <Skeleton variant="text" width="40%" height={20} animation="wave" />
-                    <Skeleton variant="circular" width={20} height={20} animation="wave" />
+                    <Skeleton variant="text" width="60%" height={24} animation="wave" />
+                    <Skeleton variant="circular" width={24} height={24} animation="wave" />
                 </Box>
-                <Skeleton variant="text" width="80%" height={32} animation="wave" sx={{ mb: 1 }} />
-                <Skeleton variant="text" width="100%" height={20} animation="wave" />
-                <Skeleton variant="text" width="60%" height={20} animation="wave" sx={{ mb: 3 }} />
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Skeleton variant="text" width="90%" height={32} animation="wave" sx={{ mb: 1 }} />
+                <Skeleton variant="text" width="100%" height={24} animation="wave" />
+                <Skeleton variant="text" width="70%" height={24} animation="wave" sx={{ mb: 3 }} />
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 'auto' }}>
                     <Box>
-                        <Skeleton variant="text" width={40} height={15} animation="wave" />
-                        <Skeleton variant="text" width={60} height={30} animation="wave" />
+                        <Skeleton variant="text" width={50} height={16} animation="wave" />
+                        <Skeleton variant="text" width={80} height={36} animation="wave" />
                     </Box>
-                    <Skeleton variant="rectangular" width={48} height={48} sx={{ borderRadius: '12px' }} animation="wave" />
+                    <Skeleton variant="rectangular" width={52} height={52} sx={{ borderRadius: '16px' }} animation="wave" />
                 </Box>
             </CardContent>
         </Card>

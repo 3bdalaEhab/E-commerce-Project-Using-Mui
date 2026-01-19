@@ -10,8 +10,9 @@ import {
     useTheme,
 } from "@mui/material";
 import { motion, AnimatePresence, Variants } from "framer-motion";
-import SkeletonLoader from "../../components/Common/SkeletonLoader";
+import { CategoriesSkeleton } from "../../components/Common/Skeletons";
 import PageMeta from "../../components/PageMeta/PageMeta";
+import EmptyState from "../../components/Common/EmptyState";
 import { useNavigate } from "react-router-dom";
 import { categoryService } from "../../services";
 import { Category } from "../../types";
@@ -49,17 +50,17 @@ const Categories: React.FC = () => {
         select: (res) => res.data
     });
 
-    if (isLoading) return (
-        <Container maxWidth="xl" sx={{ py: 10 }}>
-            <SkeletonLoader count={6} type="category" />
-        </Container>
-    );
+    if (isLoading) return <CategoriesSkeleton />;
 
     if (isError)
         return (
-            <Box sx={{ py: 10, textAlign: "center" }}>
-                <Typography variant="h5" color="error">Error loading categories</Typography>
-            </Box>
+            <EmptyState
+                title="Something went wrong"
+                description="We couldn't load the categories. This might be a temporary connection issue."
+                actionText="Try Again"
+                onAction={() => window.location.reload()}
+                icon={<Box sx={{ color: 'error.main' }}>⚠️</Box>}
+            />
         );
 
     return (

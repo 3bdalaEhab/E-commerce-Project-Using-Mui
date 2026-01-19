@@ -27,7 +27,7 @@ import { Navigation, Pagination, Autoplay } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
-import Loading from "../../components/Loading/Loading";
+import { DetailsSkeleton } from "../../components/Common/Skeletons";
 import { CartContext, WishlistContext, useToast } from "../../Context";
 import PageMeta from "../../components/PageMeta/PageMeta";
 import { productService } from "../../services";
@@ -107,7 +107,7 @@ const Details: React.FC = () => {
         }
     }
 
-    if (isLoading) return <Loading />;
+    if (isLoading) return <DetailsSkeleton />;
 
     if (isError || !data) {
         const errorMessage = error instanceof Error ? error.message : "Could not load product details.";

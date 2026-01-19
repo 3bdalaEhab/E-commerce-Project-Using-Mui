@@ -11,6 +11,7 @@ import {
 import { ArrowForward, LocalOffer } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { Helmet } from 'react-helmet';
 
 // Placeholder for the hero image. In a real scenario, this would be an asset imported or in public folder.
 const HERO_IMAGE_URL = "https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=2070&auto=format&fit=crop";
@@ -51,6 +52,9 @@ const HomeHero: React.FC = () => {
                 perspective: '1000px',
             }}
         >
+            <Helmet>
+                <link rel="preload" as="image" href={HERO_IMAGE_URL} fetchPriority="high" />
+            </Helmet>
             {/* Background Image with Parallax-like scale */}
             <Box
                 component={motion.div}

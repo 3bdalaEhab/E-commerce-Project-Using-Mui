@@ -21,6 +21,7 @@ import { storage } from "../../utils/storage";
 import { logger } from "../../utils/logger";
 import GlobalSearch from "../Common/GlobalSearch";
 import { NavItem } from "./types";
+import { pages } from "../../App";
 
 interface MobileDrawerContentProps {
     navItems: NavItem[];
@@ -77,6 +78,14 @@ const MobileDrawerContent: React.FC<MobileDrawerContentProps> = ({
                         <ListItemButton
                             component={Link}
                             to={item.path || "#"}
+                            onMouseEnter={() => {
+                                const pageKey = item.name.replace(/\s+/g, '') as keyof typeof pages;
+                                if (pages[pageKey]) pages[pageKey]();
+                            }}
+                            onTouchStart={() => {
+                                const pageKey = item.name.replace(/\s+/g, '') as keyof typeof pages;
+                                if (pages[pageKey]) pages[pageKey]();
+                            }}
                             sx={{
                                 borderRadius: 2,
                                 "&:hover": {

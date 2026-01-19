@@ -10,7 +10,7 @@ const TopProgressBar: React.FC = () => {
 
     useEffect(() => {
         setVisible(true);
-        setProgress(10);
+        setProgress(30); // Faster initial jump
 
         const timer = setInterval(() => {
             setProgress((oldProgress) => {
@@ -29,8 +29,8 @@ const TopProgressBar: React.FC = () => {
             setTimeout(() => {
                 setVisible(false);
                 setProgress(0);
-            }, 300);
-        }, 800);
+            }, 200); // Reduced from 300
+        }, 400); // Reduced from 800 - much snappier feel
 
         return () => {
             clearInterval(timer);

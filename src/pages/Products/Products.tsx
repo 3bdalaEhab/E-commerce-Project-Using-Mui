@@ -5,35 +5,37 @@ import {
     Typography,
     Container,
 } from "@mui/material";
-import SkeletonLoader from "../../components/Common/SkeletonLoader";
+import { ProductSkeleton } from "../../components/Common/Skeletons";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { CartContext, WishlistContext, useToast, useAuth } from "../../Context";
 import PageMeta from "../../components/PageMeta/PageMeta";
+import EmptyState from "../../components/Common/EmptyState";
+import SearchOffIcon from '@mui/icons-material/SearchOff';
 import ProductCard from "../../components/Common/ProductCard";
 import ProductFilterBar from "../../components/Common/ProductFilterBar";
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 import { productService } from "../../services";
 import { Product } from "../../types";
 
-const containerVariants = {
+const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
         opacity: 1,
         transition: {
-            staggerChildren: 0.1,
-            delayChildren: 0.2
+            staggerChildren: 0.05, // Reduced from 0.1
+            delayChildren: 0.1 // Reduced from 0.2
         }
     }
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
     hidden: { opacity: 0, y: 30 },
     visible: {
         opacity: 1,
         y: 0,
         transition: {
-            duration: 0.6,
-            ease: [0.22, 1, 0.36, 1] as [number, number, number, number]
+            duration: 0.4, // Reduced from 0.6
+            ease: [0.22, 1, 0.36, 1]
         }
     }
 };
@@ -126,20 +128,17 @@ const Products: React.FC = () => {
         [navigate]
     );
 
-    if (isLoading) return (
-        <Container maxWidth="xl" sx={{ py: 10 }}>
-            <SkeletonLoader count={8} type="product" />
-        </Container>
-    );
+    if (isLoading) return <ProductSkeleton />;
 
     if (isError) {
-        const errorMessage = error instanceof Error ? error.message : "Unknown error";
         return (
-            <Box sx={{ p: 10, textAlign: "center" }}>
-                <Typography variant="h5" color="error">
-                    Error loading products: {errorMessage}
-                </Typography>
-            </Box>
+            <EmptyState
+                title="Failed to load products"
+                description="We encountered an error while fetching the products. Please check your connection and try again."
+                actionText="Refresh Page"
+                onAction={() => window.location.reload()}
+                icon={<Box sx={{ color: 'error.main' }}>⚠️</Box>}
+            />
         );
     }
 
@@ -175,18 +174,24 @@ const Products: React.FC = () => {
 
                 <Box sx={{ px: { xs: 0, sm: 2 } }}>
                     {products.length === 0 && !isLoading ? (
-                        <Box sx={{ textAlign: 'center', py: 10 }}>
-                            <Typography variant="h5" color="text.secondary">
-                                No products found matching your criteria.
-                            </Typography>
-                        </Box>
+                        <EmptyState
+                            title="No matching products"
+                            description={`We couldn't find any products matching your search "${searchQuery}". Try different keywords or browse our categories.`}
+                            actionText="Clear Filters"
+                            onAction={() => {
+                                setSearchQuery("");
+                                setSelectedCategory("");
+                                navigate("/products");
+                            }}
+                            icon={<SearchOffIcon sx={{ fontSize: '3.5rem' }} />}
+                        />
                     ) : (
                         <Box
                             component={motion.div}
                             variants={containerVariants}
                             initial="hidden"
                             whileInView="visible"
-                            viewport={{ once: true, margin: "-100px" }}
+                            viewport={{ once: true, margin: "-50px" }} // Adjusted margin for better visibility trigger
                             sx={{
                                 display: "grid",
                                 gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",

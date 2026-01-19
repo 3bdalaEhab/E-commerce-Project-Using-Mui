@@ -19,7 +19,7 @@ import {
     IconButton,
     Stack,
     Paper,
-    Grid2,
+    Grid,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import {
@@ -145,8 +145,8 @@ const AllOrders: React.FC = () => {
                                         }}
                                     >
                                         <CardContent sx={{ p: 4 }}>
-                                            <Grid2 container spacing={4} alignItems="center">
-                                                <Grid2 size={{ xs: 12, md: 6 }}>
+                                            <Grid container spacing={4} alignItems="center">
+                                                <Grid size={{ xs: 12, md: 6 }}>
                                                     <Stack direction="row" spacing={2} alignItems="center" mb={1}>
                                                         <Box sx={{ p: 1, bgcolor: 'primary.transparent', borderRadius: '12px', color: 'primary.main', display: 'flex' }}>
                                                             <ReceiptLong />
@@ -161,10 +161,10 @@ const AllOrders: React.FC = () => {
                                                             </Typography>
                                                         </Box>
                                                     </Stack>
-                                                </Grid2>
+                                                </Grid>
 
 
-                                                <Grid2 size={{ xs: 12, md: 6 }}>
+                                                <Grid size={{ xs: 12, md: 6 }}>
                                                     <Stack direction="row" spacing={2} justifyContent={{ xs: 'flex-start', md: 'flex-end' }}>
                                                         <Chip
                                                             icon={<Payments sx={{ fontSize: '1rem !important' }} />}
@@ -189,25 +189,25 @@ const AllOrders: React.FC = () => {
                                                             <KeyboardArrowDown />
                                                         </IconButton>
                                                     </Stack>
-                                                </Grid2>
-                                            </Grid2>
+                                                </Grid>
+                                            </Grid>
 
 
                                             <Divider sx={{ my: 3, opacity: 0.5 }} />
 
 
-                                            <Grid2 container spacing={4}>
-                                                <Grid2 size={{ xs: 12, sm: 4 }}>
+                                            <Grid container spacing={4}>
+                                                <Grid size={{ xs: 12, sm: 4 }}>
                                                     <Typography variant="caption" color="text.secondary" fontWeight="800" sx={{ textTransform: 'uppercase', mb: 0.5, display: 'block' }}>
                                                         Total Price
                                                     </Typography>
                                                     <Typography variant="h5" fontWeight="1000" color="primary.main">
                                                         {order.totalOrderPrice?.toFixed(2)} EGP
                                                     </Typography>
-                                                </Grid2>
+                                                </Grid>
 
 
-                                                <Grid2 size={{ xs: 12, sm: 8 }}>
+                                                <Grid size={{ xs: 12, sm: 8 }}>
                                                     <Paper elevation={0} sx={{ p: 2, bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)', borderRadius: '16px', border: `1px solid ${theme.palette.divider}` }}>
                                                         <Typography variant="caption" color="text.secondary" fontWeight="800" sx={{ textTransform: 'uppercase', mb: 1, display: 'block' }}>
                                                             Shipping to
@@ -219,17 +219,17 @@ const AllOrders: React.FC = () => {
                                                             📞 {order.shippingAddress?.phone}
                                                         </Typography>
                                                     </Paper>
-                                                </Grid2>
-                                            </Grid2>
+                                                </Grid>
+                                            </Grid>
                                         </CardContent>
 
 
                                         <Collapse in={isExpanded} timeout="auto" unmountOnExit>
                                             <Box sx={{ p: 4, pt: 0, bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.01)' : 'rgba(0,0,0,0.01)' }}>
                                                 <Typography variant="subtitle1" fontWeight="900" sx={{ mb: 3 }}>Order Items ({cartItems.length})</Typography>
-                                                <Grid2 container spacing={2}>
+                                                <Grid container spacing={2}>
                                                     {cartItems.map((item, i) => (
-                                                        <Grid2 size={12} key={item._id || i}>
+                                                        <Grid size={12} key={item._id || i}>
                                                             {(() => {
                                                                 const product = typeof item.product === 'string' ? null : (item.product as Product);
                                                                 if (!product) return null;
@@ -261,9 +261,9 @@ const AllOrders: React.FC = () => {
                                                                     </Card>
                                                                 );
                                                             })()}
-                                                        </Grid2>
+                                                        </Grid>
                                                     ))}
-                                                </Grid2>
+                                                </Grid>
                                             </Box>
                                         </Collapse>
                                     </Card>

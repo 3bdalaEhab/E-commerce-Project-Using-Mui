@@ -4,6 +4,7 @@ import { Link, useLocation } from "react-router-dom";
 import { useThemeContext } from "../../Context";
 import GlobalSearch from "../Common/GlobalSearch";
 import { NavItem } from "./types";
+import { pages } from "../../App";
 
 interface DesktopNavProps {
     navItems: NavItem[];
@@ -22,6 +23,13 @@ const DesktopNav: React.FC<DesktopNavProps> = ({ navItems }) => {
                     key={item.name}
                     component={Link}
                     to={item.path || "#"}
+                    onMouseEnter={() => {
+                        const pageKey = item.name.replace(/\s+/g, '') as keyof typeof pages;
+                        if (pages[pageKey]) {
+                            pages[pageKey]();
+                            console.log(`🚀 Prefetching: ${item.name}`);
+                        }
+                    }}
                     sx={{
                         color: theme.palette.text.primary,
                         fontWeight: 700,

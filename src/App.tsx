@@ -6,6 +6,7 @@ import './App.css';
 import LayOut from './components/LayOut/LayOut';
 import Loading from './components/Loading/Loading';
 import PageTransitions from './components/Common/PageTransitions';
+import ErrorBoundary from './components/Common/ErrorBoundary';
 
 // Context
 import { useAuth } from './Context';
@@ -15,23 +16,42 @@ import { storage } from './utils/storage';
 import UnProtectedRoutes from './components/DirectingUsers/UnProtectedRoutes';
 import ProtectedRoutes from './components/DirectingUsers/protectedRoutes';
 
-// Lazy loaded pages for better performance
-const Home = lazy(() => import('./pages/Home/Home'));
-const Products = lazy(() => import('./pages/Products/Products'));
-const Categories = lazy(() => import('./pages/Categories/Categories'));
-const Wishlist = lazy(() => import('./pages/Wishlist/Wishlist'));
-const Cart = lazy(() => import('./pages/Cart/Cart'));
-const Details = lazy(() => import('./pages/Details/Details'));
-const Register = lazy(() => import('./pages/Register/Register'));
-const Login = lazy(() => import('./pages/Login/Login'));
-const NotFound = lazy(() => import('./pages/NotFound/NotFound'));
-const AllOrders = lazy(() => import('./pages/AllOrders/AllOrders'));
-const Checkout = lazy(() => import('./pages/Checkout/Checkout'));
-const ForgotPass = lazy(() => import('./pages/ForgotPass/ForgotPass'));
-const VerifyResetCode = lazy(() => import('./pages/VerifyResetCode/VerifyResetCode'));
-const ResetPassword = lazy(() => import('./pages/ResetPassword/ResetPassword'));
-const ChangePassword = lazy(() => import('./pages/ChangePassword/ChangePassword'));
-const Profile = lazy(() => import('./pages/Profile/Profile'));
+// Lazy loaded pages with prefetch support
+export const pages = {
+    Home: () => import('./pages/Home/Home'),
+    Products: () => import('./pages/Products/Products'),
+    Categories: () => import('./pages/Categories/Categories'),
+    Wishlist: () => import('./pages/Wishlist/Wishlist'),
+    Cart: () => import('./pages/Cart/Cart'),
+    Details: () => import('./pages/Details/Details'),
+    Register: () => import('./pages/Register/Register'),
+    Login: () => import('./pages/Login/Login'),
+    NotFound: () => import('./pages/NotFound/NotFound'),
+    AllOrders: () => import('./pages/AllOrders/AllOrders'),
+    Checkout: () => import('./pages/Checkout/Checkout'),
+    ForgotPass: () => import('./pages/ForgotPass/ForgotPass'),
+    VerifyResetCode: () => import('./pages/VerifyResetCode/VerifyResetCode'),
+    ResetPassword: () => import('./pages/ResetPassword/ResetPassword'),
+    ChangePassword: () => import('./pages/ChangePassword/ChangePassword'),
+    Profile: () => import('./pages/Profile/Profile'),
+};
+
+const Home = lazy(pages.Home);
+const Products = lazy(pages.Products);
+const Categories = lazy(pages.Categories);
+const Wishlist = lazy(pages.Wishlist);
+const Cart = lazy(pages.Cart);
+const Details = lazy(pages.Details);
+const Register = lazy(pages.Register);
+const Login = lazy(pages.Login);
+const NotFound = lazy(pages.NotFound);
+const AllOrders = lazy(pages.AllOrders);
+const Checkout = lazy(pages.Checkout);
+const ForgotPass = lazy(pages.ForgotPass);
+const VerifyResetCode = lazy(pages.VerifyResetCode);
+const ResetPassword = lazy(pages.ResetPassword);
+const ChangePassword = lazy(pages.ChangePassword);
+const Profile = lazy(pages.Profile);
 
 // Suspense wrapper for lazy components with animations
 const SuspenseWrapper = ({ children }: { children: React.ReactNode }) => (
@@ -218,7 +238,11 @@ function App() {
         },
     ]);
 
-    return <RouterProvider router={router} />;
+    return (
+        <ErrorBoundary>
+            <RouterProvider router={router} />
+        </ErrorBoundary>
+    );
 }
 
 export default App;
