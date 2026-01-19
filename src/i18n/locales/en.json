@@ -12,6 +12,34 @@
         "orders": "Orders",
         "settings": "Settings"
     },
+    "categories": {
+        "title": "Product Categories",
+        "subtitle": "Find exactly what you're looking for by browsing our curated collections",
+        "browseCollection": "BROWSE COLLECTION",
+        "errorDesc": "We couldn't load the categories. This might be a temporary connection issue.",
+        "mensFashion": "Men's Fashion",
+        "womensFashion": "Women's Fashion",
+        "electronics": "Electronics",
+        "music": "Music",
+        "supermarket": "SuperMarket",
+        "babyToys": "Baby & Toys",
+        "home": "Home",
+        "books": "Books",
+        "beautyHealth": "Beauty & Health",
+        "mobiles": "Mobiles"
+    },
+    "brands": {
+        "samsung": "Samsung",
+        "apple": "Apple",
+        "adidas": "Adidas",
+        "nike": "Nike",
+        "canon": "Canon",
+        "sony": "Sony",
+        "hp": "HP",
+        "dell": "Dell",
+        "puma": "Puma",
+        "zara": "Zara"
+    },
     "PageMeta": {
         "homeTitle": "Elite Store | Premium Shopping Experience",
         "homeDesc": "Welcome to our store. Explore the best products available with elite service.",
@@ -60,10 +88,21 @@
         "viewCart": "View shopping cart",
         "viewWishlist": "View wishlist",
         "viewProfile": "View my profile",
-        "viewOrders": "View all orders"
+        "viewOrders": "View all orders",
+        "readPrivacy": "Read privacy policy",
+        "readTerms": "Read terms of service",
+        "newsletterInput": "Newsletter email input",
+        "social": {
+            "facebook": "Visit our Facebook page",
+            "twitter": "Follow us on Twitter",
+            "instagram": "Follow us on Instagram",
+            "linkedin": "Connect with us on LinkedIn",
+            "github": "View our GitHub profile"
+        }
     },
     "common": {
         "price": "Price",
+        "priceLabel": "PRICE",
         "addToCart": "Add to Cart",
         "viewDetails": "View Details",
         "egp": "EGP",
@@ -80,7 +119,8 @@
         "youMayAlsoLike": "You May Also Like",
         "recentlyViewed": "Recently Viewed",
         "somethingWentWrong": "Something went wrong",
-        "refreshPage": "Refresh Page"
+        "refreshPage": "Refresh Page",
+        "na": "N/A"
     },
     "cart": {
         "title": "Cart",
@@ -116,6 +156,29 @@
         "exploreCollection": "Explore Our Collection"
     },
     "products": {
+        "poloCollarShortSleeveColorBlockMensKnitwearSweater": "Polo Collar Short Sleeve Color Block Men's Knitwear Sweater",
+        "womanShawl": "Premium Woman Shawl",
+        "womanSocks": "Comfortable Woman Socks",
+        "womanKarmaSocksMulticolour": "Woman Karma Socks Multicolour",
+        "galaxy6RunningShoes": "Galaxy 6 Running Shoes",
+        "ps5DualsenseChargingStation": "PS5 DualSense Charging Station",
+        "nswEverydayEssentialsNoShowSocks": "NSW Everyday Essentials No-Show Socks",
+        "logiTShirtGreen": "Logo T-Shirt Green",
+        "tornadoSmartLedTv32InchHdWithBuiltInReceiver2HdmiAnd2UsbInputs32es1500eBlackWeOffer50GbFreeFor1Month32es1500eBlackDescription": "The smallest smart TV from Tornado, enjoy applications and viewing in HD quality.",
+        "smartTv32InchHdLedWithBuiltInWifi2HdmiAnd2UsbInputsKdl32w600dBlackWeOffer50GbFreeFor1MonthKdl32w600dBlack": "Smart TV 32 Inch HD LED With Built in WiFi, 2 HDMI and 2 USB Inputs KDL-32W600D Black - WE Offer (50 GB Free for 1 Month) KDL-32W600D Black",
+        "smartTv32InchHdLedWithBuiltInWifi2HdmiAnd2UsbInputsKdl32w600dBlackWeOffer50GbFreeFor1MonthKdl32w600dBlackDescription": "32-inch HD display for stunning photo-realistic visuals. Go online and browse movies and enjoy video channels through built-in Wi-Fi.",
+        "50InchCrystalUhdCrystalProcessor4kFlatSmartTvUa50au7000uxznUa50au7000uxegTitanGrey": "50-Inch Crystal UHD Crystal Processor 4K Flat Smart Tv UA50AU7000UXZN / UA50AU7000UXEG Titan Grey",
+        "50InchCrystalUhdCrystalProcessor4kFlatSmartTvUa50au7000uxznUa50au7000uxegTitanGreyDescription": "PurColour Technology fine-tunes the colour spectrum to deliver true-to-life and balanced colours in every movie sequence.",
+        "4kSmartLedTv55InchWithAndroidSystemWifiConnection3HdmiAnd2UsbInputsKd55x7500hBlackWeOffer100GbFreeFor3MonthsKd55x7500hBlack": "4K Smart LED TV 55 Inch With Android System, WiFi Connection, 3 HDMI and 2 USB Inputs KD-55X7500H Black - WE Offer (100 GB Free for 3 Months) KD-55X7500H Black",
+        "4kSmartLedTv55InchWithAndroidSystemWifiConnection3HdmiAnd2UsbInputsKd55x7500hBlackWeOffer100GbFreeFor3MonthsKd55x7500hBlackDescription": "Experience our stunning Full HD picture quality, whatever you’re watching across all your entertainment.",
+        "smartLedTv50InchFullHdWithBuiltInReceiver2HdmiAnd2UsbInputsKdl50wf665BlackWeOffer100GbFreeFor3MonthsKdl50wf665Black": "Smart LED TV 50 Inch Full HD With Built-In Receiver, 2 HDMI and 2 USB Inputs KDL-50WF665 Black - WE Offer (100 GB Free for 3 Months) KDL-50WF665 Black",
+        "smartLedTv50InchFullHdWithBuiltInReceiver2HdmiAnd2UsbInputsKdl50wf665BlackWeOffer100GbFreeFor3MonthsKdl50wf665BlackDescription": "Connect with wired and wireless internet. Access YouTube instantly with one click.",
+        "24InchFullHdCurvedMonitorBlack": "24-Inch Full HD Curved Monitor Black",
+        "24InchFullHdCurvedMonitorBlackDescription": "Offers a vivid display that contains everything you need. Stands for evolving office requirements.",
+        "43InchFullHdSmartTvWithBuiltInReceiver43t5300Ua43t5300auxegBlack": "43-Inch Full HD Smart TV With Built In Receiver 43T5300 / UA43T5300AUXEG Black",
+        "43InchFullHdSmartTvWithBuiltInReceiver43t5300Ua43t5300auxegBlackDescription": "Smart TV with pure picture and vivid colors, slim and modern design fits your home.",
+        "crewNeckLongSleeveMensTricotSweaterWithColorBlock": "Crew Neck Long Sleeve Men's Tricot Sweater with Color Block",
+        "crewNeckLongSleeveMensTricotSweaterWithColorBlockDescription": "Tricot fabric, Ribbed ankles and bottom. WASH AT MAXIMUM 30 °C, DO NOT USE BLEACH.",
         "catalog": "Catalog",
         "subtitle": "Handpicked items tailored for your lifestyle",
         "noItems": "No matching products",
@@ -125,12 +188,6 @@
         "wishlistLoginWarning": "❤ Please login to save items to your wishlist",
         "failedToLoad": "Failed to load products",
         "failedToLoadDesc": "We encountered an error while fetching the products. Please check your connection and try again."
-    },
-    "categories": {
-        "title": "Product Categories",
-        "subtitle": "Find exactly what you're looking for by browsing our curated collections",
-        "browseCollection": "BROWSE COLLECTION",
-        "errorDesc": "We couldn't load the categories. This might be a temporary connection issue."
     },
     "profile": {
         "title": "My Account",
@@ -148,7 +205,8 @@
         "noAddresses": "No addresses saved yet.",
         "addAddress": "Add New",
         "saveAddress": "Save Address",
-        "cancel": "Cancel"
+        "cancel": "Cancel",
+        "emailHelper": "Email cannot be changed"
     },
     "orders": {
         "title": "Order History",
@@ -182,7 +240,21 @@
         "card": "Credit Card",
         "placeOrder": "Place Cash Order",
         "proceedToPayment": "Proceed to Secure Payment",
-        "secureSsl": "🔒 Secure SSL Encryption • Trusted Payment Gateway"
+        "secureSsl": "🔒 Secure SSL Encryption • Trusted Payment Gateway",
+        "cities": {
+            "Cairo": "Cairo",
+            "Giza": "Giza",
+            "Alexandria": "Alexandria",
+            "Aswan": "Aswan",
+            "Luxor": "Luxor",
+            "Suez": "Suez",
+            "Ismailia": "Ismailia",
+            "Port Said": "Port Said",
+            "Damietta": "Damietta",
+            "Fayoum": "Fayoum",
+            "Minya": "Minya",
+            "Qena": "Qena"
+        }
     },
     "slides": {
         "minimalist": {
@@ -214,6 +286,15 @@
         "clearAll": "Clear all",
         "viewAll": "View all results for \"{{query}}\""
     },
+    "filter": {
+        "title": "Filter",
+        "priceRange": "Price Range",
+        "bestMatch": "Best Match",
+        "lowToHigh": "Price: Low to High",
+        "highToLow": "Price: High to Low",
+        "topRated": "Top Rated",
+        "bestSelling": "Best Selling"
+    },
     "auth": {
         "signInTitle": "Sign In",
         "signInSubtitle": "Access your premium dashboard and explore the global catalog of extraordinary products.",
@@ -223,6 +304,8 @@
         "continueWithEmail": "OR CONTINUE WITH EMAIL",
         "fillDetails": "OR FILL IN YOUR DETAILS",
         "emailLabel": "Email Address",
+        "emailPlaceholder": "Your email address",
+        "phonePlaceholder": "01xxxxxxxxx",
         "passwordLabel": "Password",
         "forgotPassword": "Forgot Password?",
         "signInButton": "Sign In to Account",
@@ -254,7 +337,52 @@
         "registerSuccess": "✅ Account created successfully! Welcome to the elite community.",
         "registerError": "❌ Registration failed. Try again.",
         "switchToDark": "Switch to Dark Mode",
-        "switchToLight": "Switch to Light Mode"
+        "switchToLight": "Switch to Light Mode",
+        "verifyTitle": "Secure Verification",
+        "verifySubtitle": "Validate your identity by entering the high-entropy reset code dispatched to your email.",
+        "verifyIdentity": "Verify Identity",
+        "recoveryDesc": "Please enter the 6-digit verification code.",
+        "codeLabel": "Verification Code",
+        "codeReq": "Reset code is required",
+        "invalidCode": "Code must be 6 digits",
+        "expireMsg": "This code will expire shortly for your security.",
+        "verifyBtn": "Verify Reset Code",
+        "backRecovery": "Back to Recovery",
+        "restoreTitle": "Secure Restoration",
+        "restoreSubtitle": "Architect a formidable new password to re-establish access to your premium account.",
+        "resetPassword": "Reset Password",
+        "finalizeDesc": "Finalize your identity recovery process.",
+        "emailAccount": "Account Email",
+        "newPassLabel": "New Password",
+        "confirmNewPass": "Confirm New Password",
+        "securityLevel": "Security Level",
+        "vulnerable": "Vulnerable",
+        "secure": "Secure",
+        "absoluteSecurity": "Absolute Security",
+        "req8Chars": "8+ Chars",
+        "reqNumber": "Number",
+        "reqUpper": "Upper",
+        "reqSpecial": "Special",
+        "complexityHint": "Require 8+ chars, Upper, Lower, Number, Special",
+        "resetBtn": "Finalize Password Reset",
+        "encryptedMsg": "Your data is encrypted using military-grade AES-256.",
+        "recoveryTitle": "Account Recovery",
+        "recoverySubtitle": "Enter your verified email to initiate the secure password restoration sequence.",
+        "forgotPass": "Forgot Password",
+        "forgotDesc": "We will send a unique verification code to your email.",
+        "spamMsg": "Please check your spam folder if the code doesn't appear within 60 seconds.",
+        "sendCodeBtn": "Send Verification Code",
+        "backToLogin": "Back to Login",
+        "changePassTitle": "Change Password",
+        "changePassSubtitle": "Update your security credentials",
+        "changePassDesc": "Securely change your account password.",
+        "currentPassLabel": "Current Password",
+        "strength": "Strength",
+        "weak": "Weak",
+        "fair": "Fair",
+        "strong": "Strong",
+        "changePassBtn": "Change Password",
+        "logoutSession": "Logout Session"
     },
     "toasts": {
         "loggedOut": "Logged out successfully 👋",
@@ -277,6 +405,14 @@
         "changesSaved": "✅ Changes saved successfully",
         "saveError": "❌ Failed to save changes",
         "successCash": "🎉 Order placed successfully with Cash!",
-        "checkoutFail": "❌ Checkout failed. Please try again."
+        "checkoutFail": "❌ Checkout failed. Please try again.",
+        "verifySuccess": "✅ Code verified successfully! System unlocked.",
+        "verifyError": "❌ Verification failed. Code may be invalid.",
+        "resetSuccess": "✅ Security protocols updated! Password reset successful.",
+        "resetError": "❌ Reset sequence failed.",
+        "forgotSuccess": "✅ Secure code emitted! Check your inbox.",
+        "forgotError": "❌ Verification failed. Check your email.",
+        "changeSuccess": "✅ Password changed successfully!",
+        "changeError": "❌ Change failed."
     }
 }

@@ -3,14 +3,9 @@ import {
     AuthResponse,
     LoginCredentials,
     RegisterCredentials,
-    ForgotPasswordCredentials
+    ForgotPasswordCredentials,
+    ChangePasswordData
 } from '../types';
-
-interface ChangePasswordData {
-    currentPassword: string;
-    password: string;
-    rePassword: string;
-}
 
 interface VerifyResetCodeData {
     resetCode: string;

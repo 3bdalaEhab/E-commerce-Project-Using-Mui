@@ -32,6 +32,7 @@ import { productService, categoryService } from "../../services";
 import { Product, Category } from "../../types";
 import { useQuery } from "@tanstack/react-query";
 import { storage } from "../../utils/storage";
+import { translateAPIContent } from "../../utils/localization";
 
 // Debounce hook for performance
 function useDebounce<T>(value: T, delay: number): T {
@@ -393,6 +394,7 @@ const GlobalSearch: React.FC = () => {
                                         >
                                             <Avatar
                                                 src={category.image}
+                                                alt={translateAPIContent(category.name, 'categories')}
                                                 variant="rounded"
                                                 sx={{
                                                     width: 44,
@@ -405,7 +407,7 @@ const GlobalSearch: React.FC = () => {
                                             </Avatar>
                                             <Box sx={{ flex: 1, overflow: 'hidden' }}>
                                                 <Typography variant="body2" fontWeight="600" noWrap>
-                                                    {category.name}
+                                                    {translateAPIContent(category.name, 'categories')}
                                                 </Typography>
                                                 <Typography variant="caption" color="text.secondary">
                                                     {t("search.browseCategory")}
@@ -464,6 +466,7 @@ const GlobalSearch: React.FC = () => {
                                         >
                                             <Avatar
                                                 src={product.imageCover}
+                                                alt={translateAPIContent(product.title, 'products')}
                                                 variant="rounded"
                                                 sx={{
                                                     width: 48,
@@ -474,11 +477,11 @@ const GlobalSearch: React.FC = () => {
                                             />
                                             <Box sx={{ flex: 1, overflow: 'hidden', minWidth: 0 }}>
                                                 <Typography variant="body2" fontWeight="600" noWrap>
-                                                    {product.title}
+                                                    {translateAPIContent(product.title, 'products')}
                                                 </Typography>
                                                 <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 0.5 }}>
                                                     <Typography variant="caption" color="text.secondary" noWrap>
-                                                        {product.category?.name || 'Uncategorized'}
+                                                        {translateAPIContent(product.category?.name, 'categories') || 'Uncategorized'}
                                                     </Typography>
                                                     {product.ratingsAverage > 0 && (
                                                         <>
@@ -498,7 +501,7 @@ const GlobalSearch: React.FC = () => {
                                                             fontWeight="700"
                                                             color="primary"
                                                         >
-                                                            ${product.priceAfterDiscount}
+                                                            {product.priceAfterDiscount} {t("common.egp")}
                                                         </Typography>
                                                         <Typography
                                                             variant="caption"
@@ -508,12 +511,12 @@ const GlobalSearch: React.FC = () => {
                                                                 fontSize: '0.7rem'
                                                             }}
                                                         >
-                                                            ${product.price}
+                                                            {product.price} {t("common.egp")}
                                                         </Typography>
                                                     </Stack>
                                                 ) : (
                                                     <Typography variant="body2" fontWeight="700" color="primary">
-                                                        ${product.price}
+                                                        {product.price} {t("common.egp")}
                                                     </Typography>
                                                 )}
                                                 {product.quantity === 0 && (

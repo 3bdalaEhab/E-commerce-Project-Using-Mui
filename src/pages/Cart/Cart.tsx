@@ -26,6 +26,7 @@ import EmptyState from "../../components/Common/EmptyState";
 import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined';
 import { Product, CartItem as CartItemType } from "../../types";
 import { useTranslation } from "react-i18next";
+import { translateAPIContent } from "../../utils/localization";
 
 // 🔹 Memoized Cart Item Component
 interface CartItemProps {
@@ -71,7 +72,7 @@ const CartItem = React.memo(({ item, onUpdateQuantity, onRemove }: CartItemProps
                 <CardMedia
                     component="img"
                     image={product.imageCover}
-                    alt={product.title}
+                    alt={translateAPIContent(product.title, 'products')}
                     sx={{ width: { xs: "100%", sm: 200 }, height: { xs: 180, sm: "auto" }, objectFit: "cover" }}
                 />
                 <CardContent sx={{ flex: 1, p: { xs: 2.5, sm: 3.5 } }}>
@@ -80,7 +81,7 @@ const CartItem = React.memo(({ item, onUpdateQuantity, onRemove }: CartItemProps
                             <Typography
                                 variant="h6"
                                 fontWeight="900"
-                                title={product.title}
+                                title={translateAPIContent(product.title, 'products')}
                                 sx={{
                                     mb: 1,
                                     letterSpacing: '-0.5px',
@@ -90,12 +91,12 @@ const CartItem = React.memo(({ item, onUpdateQuantity, onRemove }: CartItemProps
                                     maxWidth: { xs: '200px', sm: '300px', md: '400px' }
                                 }}
                             >
-                                {product.title}
+                                {translateAPIContent(product.title, 'products')}
                             </Typography>
                             <Box sx={{ display: "flex", gap: 1, mb: 3 }}>
-                                <Chip label={product.category?.name} size="small" variant="outlined" color="primary"
+                                <Chip label={translateAPIContent(product.category?.name, 'categories')} size="small" variant="outlined" color="primary"
                                     sx={{ borderRadius: '8px', fontWeight: 700, fontSize: '0.7rem' }} />
-                                {product.brand && <Chip label={product.brand.name} size="small" variant="outlined"
+                                {product.brand && <Chip label={translateAPIContent(product.brand.name, 'brands')} size="small" variant="outlined"
                                     sx={{ borderRadius: '8px', fontWeight: 600, fontSize: '0.7rem' }} />}
                             </Box>
                         </Box>

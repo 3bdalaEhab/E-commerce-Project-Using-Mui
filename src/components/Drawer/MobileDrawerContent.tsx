@@ -66,7 +66,7 @@ const MobileDrawerContent: React.FC<MobileDrawerContentProps> = ({
                         WebkitTextFillColor: "transparent",
                     }}
                 >
-                    E-COMMERCE
+                    {t("footer.brandName")}
                 </Typography>
             </Box>
             <Divider sx={{ mb: 2 }} />
@@ -76,16 +76,16 @@ const MobileDrawerContent: React.FC<MobileDrawerContentProps> = ({
             <Divider sx={{ mb: 2 }} />
             <List onClick={handleDrawerToggle}>
                 {navItems.map((item) => (
-                    <ListItem key={item.name} disablePadding sx={{ mb: 1 }}>
+                    <ListItem key={item.id} disablePadding sx={{ mb: 1 }}>
                         <ListItemButton
                             component={Link}
                             to={item.path || "#"}
                             onMouseEnter={() => {
-                                const pageKey = item.name.replace(/\s+/g, '') as keyof typeof pages;
+                                const pageKey = item.id.charAt(0).toUpperCase() + item.id.slice(1) as keyof typeof pages;
                                 if (pages[pageKey]) pages[pageKey]();
                             }}
                             onTouchStart={() => {
-                                const pageKey = item.name.replace(/\s+/g, '') as keyof typeof pages;
+                                const pageKey = item.id.charAt(0).toUpperCase() + item.id.slice(1) as keyof typeof pages;
                                 if (pages[pageKey]) pages[pageKey]();
                             }}
                             sx={{
@@ -101,13 +101,13 @@ const MobileDrawerContent: React.FC<MobileDrawerContentProps> = ({
                             <ListItemIcon sx={{ minWidth: "40px", color: theme.palette.primary.main }}>
                                 <Badge
                                     badgeContent={
-                                        item.name === t("nav.cart")
+                                        item.id === "cart"
                                             ? item.numItem
-                                            : item.name === t("nav.wishlist")
+                                            : item.id === "wishlist"
                                                 ? item.numWishItem
                                                 : 0
                                     }
-                                    color={item.name === t("nav.cart") ? "primary" : "secondary"}
+                                    color={item.id === "cart" ? "primary" : "secondary"}
                                 >
                                     {item.icon}
                                 </Badge>

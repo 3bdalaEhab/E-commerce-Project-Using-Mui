@@ -11,12 +11,13 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css/effect-fade";
 
-export default function CategoriesSlider() {
+
+export default React.memo(function CategoriesSlider() {
     const theme = useTheme();
     const navigate = useNavigate();
     const { t } = useTranslation();
 
-    const SLIDER_DATA = [
+    const SLIDER_DATA = React.useMemo(() => [
         {
             id: 1,
             title: t("slides.minimalist.title"),
@@ -45,7 +46,7 @@ export default function CategoriesSlider() {
             image: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?q=80&w=2564&auto=format&fit=crop",
             link: "/products?category=electronics"
         }
-    ];
+    ], [t]);
 
     return (
         <Box
@@ -238,4 +239,4 @@ export default function CategoriesSlider() {
             </style>
         </Box>
     );
-}
+});

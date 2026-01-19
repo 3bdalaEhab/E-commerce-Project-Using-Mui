@@ -24,10 +24,9 @@ const DesktopNav: React.FC<DesktopNavProps> = ({ navItems }) => {
                     component={Link}
                     to={item.path || "#"}
                     onMouseEnter={() => {
-                        const pageKey = item.name.replace(/\s+/g, '') as keyof typeof pages;
+                        const pageKey = item.id.charAt(0).toUpperCase() + item.id.slice(1) as keyof typeof pages;
                         if (pages[pageKey]) {
                             pages[pageKey]();
-                            console.log(`🚀 Prefetching: ${item.name}`);
                         }
                     }}
                     sx={{
@@ -51,13 +50,13 @@ const DesktopNav: React.FC<DesktopNavProps> = ({ navItems }) => {
                 >
                     <Badge
                         badgeContent={
-                            item.name === "Cart"
+                            item.id === "cart"
                                 ? item.numItem
-                                : item.name === "Wishlist"
+                                : item.id === "wishlist"
                                     ? item.numWishItem
                                     : 0
                         }
-                        color={item.name === "Cart" ? "primary" : "secondary"}
+                        color={item.id === "cart" ? "primary" : "secondary"}
                         sx={{
                             "& .MuiBadge-badge": {
                                 fontSize: "0.65rem",

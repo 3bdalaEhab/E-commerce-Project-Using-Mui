@@ -15,6 +15,7 @@ import PageMeta from "../../components/PageMeta/PageMeta";
 import EmptyState from "../../components/Common/EmptyState";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { translateAPIContent } from "../../utils/localization";
 import { categoryService } from "../../services";
 import { Category } from "../../types";
 
@@ -161,7 +162,7 @@ const Categories: React.FC = () => {
                                                 transition: "color 0.4s ease",
                                             }}
                                         >
-                                            {category.name}
+                                            {translateAPIContent(category.name, 'categories')}
                                         </Typography>
                                         <Typography
                                             variant="button"

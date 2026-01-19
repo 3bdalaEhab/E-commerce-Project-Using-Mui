@@ -110,6 +110,14 @@ export interface ForgotPasswordCredentials {
     email: string;
 }
 
+export interface ChangePasswordData {
+    password?: string;
+    currentPassword?: string;
+    newPassword?: string;
+    passwordConfirm?: string;
+    rePassword?: string;
+}
+
 export interface AuthResponse {
     message: string;
     user?: User;

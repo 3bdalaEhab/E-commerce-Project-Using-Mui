@@ -8,6 +8,7 @@ import {
 } from "@mui/material";
 import { VerifiedUser, ArrowBack } from "@mui/icons-material";
 import { useNavigate, Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useToast } from "../../Context";
 import { useThemeContext } from "../../Context/ThemeContext";
 import AuthLayout from "../../components/Common/AuthLayout";
@@ -16,6 +17,7 @@ import { authService } from "../../services";
 import { AxiosError } from "axios";
 
 const VerifyResetCode: React.FC = () => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const { primaryColor } = useThemeContext();
     const { showToast } = useToast();
@@ -33,14 +35,14 @@ const VerifyResetCode: React.FC = () => {
             const res = await authService.verifyResetCode({ resetCode: formData.resetCode.trim() });
 
             if (res.status === "Success") {
-                showToast("✅ Code verified successfully! System unlocked.", "success");
+                showToast(t("toasts.verifySuccess"), "success");
                 setTimeout(() => navigate("/ResetPassword"), 1500);
             } else {
-                showToast("❌ Unexpected response from server. Please try again.", "error");
+                showToast(t("toasts.error"), "error");
             }
         } catch (err) {
             const error = err as AxiosError<{ message?: string; error?: string }>;
-            const msg = error.response?.data?.message || error.response?.data?.error || "❌ Verification failed. Code may be invalid.";
+            const msg = error.response?.data?.message || error.response?.data?.error || t("toasts.verifyError");
             showToast(msg, "error");
         } finally {
             setLoading(false);
@@ -49,27 +51,27 @@ const VerifyResetCode: React.FC = () => {
 
     return (
         <AuthLayout
-            title="Secure Verification"
-            subtitle="Validate your identity by entering the high-entropy reset code dispatched to your email."
+            title={t("auth.verifyTitle")}
+            subtitle={t("auth.verifySubtitle")}
         >
             <Box sx={{ width: '100%', maxWidth: 450 }}>
                 <Typography variant="h4" fontWeight="1000" sx={{ mb: 1, letterSpacing: '-1px' }}>
-                    Verify Identity
+                    {t("auth.verifyIdentity")}
                 </Typography>
                 <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-                    Please enter the 6-digit verification code.
+                    {t("auth.recoveryDesc")}
                 </Typography>
 
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <CustomTextField
-                        label="Verification Code"
+                        label={t("auth.codeLabel")}
                         type="text"
                         icon={VerifiedUser}
                         {...register("resetCode", {
-                            required: "Reset code is required",
+                            required: t("auth.codeReq"),
                             pattern: {
                                 value: /^[0-9]{6}$/,
-                                message: "Code must be 6 digits",
+                                message: t("auth.invalidCode"),
                             }
                         })}
                         error={!!errors.resetCode}
@@ -105,7 +107,7 @@ const VerifyResetCode: React.FC = () => {
                             <VerifiedUser sx={{ color: '#fff', fontSize: 20 }} />
                         </Box>
                         <Typography variant="body2" color="text.secondary" fontWeight={500}>
-                            This code will expire shortly for your security.
+                            {t("auth.expireMsg")}
                         </Typography>
                     </Box>
 
@@ -128,7 +130,7 @@ const VerifyResetCode: React.FC = () => {
                             transition: "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
                         }}
                     >
-                        {loading ? <CircularProgress size={24} color="inherit" /> : "🎯 Verify Reset Code"}
+                        {loading ? <CircularProgress size={24} color="inherit" /> : `🎯 ${t("auth.verifyBtn")}`}
                     </Button>
 
                     <Box sx={{ mt: 4, textAlign: 'center' }}>
@@ -144,7 +146,7 @@ const VerifyResetCode: React.FC = () => {
                                 gap: 1
                             }}
                         >
-                            <ArrowBack fontSize="small" /> Back to Recovery
+                            <ArrowBack fontSize="small" /> {t("auth.backRecovery")}
                         </Link>
                     </Box>
                 </form>

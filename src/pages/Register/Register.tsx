@@ -179,6 +179,7 @@ const Register: React.FC = () => {
                                         message: t("auth.invalidPhone"),
                                     },
                                 })}
+                                placeholder={t("auth.phonePlaceholder")}
                                 error={!!errors.phone}
                                 helperText={errors.phone?.message}
                                 disabled={loading}

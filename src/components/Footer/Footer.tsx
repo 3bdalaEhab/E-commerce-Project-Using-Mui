@@ -26,7 +26,7 @@ export default function Footer() {
             '/categories': 'Categories',
             '/cart': 'Cart',
             '/wishlist': 'Wishlist',
-            '/profile': 'Profile',
+
             '/allorders': 'AllOrders',
             '/login': 'Login',
             '/register': 'Register'
@@ -35,23 +35,22 @@ export default function Footer() {
         const pageKey = pathMap[path.toLowerCase()];
         if (pageKey && pages[pageKey]) {
             pages[pageKey]();
-            console.log(`🚀 Footer Prefetching: ${pageKey}`);
         }
     };
 
 
     const footerLinks = {
         shop: [
-            { name: t("nav.products"), path: '/products', ariaLabel: t("footer.shopAllProducts") || 'Navigate to all products' },
-            { name: t("nav.categories"), path: '/categories', ariaLabel: t("footer.browseCategories") || 'Browse product categories' },
-            { name: t("nav.cart"), path: '/cart', ariaLabel: t("footer.viewCart") || 'View shopping cart' },
-            { name: t("nav.wishlist"), path: '/wishlist', ariaLabel: t("footer.viewWishlist") || 'View wishlist' },
+            { name: t("nav.products"), path: '/products', ariaLabel: t("footer.shopAllProducts") },
+            { name: t("nav.categories"), path: '/categories', ariaLabel: t("footer.browseCategories") },
+            { name: t("nav.cart"), path: '/cart', ariaLabel: t("footer.viewCart") },
+            { name: t("nav.wishlist"), path: '/wishlist', ariaLabel: t("footer.viewWishlist") },
         ],
         support: [
-            { name: t("nav.profile"), path: '/profile', ariaLabel: t("footer.viewProfile") || 'View my profile' },
-            { name: t("nav.orders"), path: '/allorders', ariaLabel: t("footer.viewOrders") || 'View all orders' },
-            { name: t("footer.privacyPolicy") || 'Privacy Policy', path: '#', ariaLabel: 'Read privacy policy' },
-            { name: t("footer.termsOfService") || 'Terms of Service', path: '#', ariaLabel: 'Read terms of service' },
+
+            { name: t("nav.orders"), path: '/allorders', ariaLabel: t("footer.viewOrders") },
+            { name: t("footer.privacyPolicy"), path: '#', ariaLabel: t("footer.readPrivacy") },
+            { name: t("footer.termsOfService"), path: '#', ariaLabel: t("footer.readTerms") },
         ],
         company: [
             { name: t("nav.login"), path: '/login', ariaLabel: t("nav.login") },
@@ -65,20 +64,20 @@ export default function Footer() {
     const handleNewsletterSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (!email || !email.includes('@')) {
-            showToast(t("footer.invalidEmail") || 'Please enter a valid email address', 'warning');
+            showToast(t("footer.invalidEmail"), 'warning');
             return;
         }
-        showToast(t("footer.subscribeSuccess") || 'Thank you for subscribing to our newsletter!', 'success');
+        showToast(t("footer.subscribeSuccess"), 'success');
         setEmail('');
     };
 
 
     const socialLinks = [
-        { Icon: Facebook, label: 'Visit our Facebook page', url: '#' },
-        { Icon: Twitter, label: 'Follow us on Twitter', url: '#' },
-        { Icon: Instagram, label: 'Follow us on Instagram', url: '#' },
-        { Icon: LinkedIn, label: 'Connect with us on LinkedIn', url: '#' },
-        { Icon: GitHub, label: 'View our GitHub profile', url: '#' },
+        { Icon: Facebook, label: t("footer.social.facebook"), url: '#' },
+        { Icon: Twitter, label: t("footer.social.twitter"), url: '#' },
+        { Icon: Instagram, label: t("footer.social.instagram"), url: '#' },
+        { Icon: LinkedIn, label: t("footer.social.linkedin"), url: '#' },
+        { Icon: GitHub, label: t("footer.social.github"), url: '#' },
     ];
 
 
@@ -131,7 +130,7 @@ export default function Footer() {
                                         size="small"
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
-                                        aria-label="Newsletter email input"
+                                        aria-label={t("footer.newsletterInput")}
                                         required
                                         sx={{
                                             flex: 1,

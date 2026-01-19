@@ -19,9 +19,10 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import { useQuickView } from '../../Context/QuickViewContext';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { CartContext, WishlistContext, useToast, useAuth } from '../../Context';
-import { Link } from 'react-router-dom';
+import { translateAPIContent, translateProductDescription } from '../../utils/localization';
 
 const QuickViewModal = () => {
     const theme = useTheme();
@@ -31,6 +32,7 @@ const QuickViewModal = () => {
     const { addToWishlist, removeFromWishlist, wishListItemId } = useContext(WishlistContext);
     const { userToken } = useAuth();
     const { showToast } = useToast();
+    const { t } = useTranslation();
 
     const [addingToCart, setAddingToCart] = useState(false);
     const [wishlistLoading, setWishlistLoading] = useState(false);
@@ -41,7 +43,7 @@ const QuickViewModal = () => {
 
     const handleAddToCart = async () => {
         if (!userToken) {
-            showToast("👋 Please login to add items to your cart", "warning");
+            showToast(t("products.loginWarning"), "warning");
             closeQuickView();
             setTimeout(() => navigate('/login'), 1500);
             return;
@@ -50,12 +52,12 @@ const QuickViewModal = () => {
         try {
             const res = await addToCart(activeProduct._id);
             if (res?.status === "success") {
-                showToast("✨ Added to cart successfully!", "success");
+                showToast(t("toasts.addedToCart"), "success");
             } else {
-                showToast("❌ Failed to add to cart.", "error");
+                showToast(res?.message || t("toasts.failedToAddToCart"), "error");
             }
         } catch {
-            showToast("❌ Connection error.", "error");
+            showToast(t("toasts.error"), "error");
         } finally {
             setAddingToCart(false);
         }
@@ -63,7 +65,7 @@ const QuickViewModal = () => {
 
     const handleWishlistToggle = async () => {
         if (!userToken) {
-            showToast("❤ Please login to save items to your wishlist", "warning");
+            showToast(t("products.wishlistLoginWarning"), "warning");
             closeQuickView();
             setTimeout(() => navigate('/login'), 1500);
             return;
@@ -72,10 +74,10 @@ const QuickViewModal = () => {
         try {
             if (isInWishlist) {
                 await removeFromWishlist(activeProduct._id);
-                showToast("💔 Removed from wishlist", "success");
+                showToast(t("toasts.removedFromWishlist"), "success");
             } else {
                 await addToWishlist(activeProduct._id);
-                showToast("❤️ Added to wishlist", "success");
+                showToast(t("toasts.addedToWishlist"), "success");
             }
         } finally {
             setWishlistLoading(false);
@@ -119,7 +121,7 @@ const QuickViewModal = () => {
                         <Grid size={{ xs: 12, md: 6 }} sx={{ bgcolor: 'action.hover', position: 'relative', minHeight: { xs: 300, md: 500 }, display: 'flex', alignItems: 'center', justifyContent: 'center', p: 4 }}>
                             <img
                                 src={activeProduct.imageCover}
-                                alt={activeProduct.title}
+                                alt={translateAPIContent(activeProduct.title, 'products')}
                                 style={{ maxWidth: '100%', maxHeight: '400px', objectFit: 'contain', filter: 'drop-shadow(0 20px 40px rgba(0,0,0,0.2))' }}
                             />
                         </Grid>
@@ -129,7 +131,7 @@ const QuickViewModal = () => {
                             <Box sx={{ p: { xs: 3, md: 5 }, display: 'flex', flexDirection: 'column', height: '100%' }}>
                                 <Stack spacing={1} sx={{ mb: 2 }}>
                                     <Chip
-                                        label={activeProduct.category?.name}
+                                        label={translateAPIContent(activeProduct.category?.name, 'categories')}
                                         size="small"
                                         sx={{ alignSelf: 'flex-start', fontWeight: 700, borderRadius: '8px' }}
                                     />
@@ -143,12 +145,12 @@ const QuickViewModal = () => {
                                             textOverflow: 'ellipsis'
                                         }}
                                     >
-                                        {activeProduct.title}
+                                        {translateAPIContent(activeProduct.title, 'products')}
                                     </Typography>
                                     <Stack direction="row" alignItems="center" spacing={1}>
                                         <Rating value={activeProduct.ratingsAverage} readOnly precision={0.1} size="small" />
                                         <Typography variant="caption" color="text.secondary" fontWeight="700">
-                                            ({activeProduct.ratingsAverage} Rating)
+                                            ({activeProduct.ratingsAverage} {t("common.rating")})
                                         </Typography>
                                     </Stack>
                                 </Stack>
@@ -166,21 +168,21 @@ const QuickViewModal = () => {
                                         overflow: 'hidden'
                                     }}
                                 >
-                                    {activeProduct.description}
+                                    {translateProductDescription(activeProduct.title, activeProduct.description)}
                                 </Typography>
 
                                 <Divider sx={{ mb: 3 }} />
 
                                 <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 4 }}>
                                     <Box>
-                                        <Typography variant="caption" color="text.secondary" fontWeight="700">PRICE</Typography>
+                                        <Typography variant="caption" color="text.secondary" fontWeight="700">{t("common.priceLabel")}</Typography>
                                         <Typography
                                             variant="h4"
                                             fontWeight="900"
                                             color="primary"
                                             sx={{ whiteSpace: 'nowrap' }}
                                         >
-                                            {activeProduct.price} EGP
+                                            {activeProduct.price} {t("common.egp")}
                                         </Typography>
                                     </Box>
                                     <IconButton
@@ -216,12 +218,12 @@ const QuickViewModal = () => {
                                             '&:hover': { transform: 'translateY(-2px)', boxShadow: '0 12px 25px rgba(0,0,0,0.2)' }
                                         }}
                                     >
-                                        {addingToCart ? <CircularProgress size={24} color="inherit" /> : 'Add to Cart'}
+                                        {addingToCart ? <CircularProgress size={24} color="inherit" /> : t("common.addToCart")}
                                     </Button>
 
                                     <Link to={`/details/${activeProduct._id}`} onClick={closeQuickView} style={{ textDecoration: 'none' }}>
                                         <Button fullWidth variant="text" sx={{ fontWeight: 800, color: 'text.secondary' }}>
-                                            View Full Details
+                                            {t("common.viewDetails")}
                                         </Button>
                                     </Link>
                                 </Stack>

@@ -35,10 +35,11 @@ import Loading from "../../components/Loading/Loading";
 import EmptyState from "../../components/Common/EmptyState";
 import { orderService } from "../../services";
 import { Order, Product } from "../../types";
+import { translateAPIContent } from "../../utils/localization";
 
 
 const AllOrders: React.FC = () => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const theme = useTheme();
     const navigate = useNavigate();
     const [userId, setUserId] = useState<string | null>(null);
@@ -159,7 +160,7 @@ const AllOrders: React.FC = () => {
                                                             </Typography>
                                                             <Typography variant="caption" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                                                                 <CalendarMonth sx={{ fontSize: 14 }} />
-                                                                {order.createdAt ? new Date(order.createdAt).toLocaleDateString(t("nav.home") === "Home" ? "en-US" : "ar-EG", { year: "numeric", month: "long", day: "numeric" }) : "N/A"}
+                                                                {order.createdAt ? new Date(order.createdAt).toLocaleDateString(i18n.language === "ar" ? "ar-EG" : i18n.language === "fr" ? "fr-FR" : "en-US", { year: "numeric", month: "long", day: "numeric" }) : t("common.na")}
                                                             </Typography>
                                                         </Box>
                                                     </Stack>
@@ -248,11 +249,13 @@ const AllOrders: React.FC = () => {
                                                                         <CardMedia
                                                                             component="img"
                                                                             image={product.imageCover}
-                                                                            alt={product.title}
+                                                                            alt={translateAPIContent(product.title, 'products')}
                                                                             sx={{ width: 60, height: 60, borderRadius: '10px', objectFit: 'cover' }}
                                                                         />
                                                                         <Box sx={{ flex: 1 }}>
-                                                                            <Typography variant="body2" fontWeight="800">{product.title}</Typography>
+                                                                            <Typography variant="body2" fontWeight="800">
+                                                                                {translateAPIContent(product.title, 'products')}
+                                                                            </Typography>
                                                                             <Typography variant="caption" color="text.secondary">
                                                                                 {t("orders.qty", { count: item.count, price: item.price })}
                                                                             </Typography>

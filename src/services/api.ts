@@ -2,6 +2,7 @@ import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig, AxiosResp
 import { storage } from '../utils/storage';
 import { logger } from '../utils/logger';
 import { getValidToken } from '../utils/security';
+import i18n from '../i18n/i18n';
 
 // API Base URL
 export const API_BASE_URL = 'https://ecommerce.routemisr.com/api/v1';
@@ -15,6 +16,11 @@ const api: AxiosInstance = axios.create({
     },
 });
 
+interface ErrorResponse {
+    message?: string;
+    status?: string;
+}
+
 // Request Interceptor - Add token to requests
 api.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
@@ -23,6 +29,13 @@ api.interceptors.request.use(
         if (token && config.headers) {
             config.headers.token = token;
         }
+
+        // Add language header for multi-language API support
+        if (config.headers) {
+            config.headers['lang'] = i18n.language;
+        }
+
+
         return config;
     },
     (error: AxiosError) => {
@@ -36,13 +49,13 @@ api.interceptors.response.use(
     (response: AxiosResponse) => response,
     (error: AxiosError) => {
         const status = error.response?.status;
-        const message = error.response?.data?.message || error.message || 'An error occurred';
+        const message = (error.response?.data as ErrorResponse)?.message || error.message || 'An error occurred';
 
         // Handle 401 Unauthorized
         if (status === 401) {
             logger.warn('Unauthorized access - token expired or invalid', 'API');
             storage.remove('userToken');
-            
+
             // Only redirect if not already on login page
             if (window.location.pathname !== '/login') {
                 // Use setTimeout to avoid navigation issues during render
@@ -51,17 +64,17 @@ api.interceptors.response.use(
                 }, 100);
             }
         }
-        
+
         // Handle 403 Forbidden
         else if (status === 403) {
             logger.error('Access forbidden', 'API', { status, message });
         }
-        
+
         // Handle 500 Server Error
         else if (status === 500) {
             logger.error('Server error', 'API', { status, message });
         }
-        
+
         // Handle Network Error
         else if (!error.response) {
             logger.error('Network error', 'API', { message: error.message });
@@ -74,7 +87,7 @@ api.interceptors.response.use(
             url: error.config?.url,
             method: error.config?.method,
         });
-        
+
         return Promise.reject(error);
     }
 );

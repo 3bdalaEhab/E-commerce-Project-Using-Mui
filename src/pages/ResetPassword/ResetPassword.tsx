@@ -14,6 +14,7 @@ import {
 } from "@mui/material";
 import { Lock, Visibility, VisibilityOff, Email, Security, CheckCircle } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useToast } from "../../Context";
 import { useThemeContext } from "../../Context/ThemeContext";
 import AuthLayout from "../../components/Common/AuthLayout";
@@ -28,6 +29,7 @@ interface ResetPasswordData {
 }
 
 const ResetPassword: React.FC = () => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const { primaryColor } = useThemeContext();
     const theme = useTheme();
@@ -70,11 +72,11 @@ const ResetPassword: React.FC = () => {
                 newPassword: formData.newPassword
             });
 
-            showToast("✅ Security protocols updated! Password reset successful.", "success");
+            showToast(t("toasts.resetSuccess"), "success");
             setTimeout(() => navigate("/login"), 1500);
         } catch (err) {
             const error = err as AxiosError<{ message?: string; error?: string }>;
-            const msg = error.response?.data?.message || error.response?.data?.error || "❌ Reset sequence failed.";
+            const msg = error.response?.data?.message || error.response?.data?.error || t("toasts.resetError");
             showToast(msg, "error");
         } finally {
             setLoading(false);
@@ -82,31 +84,31 @@ const ResetPassword: React.FC = () => {
     };
 
     const strengthColor = strength <= 30 ? theme.palette.error.main : strength <= 60 ? theme.palette.warning.main : theme.palette.success.main;
-    const strengthLabel = strength <= 30 ? "Vulnerable" : strength <= 60 ? "Secure" : "Absolute Security";
+    const strengthLabel = strength <= 30 ? t("auth.vulnerable") : strength <= 60 ? t("auth.secure") : t("auth.absoluteSecurity");
 
     return (
         <AuthLayout
-            title="Secure Restoration"
-            subtitle="Architect a formidable new password to re-establish access to your premium account."
+            title={t("auth.restoreTitle")}
+            subtitle={t("auth.restoreSubtitle")}
         >
             <Box sx={{ width: '100%', maxWidth: 450 }}>
                 <Typography variant="h4" fontWeight="1000" sx={{ mb: 1, letterSpacing: '-1px' }}>
-                    Reset Password
+                    {t("auth.resetPassword")}
                 </Typography>
                 <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-                    Finalize your identity recovery process.
+                    {t("auth.finalizeDesc")}
                 </Typography>
 
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <CustomTextField
-                        label="Account Email"
+                        label={t("auth.emailAccount")}
                         type="email"
                         icon={Email}
                         {...register("email", {
-                            required: "Email is required",
+                            required: t("auth.emailReq"),
                             pattern: {
                                 value: /^[^@ ]+@[^@ ]+\.[^@ .]{2,}$/,
-                                message: "Invalid email",
+                                message: t("auth.invalidEmail"),
                             },
                         })}
                         error={!!errors.email}
@@ -117,14 +119,14 @@ const ResetPassword: React.FC = () => {
                     <Grid container spacing={2}>
                         <Grid size={{ xs: 12 }}>
                             <CustomTextField
-                                label="New Password"
+                                label={t("auth.newPassLabel")}
                                 type={showPassword ? "text" : "password"}
                                 icon={Lock}
                                 {...register("newPassword", {
-                                    required: "Password is required",
+                                    required: t("auth.passwordReq"),
                                     pattern: {
                                         value: /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[#?!@$%^&*-]).{8,}$/,
-                                        message: "Require 8+ chars, Upper, Lower, Number, Special",
+                                        message: t("auth.complexityHint"),
                                     },
                                 })}
                                 error={!!errors.newPassword}
@@ -146,7 +148,7 @@ const ResetPassword: React.FC = () => {
                             <Grid size={{ xs: 12 }}>
                                 <Box sx={{ mb: 2.5, px: 1 }}>
                                     <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
-                                        <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>Security Level</Typography>
+                                        <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>{t("auth.securityLevel")}</Typography>
                                         <Typography variant="caption" sx={{ color: strengthColor, fontWeight: 800, textTransform: 'uppercase' }}>{strengthLabel}</Typography>
                                     </Box>
                                     <LinearProgress
@@ -165,10 +167,10 @@ const ResetPassword: React.FC = () => {
                                     />
                                     <Stack direction="row" spacing={1} sx={{ mt: 1.5 }}>
                                         {[
-                                            { test: newPassword.length >= 8, label: '8+ Chars' },
-                                            { test: /[0-9]/.test(newPassword), label: 'Number' },
-                                            { test: /[A-Z]/.test(newPassword), label: 'Upper' },
-                                            { test: /[#?!@$%^&*-]/.test(newPassword), label: 'Special' }
+                                            { test: newPassword.length >= 8, label: t("auth.req8Chars") },
+                                            { test: /[0-9]/.test(newPassword), label: t("auth.reqNumber") },
+                                            { test: /[A-Z]/.test(newPassword), label: t("auth.reqUpper") },
+                                            { test: /[#?!@$%^&*-]/.test(newPassword), label: t("auth.reqSpecial") }
                                         ].map((req, idx) => (
                                             <Box
                                                 key={idx}
@@ -193,12 +195,12 @@ const ResetPassword: React.FC = () => {
 
                         <Grid size={{ xs: 12 }}>
                             <CustomTextField
-                                label="Confirm New Password"
+                                label={t("auth.confirmNewPass")}
                                 type={showPassword ? "text" : "password"}
                                 icon={Security}
                                 {...register("confirmPassword", {
-                                    required: "Please confirm your password",
-                                    validate: (val) => val === newPassword || "Passwords do not align",
+                                    required: t("auth.confirmReq"),
+                                    validate: (val) => val === newPassword || t("auth.mismatch"),
                                 })}
                                 error={!!errors.confirmPassword}
                                 helperText={errors.confirmPassword?.message}
@@ -227,13 +229,13 @@ const ResetPassword: React.FC = () => {
                             transition: "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
                         }}
                     >
-                        {loading ? <CircularProgress size={24} color="inherit" /> : "Finalize Password Reset"}
+                        {loading ? <CircularProgress size={24} color="inherit" /> : t("auth.resetBtn")}
                     </Button>
 
                     <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 1 }}>
                         <CheckCircle sx={{ color: theme.palette.success.main, fontSize: 16 }} />
                         <Typography variant="caption" color="text.secondary" fontWeight={600}>
-                            Your data is encrypted using military-grade AES-256.
+                            {t("auth.encryptedMsg")}
                         </Typography>
                     </Box>
                 </form>

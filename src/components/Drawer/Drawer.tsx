@@ -53,26 +53,28 @@ const DrawerAppBar: React.FC<DrawerAppBarProps> = (props) => {
 
   const navItems: NavItem[] = userToken
     ? [
-      { name: t("nav.home"), path: "/", icon: <Home /> },
-      { name: t("nav.products"), path: "/products", icon: <Storefront /> },
-      { name: t("nav.categories"), path: "/categories", icon: <Category /> },
+      { id: "home", name: t("nav.home"), path: "/", icon: <Home /> },
+      { id: "products", name: t("nav.products"), path: "/products", icon: <Storefront /> },
+      { id: "categories", name: t("nav.categories"), path: "/categories", icon: <Category /> },
       {
+        id: "wishlist",
         name: t("nav.wishlist"),
         path: "/wishlist",
         icon: <Favorite />,
         numWishItem: numWishItemList,
       },
       {
+        id: "cart",
         name: t("nav.cart"),
         path: "/cart",
         icon: <ShoppingCart />,
         numItem: numOfCartItems,
       },
-      { name: t("nav.orders"), path: "/allOrders", icon: <ListAlt /> },
+      { id: "orders", name: t("nav.orders"), path: "/allOrders", icon: <ListAlt /> },
     ]
     : [
-      { name: t("nav.login"), path: "/login", icon: <Login /> },
-      { name: t("nav.register"), path: "/register", icon: <AppRegistration /> },
+      { id: "login", name: t("nav.login"), path: "/login", icon: <Login /> },
+      { id: "register", name: t("nav.register"), path: "/register", icon: <AppRegistration /> },
     ];
 
   const container =

@@ -14,6 +14,7 @@ import FilterListIcon from "@mui/icons-material/FilterList";
 import SortIcon from "@mui/icons-material/Sort";
 import CloseIcon from "@mui/icons-material/Close";
 import CheckIcon from "@mui/icons-material/Check";
+import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 
 interface ProductFilterBarProps {
@@ -30,17 +31,18 @@ const ProductFilterBar: React.FC<ProductFilterBarProps> = ({
     maxPrice = 5000,
 }) => {
     const theme = useTheme();
+    const { t } = useTranslation();
     const [showFilters, setShowFilters] = useState(false);
     const [priceRange, setPriceRange] = useState<number[]>([minPrice, maxPrice]);
     const [sortAnchorEl, setSortAnchorEl] = useState<null | HTMLElement>(null);
-    const [selectedSort, setSelectedSort] = useState("Best Match");
+    const [selectedSortValue, setSelectedSortValue] = useState("");
 
     const sortOptions = [
-        { label: "Best Match", value: "" },
-        { label: "Price: Low to High", value: "price" },
-        { label: "Price: High to Low", value: "-price" },
-        { label: "Top Rated", value: "-ratingsAverage" },
-        { label: "Best Selling", value: "-sold" },
+        { label: t("filter.bestMatch"), value: "" },
+        { label: t("filter.lowToHigh"), value: "price" },
+        { label: t("filter.highToLow"), value: "-price" },
+        { label: t("filter.topRated"), value: "-ratingsAverage" },
+        { label: t("filter.bestSelling"), value: "-sold" },
     ];
 
     const handlePriceChange = (_event: Event, newValue: number | number[]) => {
@@ -58,10 +60,13 @@ const ProductFilterBar: React.FC<ProductFilterBarProps> = ({
     const handleSortClose = (option?: { label: string, value: string }) => {
         setSortAnchorEl(null);
         if (option) {
-            setSelectedSort(option.label);
+            setSelectedSortValue(option.value);
             onSort(option.value);
         }
     };
+
+    // Derive the label for the currently selected sort value
+    const selectedSortLabel = sortOptions.find(opt => opt.value === selectedSortValue)?.label || t("filter.bestMatch");
 
     return (
         <Box sx={{ mb: 4, position: 'relative', zIndex: 10 }}>
@@ -110,7 +115,7 @@ const ProductFilterBar: React.FC<ProductFilterBarProps> = ({
                         }}
                     >
                         {showFilters ? <CloseIcon fontSize="small" /> : <FilterListIcon fontSize="small" />}
-                        <Typography variant="body2" fontWeight={600}>Filter</Typography>
+                        <Typography variant="body2" fontWeight={600}>{t("filter.title")}</Typography>
                     </Box>
 
                     <Box sx={{ width: '1px', height: 24, bgcolor: 'divider' }} />
@@ -131,7 +136,7 @@ const ProductFilterBar: React.FC<ProductFilterBarProps> = ({
                         }}
                     >
                         <SortIcon fontSize="small" color="action" />
-                        <Typography variant="body2" fontWeight={600}>{selectedSort}</Typography>
+                        <Typography variant="body2" fontWeight={600}>{selectedSortLabel}</Typography>
                     </Box>
                 </Paper>
             </Box>
@@ -160,9 +165,9 @@ const ProductFilterBar: React.FC<ProductFilterBarProps> = ({
                         }}
                     >
                         <Typography variant="subtitle2" fontWeight="700" gutterBottom sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                            Price Range
+                            {t("filter.priceRange")}
                             <Typography variant="caption" sx={{ bgcolor: 'primary.main', color: 'white', px: 1, borderRadius: '4px' }}>
-                                ${priceRange[0]} - ${priceRange[1]}
+                                {priceRange[0]} {t("common.egp")} - {priceRange[1]} {t("common.egp")}
                             </Typography>
                         </Typography>
 
@@ -214,7 +219,7 @@ const ProductFilterBar: React.FC<ProductFilterBarProps> = ({
                     <MenuItem
                         key={option.value}
                         onClick={() => handleSortClose(option)}
-                        selected={selectedSort === option.label}
+                        selected={selectedSortValue === option.value}
                         sx={{
                             fontSize: '0.9rem',
                             fontWeight: 500,
@@ -222,7 +227,7 @@ const ProductFilterBar: React.FC<ProductFilterBarProps> = ({
                             gap: 1
                         }}
                     >
-                        {selectedSort === option.label && <CheckIcon fontSize="small" color="primary" />}
+                        {selectedSortValue === option.value && <CheckIcon fontSize="small" color="primary" />}
                         <span style={{ flex: 1 }}>{option.label}</span>
                     </MenuItem>
                 ))}

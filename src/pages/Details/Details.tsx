@@ -25,6 +25,7 @@ import { Breadcrumbs, Link as MuiLink } from "@mui/material";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Autoplay } from "swiper/modules";
 import { useTranslation } from "react-i18next";
+import { translateAPIContent, translateProductDescription } from "../../utils/localization";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
@@ -112,11 +113,11 @@ const Details: React.FC = () => {
     if (isLoading) return <DetailsSkeleton />;
 
     if (isError || !data) {
-        const errorMessage = error instanceof Error ? error.message : "Could not load product details.";
+        const errorMessage = error instanceof Error ? error.message : t("products.failedToLoadDesc");
         return (
             <Container maxWidth="md" sx={{ py: 10 }}>
                 <Alert severity="error" sx={{ borderRadius: "16px" }}>
-                    <strong>Error loading product details:</strong> {errorMessage}
+                    <strong>{t("common.error")}:</strong> {errorMessage}
                 </Alert>
             </Container>
         );
@@ -127,8 +128,8 @@ const Details: React.FC = () => {
     return (
         <Box sx={{ bgcolor: "background.default", minHeight: "100vh", pb: 10 }}>
             <PageMeta
-                title={data.title}
-                description={data.description}
+                title={translateAPIContent(data.title, 'products')}
+                description={translateProductDescription(data.title, data.description)}
                 image={data.imageCover}
                 type="product"
             />
@@ -146,7 +147,9 @@ const Details: React.FC = () => {
                     <MuiLink component={RouterLink} underline="hover" color="inherit" to="/products">
                         {t("nav.products")}
                     </MuiLink>
-                    <Typography color="text.primary" fontWeight="700">{data.category?.name}</Typography>
+                    <Typography color="text.primary" fontWeight="700">
+                        {translateAPIContent(data.category?.name, 'categories')}
+                    </Typography>
                 </Breadcrumbs>
 
                 <Paper
@@ -176,7 +179,7 @@ const Details: React.FC = () => {
                                             <Box sx={{ height: { xs: 350, md: 500 }, bgcolor: 'white', borderRadius: '16px', overflow: 'hidden' }}>
                                                 <ImageZoom
                                                     src={img}
-                                                    alt={data.title}
+                                                    alt={translateAPIContent(data.title, 'products')}
                                                 />
                                             </Box>
                                         </SwiperSlide>
@@ -194,11 +197,11 @@ const Details: React.FC = () => {
                             <Box sx={{ p: { xs: 4, md: 6 }, height: '100%', display: 'flex', flexDirection: 'column' }}>
                                 <Stack spacing={2} mb={4}>
                                     <Stack direction="row" spacing={1}>
-                                        <Chip label={data.category?.name} size="small" variant="outlined" sx={{ fontWeight: 800, borderRadius: '8px' }} />
-                                        {data.brand && <Chip label={data.brand.name} size="small" variant="outlined" sx={{ fontWeight: 800, borderRadius: '8px' }} />}
+                                        <Chip label={translateAPIContent(data.category?.name, 'categories')} size="small" variant="outlined" sx={{ fontWeight: 800, borderRadius: '8px' }} />
+                                        {data.brand && <Chip label={translateAPIContent(data.brand.name, 'brands')} size="small" variant="outlined" sx={{ fontWeight: 800, borderRadius: '8px' }} />}
                                     </Stack>
                                     <Typography variant="h3" fontWeight="1000" sx={{ letterSpacing: -1.5, lineHeight: 1.1 }}>
-                                        {data.title}
+                                        {translateAPIContent(data.title, 'products')}
                                     </Typography>
                                     <Stack direction="row" spacing={1} alignItems="center">
                                         <Rating value={data.ratingsAverage} precision={0.1} readOnly sx={{ color: 'primary.main' }} />
@@ -207,7 +210,7 @@ const Details: React.FC = () => {
                                 </Stack>
 
                                 <Typography variant="body1" color="text.secondary" sx={{ mb: 4, lineHeight: 1.8, flex: 1 }}>
-                                    {data.description}
+                                    {translateProductDescription(data.title, data.description)}
                                 </Typography>
 
                                 <Divider sx={{ mb: 4, opacity: 0.5 }} />

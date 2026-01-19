@@ -8,6 +8,7 @@ import {
 } from "@mui/material";
 import { Email, ArrowBack } from "@mui/icons-material";
 import { Link, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useToast } from "../../Context";
 import { useThemeContext } from "../../Context/ThemeContext";
 import AuthLayout from "../../components/Common/AuthLayout";
@@ -17,6 +18,7 @@ import { ForgotPasswordCredentials } from "../../types";
 import { AxiosError } from "axios";
 
 const ForgotPass: React.FC = () => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const { primaryColor } = useThemeContext();
     const { showToast } = useToast();
@@ -34,12 +36,12 @@ const ForgotPass: React.FC = () => {
             const res = await authService.forgotPassword({ email: formData.email.trim() });
 
             if (res.statusMsg === "success") {
-                showToast("✅ Secure code emitted! Check your inbox.", "success");
+                showToast(t("toasts.forgotSuccess"), "success");
                 setTimeout(() => navigate("/VerifyResetCode"), 1500);
             }
         } catch (err) {
             const error = err as AxiosError<{ message?: string; error?: string }>;
-            const msg = error.response?.data?.message || error.response?.data?.error || "❌ Verification failed. Check your email.";
+            const msg = error.response?.data?.message || error.response?.data?.error || t("toasts.forgotError");
             showToast(msg, "error");
         } finally {
             setLoading(false);
@@ -48,27 +50,27 @@ const ForgotPass: React.FC = () => {
 
     return (
         <AuthLayout
-            title="Account Recovery"
-            subtitle="Enter your verified email to initiate the secure password restoration sequence."
+            title={t("auth.recoveryTitle")}
+            subtitle={t("auth.recoverySubtitle")}
         >
             <Box sx={{ width: '100%', maxWidth: 450 }}>
                 <Typography variant="h4" fontWeight="1000" sx={{ mb: 1, letterSpacing: '-1px' }}>
-                    Forgot Password
+                    {t("auth.forgotPass")}
                 </Typography>
                 <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-                    We will send a unique verification code to your email.
+                    {t("auth.forgotDesc")}
                 </Typography>
 
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <CustomTextField
-                        label="Email Address"
+                        label={t("auth.emailLabel")}
                         type="email"
                         icon={Email}
                         {...register("email", {
-                            required: "Email is required",
+                            required: t("auth.emailReq"),
                             pattern: {
                                 value: /^[^@ ]+@[^@ ]+\.[^@ .]{2,}$/,
-                                message: "Invalid email address",
+                                message: t("auth.invalidEmail"),
                             },
                         })}
                         error={!!errors.email}
@@ -103,7 +105,7 @@ const ForgotPass: React.FC = () => {
                             <Email sx={{ color: '#fff', fontSize: 20 }} />
                         </Box>
                         <Typography variant="body2" color="text.secondary" fontWeight={500}>
-                            Please check your spam folder if the code doesn't appear within 60 seconds.
+                            {t("auth.spamMsg")}
                         </Typography>
                     </Box>
 
@@ -126,7 +128,7 @@ const ForgotPass: React.FC = () => {
                             transition: "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
                         }}
                     >
-                        {loading ? <CircularProgress size={24} color="inherit" /> : "Send Verification Code"}
+                        {loading ? <CircularProgress size={24} color="inherit" /> : t("auth.sendCodeBtn")}
                     </Button>
 
                     <Box sx={{ mt: 4, textAlign: 'center' }}>
@@ -142,7 +144,7 @@ const ForgotPass: React.FC = () => {
                                 gap: 1
                             }}
                         >
-                            <ArrowBack fontSize="small" /> Back to Login
+                            <ArrowBack fontSize="small" /> {t("auth.backToLogin")}
                         </Link>
                     </Box>
                 </form>

@@ -135,7 +135,7 @@ const Checkout: React.FC = () => {
                                     <CustomTextField
                                         {...field}
                                         label={t("auth.phoneLabel")}
-                                        placeholder="01xxxxxxxxx"
+                                        placeholder={t("auth.phonePlaceholder")}
                                         icon={PhoneIphoneIcon}
                                         error={!!errors.phone}
                                         helperText={errors.phone?.message}
@@ -151,6 +151,7 @@ const Checkout: React.FC = () => {
                                     <Autocomplete
                                         {...field}
                                         options={cities}
+                                        getOptionLabel={(option) => t(`checkout.cities.${option}`)}
                                         onChange={(_, value) => field.onChange(value)}
                                         renderInput={(params) => (
                                             <CustomTextField

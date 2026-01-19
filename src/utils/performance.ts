@@ -97,7 +97,7 @@ export const getPerformanceMetrics = () => {
 // Log performance metrics (useful for development)
 export const logPerformanceMetrics = () => {
     const metrics = getPerformanceMetrics();
-    if (metrics) {
+    if (metrics && import.meta.env.DEV) {
         console.group('🚀 Performance Metrics');
         console.table(metrics);
         console.groupEnd();

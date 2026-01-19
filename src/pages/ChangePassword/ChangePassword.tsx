@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import { Lock, Visibility, VisibilityOff, Logout } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useToast } from "../../Context";
 import AuthLayout from "../../components/Common/AuthLayout";
 import CustomTextField from "../../components/Common/CustomTextField";
@@ -22,6 +23,7 @@ import { storage } from "../../utils/storage";
 import { logger } from "../../utils/logger";
 
 const ChangePassword: React.FC = () => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const theme = useTheme();
     const { showToast } = useToast();
@@ -52,7 +54,7 @@ const ChangePassword: React.FC = () => {
     }, []);
 
     useEffect(() => {
-        calculateStrength(newPassword);
+        calculateStrength(newPassword || "");
     }, [newPassword, calculateStrength]);
 
     const toggleCurrentPassword = useCallback(() => setShowCurrentPassword((s) => !s), []);
@@ -62,18 +64,18 @@ const ChangePassword: React.FC = () => {
     const onSubmit = async (formData: ChangePasswordData) => {
         setLoading(true);
         try {
-            const res = await authService.changePassword(
-                formData.password,
-                formData.newPassword,
-                formData.passwordConfirm
-            );
+            const res = await authService.changePassword({
+                currentPassword: formData.password,
+                password: formData.newPassword,
+                rePassword: formData.passwordConfirm
+            } as ChangePasswordData);
 
             if (res.token) storage.set("userToken", res.token);
-            showToast("✅ Password changed successfully!", "success");
+            showToast(t("toasts.changeSuccess"), "success");
             setTimeout(() => navigate("/login"), 1500);
         } catch (err) {
             const error = err as AxiosError<{ message?: string; error?: string }>;
-            const msg = error.response?.data?.message || error.response?.data?.error || "❌ Change failed.";
+            const msg = error.response?.data?.message || error.response?.data?.error || t("toasts.changeError");
             showToast(msg, "error");
         } finally {
             setLoading(false);
@@ -87,20 +89,19 @@ const ChangePassword: React.FC = () => {
     }, [navigate]);
 
     const strengthColor = strength <= 30 ? theme.palette.error.main : strength <= 60 ? theme.palette.warning.main : theme.palette.success.main;
-    const strengthLabel = strength <= 30 ? "Weak" : strength <= 60 ? "Fair" : "Strong";
+    const strengthLabel = strength <= 30 ? t("auth.weak") : strength <= 60 ? t("auth.fair") : t("auth.strong");
 
     return (
         <AuthLayout
-            title="Change Password"
-            subtitle="Update your security credentials"
-            description="Securely change your account password."
+            title={t("auth.changePassTitle")}
+            subtitle={t("auth.changePassSubtitle")}
         >
             <form onSubmit={handleSubmit(onSubmit)}>
                 <CustomTextField
-                    label="Current Password"
+                    label={t("auth.currentPassLabel")}
                     type={showCurrentPassword ? "text" : "password"}
                     icon={Lock}
-                    {...register("password", { required: "Current password is required" })}
+                    {...register("password", { required: t("auth.passwordReq") })}
                     error={!!errors.password}
                     helperText={errors.password?.message}
                     disabled={loading}
@@ -116,14 +117,14 @@ const ChangePassword: React.FC = () => {
                 />
 
                 <CustomTextField
-                    label="New Password"
+                    label={t("auth.newPassLabel")}
                     type={showNewPassword ? "text" : "password"}
                     icon={Lock}
                     {...register("newPassword", {
-                        required: "New password is required",
+                        required: t("auth.passwordReq"),
                         pattern: {
                             value: /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[#?!@$%^&*-]).{8,}$/,
-                            message: "Require 8+ chars, Upper, Lower, Number, Special",
+                            message: t("auth.complexityHint"),
                         },
                     })}
                     error={!!errors.newPassword}
@@ -143,7 +144,7 @@ const ChangePassword: React.FC = () => {
                 {newPassword && (
                     <Box sx={{ mb: 2.5, px: 1 }}>
                         <Box sx={{ display: "flex", justifyContent: "space-between", mb: 0.5 }}>
-                            <Typography variant="caption" color="text.secondary">Strength</Typography>
+                            <Typography variant="caption" color="text.secondary">{t("auth.strength")}</Typography>
                             <Typography variant="caption" sx={{ color: strengthColor, fontWeight: "bold" }}>{strengthLabel}</Typography>
                         </Box>
                         <LinearProgress
@@ -160,12 +161,12 @@ const ChangePassword: React.FC = () => {
                 )}
 
                 <CustomTextField
-                    label="Confirm New Password"
+                    label={t("auth.confirmNewPass")}
                     type={showConfirmPassword ? "text" : "password"}
                     icon={Lock}
                     {...register("passwordConfirm", {
-                        required: "Please confirm your password",
-                        validate: (val) => val === newPassword || "Passwords don't match",
+                        required: t("auth.confirmReq"),
+                        validate: (val) => val === newPassword || t("auth.mismatch"),
                     })}
                     error={!!errors.passwordConfirm}
                     helperText={errors.passwordConfirm?.message}
@@ -195,7 +196,7 @@ const ChangePassword: React.FC = () => {
                         "&:hover": { transform: "translateY(-2px)", boxShadow: `0 8px 20px ${theme.palette.primary.main}40` }
                     }}
                 >
-                    {loading ? <CircularProgress size={24} color="inherit" /> : "🔐 Change Password"}
+                    {loading ? <CircularProgress size={24} color="inherit" /> : `🔐 ${t("auth.changePassBtn")}`}
                 </Button>
 
                 <Button
@@ -215,7 +216,7 @@ const ChangePassword: React.FC = () => {
                     }}
                     disabled={loading}
                 >
-                    Logout Session
+                    {t("auth.logoutSession")}
                 </Button>
             </form>
         </AuthLayout>

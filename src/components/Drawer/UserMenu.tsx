@@ -16,6 +16,7 @@ import { Lock as LockIcon, Logout } from "@mui/icons-material";
 import { useAuth, useThemeContext, useToast } from "../../Context";
 import { storage } from "../../utils/storage";
 import { logger } from "../../utils/logger";
+import { useTranslation } from "react-i18next";
 
 const UserMenu: React.FC = () => {
     const theme = useTheme();
@@ -23,6 +24,7 @@ const UserMenu: React.FC = () => {
     const { mode } = useThemeContext();
     const { setUserToken } = useAuth();
     const { showToast } = useToast();
+    const { t } = useTranslation();
 
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const isMenuOpen = Boolean(anchorEl);
@@ -123,6 +125,8 @@ const UserMenu: React.FC = () => {
                 transformOrigin={{ horizontal: "right", vertical: "top" }}
                 anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
             >
+
+
                 <MenuItem
                     component={Link}
                     to="/change-password"
@@ -140,7 +144,7 @@ const UserMenu: React.FC = () => {
                         <LockIcon fontSize="small" />
                     </ListItemIcon>
                     <Typography variant="body2" fontWeight={600}>
-                        Change Password
+                        {t("auth.changePassTitle")}
                     </Typography>
                 </MenuItem>
 
@@ -163,7 +167,7 @@ const UserMenu: React.FC = () => {
                         <Logout fontSize="small" color="error" />
                     </ListItemIcon>
                     <Typography variant="body2" fontWeight={600}>
-                        Logout
+                        {t("nav.logout")}
                     </Typography>
                 </MenuItem>
             </Menu>

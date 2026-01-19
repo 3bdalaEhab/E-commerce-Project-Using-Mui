@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Box, Container, Typography, Button, Slide, Avatar, Stack, useTheme } from '@mui/material';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { Product } from '../../types';
+import { useTranslation } from 'react-i18next';
+import { translateAPIContent } from '../../utils/localization';
 
 interface StickyBuyBarProps {
     product: Product;
@@ -11,6 +13,7 @@ interface StickyBuyBarProps {
 
 const StickyBuyBar: React.FC<StickyBuyBarProps> = ({ product, onAddToCart, loading }) => {
     const theme = useTheme();
+    const { t } = useTranslation();
     const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
@@ -46,20 +49,20 @@ const StickyBuyBar: React.FC<StickyBuyBarProps> = ({ product, onAddToCart, loadi
                     <Stack direction="row" alignItems="center" justifyContent="space-between">
                         {/* Product Info (Hidden on mobile) */}
                         <Stack direction="row" spacing={2} alignItems="center" sx={{ display: { xs: 'none', md: 'flex' } }}>
-                            <Avatar src={product.imageCover} alt={product.title} variant="rounded" sx={{ width: 48, height: 48 }} />
+                            <Avatar src={product.imageCover} alt={translateAPIContent(product.title, 'products')} variant="rounded" sx={{ width: 48, height: 48 }} />
                             <Box>
                                 <Typography variant="subtitle2" fontWeight="800" noWrap sx={{ maxWidth: 300 }}>
-                                    {product.title}
+                                    {translateAPIContent(product.title, 'products')}
                                 </Typography>
                                 <Typography variant="caption" color="text.secondary" fontWeight="700">
-                                    ${product.price}
+                                    {product.price} {t("common.egp")}
                                 </Typography>
                             </Box>
                         </Stack>
 
                         {/* Price (Mobile Only) */}
                         <Typography variant="h6" fontWeight="900" sx={{ display: { xs: 'block', md: 'none' } }}>
-                            ${product.price}
+                            {product.price} {t("common.egp")}
                         </Typography>
 
                         {/* Action */}
@@ -77,7 +80,7 @@ const StickyBuyBar: React.FC<StickyBuyBarProps> = ({ product, onAddToCart, loadi
                                 boxShadow: theme.shadows[4]
                             }}
                         >
-                            Add to Cart
+                            {t("common.addToCart")}
                         </Button>
                     </Stack>
                 </Container>

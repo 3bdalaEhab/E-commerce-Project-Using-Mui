@@ -16,6 +16,7 @@ import { Star, Favorite, FavoriteBorder, Visibility } from "@mui/icons-material"
 import { Product } from "../../types";
 import { useQuickView } from "../../Context/QuickViewContext";
 import { useTranslation } from "react-i18next";
+import { translateAPIContent, translateProductDescription } from "../../utils/localization";
 
 interface ProductCardProps {
     product: Product;
@@ -25,6 +26,16 @@ interface ProductCardProps {
     onWishlistToggle: (e: React.MouseEvent, id: string) => void;
     isWishlisted: boolean;
 }
+
+// Variants for animation defined outside to avoid recreation
+const cardVariants: Variants = {
+    hidden: { opacity: 0, y: 30 },
+    visible: (i: number) => ({
+        opacity: 1,
+        y: 0,
+        transition: { duration: 0.5, ease: "easeOut", delay: i * 0.1 },
+    }),
+};
 
 const ProductCard: React.FC<ProductCardProps> = React.memo(
     ({
@@ -38,15 +49,6 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
         const theme = useTheme();
         const { openQuickView } = useQuickView();
         const { t } = useTranslation();
-
-        const cardVariants: Variants = {
-            hidden: { opacity: 0, y: 30 },
-            visible: (i: number) => ({
-                opacity: 1,
-                y: 0,
-                transition: { duration: 0.5, ease: "easeOut", delay: i * 0.1 },
-            }),
-        };
 
         return (
             <motion.div
@@ -91,7 +93,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
                         <CardMedia
                             component="img"
                             image={product.imageCover}
-                            alt={product.title}
+                            alt={translateAPIContent(product.title, 'products')}
                             className="product-image"
                             loading="lazy"
                             decoding="async"
@@ -146,7 +148,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
                                         maxWidth: '120px'
                                     }}
                                 >
-                                    {product.category?.name}
+                                    {translateAPIContent(product.category?.name, 'categories')}
                                 </Typography>
                                 <Box
                                     sx={{
@@ -164,7 +166,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
 
                             <Typography
                                 variant="h6"
-                                title={product.title}
+                                title={translateAPIContent(product.title, 'products')}
                                 sx={{
                                     fontWeight: 1000,
                                     lineHeight: 1.1,
@@ -176,7 +178,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
                                     textOverflow: 'ellipsis'
                                 }}
                             >
-                                {product.title}
+                                {translateAPIContent(product.title, 'products')}
                             </Typography>
                             <Typography
                                 variant="body2"
@@ -191,13 +193,13 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
                                     opacity: 0.7
                                 }}
                             >
-                                {product.description}
+                                {translateProductDescription(product.title, product.description)}
                             </Typography>
                         </Box>
 
                         <Box sx={{ mt: "auto", display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <Box>
-                                <Typography variant="caption" color="text.secondary" fontWeight="800" sx={{ fontSize: '0.65rem', display: 'block', mb: -0.5 }}>PRICE</Typography>
+                                <Typography variant="caption" color="text.secondary" fontWeight="800" sx={{ fontSize: '0.65rem', display: 'block', mb: -0.5 }}>{t("common.priceLabel")}</Typography>
                                 <Typography
                                     variant="h5"
                                     fontWeight="1000"
