@@ -13,19 +13,27 @@ import {
     Divider,
     Avatar,
     CircularProgress,
-    Stack
+    Stack,
+    Chip,
+    ListItemIcon,
+    ListItemText
 } from "@mui/material";
 import {
     Search as SearchIcon,
     Close as CloseIcon,
     History as HistoryIcon,
     TrendingUp,
-    Storefront
+    Storefront,
+    Category as CategoryIcon,
+    KeyboardArrowRight,
+    PriceCheck,
+    Inventory
 } from "@mui/icons-material";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { productService } from "../../services";
-import { Product } from "../../types";
+import { productService, categoryService } from "../../services";
+import { Product, Category } from "../../types";
+import { useQuery } from "@tanstack/react-query";
 
 // Debounce hook for performance
 function useDebounce<T>(value: T, delay: number): T {
@@ -42,23 +50,54 @@ const GlobalSearch: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const inputRef = useRef<HTMLInputElement>(null);
+    const containerRef = useRef<HTMLDivElement>(null);
 
     const [searchValue, setSearchValue] = useState("");
     const [isFocused, setIsFocused] = useState(false);
     const [recentSearches, setRecentSearches] = useState<string[]>([]);
-
-    // Autocomplete States
-    const [suggestions, setSuggestions] = useState<Product[]>([]);
-    const [isLoading, setIsLoading] = useState(false);
+    const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
 
     // Debounce search value to avoid too many API calls
-    const debouncedSearchTerm = useDebounce(searchValue, 400);
+    const debouncedSearchTerm = useDebounce(searchValue.trim(), 300);
+
+    // Fetch products with search
+    const { data: productsData, isLoading: isLoadingProducts } = useQuery({
+        queryKey: ["search-products", debouncedSearchTerm],
+        queryFn: () => productService.getProducts({
+            keyword: debouncedSearchTerm,
+            limit: 6
+        }),
+        enabled: debouncedSearchTerm.length > 0,
+        staleTime: 1000 * 60 * 2, // 2 minutes cache
+    });
+
+    // Fetch categories for category search
+    const { data: categoriesData } = useQuery({
+        queryKey: ["categories"],
+        queryFn: () => categoryService.getCategories(),
+        staleTime: 1000 * 60 * 10, // 10 minutes cache
+    });
+
+    const suggestions = productsData?.data || [];
+    const categories = categoriesData?.data || [];
+    const isLoading = isLoadingProducts;
+
+    // Filter matching categories
+    const matchingCategories = debouncedSearchTerm.length > 0
+        ? categories.filter((cat: Category) =>
+            cat.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
+        ).slice(0, 3)
+        : [];
 
     // Load recent searches on mount
     useEffect(() => {
         const saved = localStorage.getItem("recent_searches");
         if (saved) {
-            setRecentSearches(JSON.parse(saved).slice(0, 5));
+            try {
+                setRecentSearches(JSON.parse(saved).slice(0, 8));
+            } catch (e) {
+                console.error("Error parsing recent searches:", e);
+            }
         }
     }, []);
 
@@ -67,83 +106,136 @@ const GlobalSearch: React.FC = () => {
         if (location.pathname === '/products') {
             const params = new URLSearchParams(location.search);
             const query = params.get('keyword') || "";
-            // Only update if significantly different to avoid conflict with typing
             if (query !== searchValue && !isFocused) {
                 setSearchValue(query);
             }
         }
-    }, [location.pathname, location.search, isFocused]);
+    }, [location.pathname, location.search, isFocused, searchValue]);
 
-    // Fetch Suggestions Effect
+    // Keyboard shortcut: Ctrl+K or Cmd+K to focus search
     useEffect(() => {
-        const fetchSuggestions = async () => {
-            if (!debouncedSearchTerm.trim()) {
-                setSuggestions([]);
-                return;
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                e.preventDefault();
+                inputRef.current?.focus();
+                setIsFocused(true);
             }
-
-            setIsLoading(true);
-            try {
-                // Fetch top 5 matching products
-                const response = await productService.getProducts({
-                    keyword: debouncedSearchTerm,
-                    limit: 5
-                });
-                if (response && response.data) {
-                    setSuggestions(response.data);
-                }
-            } catch (error) {
-                console.error("Search error:", error);
-            } finally {
-                setIsLoading(false);
+            if (e.key === 'Escape' && isFocused) {
+                setIsFocused(false);
+                inputRef.current?.blur();
             }
         };
 
-        fetchSuggestions();
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [isFocused]);
+
+    // Keyboard navigation in suggestions
+    useEffect(() => {
+        if (!isFocused || selectedSuggestionIndex < 0) return;
+
+        const handleKeyDown = (e: KeyboardEvent) => {
+            const totalItems = suggestions.length + matchingCategories.length;
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                setSelectedSuggestionIndex((prev) => (prev + 1) % Math.max(totalItems, 1));
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                setSelectedSuggestionIndex((prev) => (prev - 1 + totalItems) % Math.max(totalItems, 1));
+            } else if (e.key === 'Enter' && selectedSuggestionIndex >= 0) {
+                e.preventDefault();
+                const index = selectedSuggestionIndex;
+                if (index < suggestions.length) {
+                    handleSuggestionClick(suggestions[index]);
+                } else {
+                    const catIndex = index - suggestions.length;
+                    if (matchingCategories[catIndex]) {
+                        navigate(`/products?category=${matchingCategories[catIndex]._id}`);
+                        setIsFocused(false);
+                    }
+                }
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [isFocused, selectedSuggestionIndex, suggestions, matchingCategories]);
+
+    // Reset selection when search changes
+    useEffect(() => {
+        setSelectedSuggestionIndex(-1);
     }, [debouncedSearchTerm]);
 
-    const addToHistory = (query: string) => {
+    const addToHistory = useCallback((query: string) => {
+        if (!query.trim()) return;
         const updatedRecent = [
             query,
-            ...recentSearches.filter(s => s !== query)
-        ].slice(0, 5);
+            ...recentSearches.filter(s => s.toLowerCase() !== query.toLowerCase())
+        ].slice(0, 8);
         setRecentSearches(updatedRecent);
         localStorage.setItem("recent_searches", JSON.stringify(updatedRecent));
-    };
+    }, [recentSearches]);
 
     const handleSearchSubmit = useCallback((query: string) => {
         if (!query.trim()) return;
         addToHistory(query);
         navigate(`/products?keyword=${encodeURIComponent(query)}`);
         setIsFocused(false);
-    }, [navigate, recentSearches]);
+        setSearchValue(query);
+    }, [navigate, addToHistory]);
 
-    const handleSuggestionClick = (product: Product) => {
-        addToHistory(product.title); // Optionally add to history
-        navigate(`/details/${product._id}`); // Go straight to details
+    const handleSuggestionClick = useCallback((product: Product) => {
+        addToHistory(product.title);
+        navigate(`/details/${product._id}`);
         setIsFocused(false);
-    };
-
-    const handleClear = () => {
         setSearchValue("");
-        setSuggestions([]);
+    }, [navigate, addToHistory]);
+
+    const handleCategoryClick = useCallback((categoryId: string, categoryName: string) => {
+        addToHistory(categoryName);
+        navigate(`/products?category=${categoryId}`);
+        setIsFocused(false);
+        setSearchValue("");
+    }, [navigate, addToHistory]);
+
+    const handleClear = useCallback(() => {
+        setSearchValue("");
+        setSelectedSuggestionIndex(-1);
         if (location.pathname === '/products') {
             navigate('/products');
         }
         inputRef.current?.focus();
-    };
+    }, [location.pathname, navigate]);
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
-        if (e.key === 'Enter') {
+        if (e.key === 'Enter' && selectedSuggestionIndex < 0) {
             handleSearchSubmit(searchValue);
         }
     };
 
-    const showSuggestions = isFocused && (searchValue.length > 0 || recentSearches.length > 0);
+    const removeFromHistory = useCallback((term: string) => {
+        const updated = recentSearches.filter(s => s !== term);
+        setRecentSearches(updated);
+        localStorage.setItem("recent_searches", JSON.stringify(updated));
+    }, [recentSearches]);
+
+    const showSuggestions = isFocused && (searchValue.length > 0 || recentSearches.length > 0 || matchingCategories.length > 0);
+    const hasResults = suggestions.length > 0 || matchingCategories.length > 0;
+    const showNoResults = debouncedSearchTerm.length > 0 && !hasResults && !isLoading;
 
     return (
         <ClickAwayListener onClickAway={() => setIsFocused(false)}>
-            <Box sx={{ position: 'relative', width: { xs: 'auto', md: '300px', lg: '400px' }, flex: 1, mx: { xs: 1, md: 2 }, zIndex: 1300 }}>
+            <Box
+                ref={containerRef}
+                sx={{
+                    position: 'relative',
+                    width: { xs: '100%', sm: 'auto' },
+                    maxWidth: { xs: '100%', md: '400px', lg: '500px' },
+                    flex: 1,
+                    mx: { xs: 1, md: 2 },
+                    zIndex: 1300
+                }}
+            >
                 <Paper
                     elevation={0}
                     sx={{
@@ -152,27 +244,34 @@ const GlobalSearch: React.FC = () => {
                         px: 1.5,
                         py: 0.8,
                         borderRadius: '16px',
-                        border: `1px solid ${isFocused ? theme.palette.primary.main : theme.palette.divider}`,
-                        backgroundColor: alpha(theme.palette.background.paper, 0.8),
-                        backdropFilter: 'blur(12px)',
+                        border: `2px solid ${isFocused ? theme.palette.primary.main : theme.palette.divider}`,
+                        backgroundColor: alpha(theme.palette.background.paper, 0.95),
+                        backdropFilter: 'blur(16px)',
                         transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                         boxShadow: isFocused
-                            ? `0 8px 30px ${alpha(theme.palette.primary.main, 0.15)}`
-                            : '0 2px 10px rgba(0,0,0,0.02)',
+                            ? `0 12px 40px ${alpha(theme.palette.primary.main, 0.2)}`
+                            : '0 2px 10px rgba(0,0,0,0.04)',
                         width: '100%',
+                        '&:hover': {
+                            borderColor: isFocused ? theme.palette.primary.main : alpha(theme.palette.primary.main, 0.5),
+                        }
                     }}
                 >
                     <SearchIcon
                         sx={{
                             color: isFocused ? 'primary.main' : 'text.disabled',
-                            transition: 'color 0.3s'
+                            transition: 'color 0.3s',
+                            fontSize: '1.3rem'
                         }}
                     />
                     <InputBase
                         inputRef={inputRef}
-                        placeholder="Search for premium products..."
+                        placeholder="Search products, categories..."
                         value={searchValue}
-                        onChange={(e) => setSearchValue(e.target.value)}
+                        onChange={(e) => {
+                            setSearchValue(e.target.value);
+                            setSelectedSuggestionIndex(-1);
+                        }}
                         onFocus={() => setIsFocused(true)}
                         onKeyDown={handleKeyDown}
                         sx={{
@@ -183,14 +282,28 @@ const GlobalSearch: React.FC = () => {
                             fontFamily: 'Outfit, sans-serif',
                             '& input::placeholder': {
                                 color: 'text.disabled',
-                                opacity: 0.8,
+                                opacity: 0.7,
                             },
                         }}
                     />
+                    {!isFocused && (
+                        <Chip
+                            label="⌘K"
+                            size="small"
+                            sx={{
+                                height: 22,
+                                fontSize: '0.7rem',
+                                fontWeight: 700,
+                                bgcolor: alpha(theme.palette.text.disabled, 0.1),
+                                border: `1px solid ${alpha(theme.palette.divider, 0.5)}`,
+                                display: { xs: 'none', md: 'flex' }
+                            }}
+                        />
+                    )}
                     <AnimatePresence>
                         {isLoading ? (
                             <Fade in>
-                                <CircularProgress size={20} thickness={4} sx={{ color: 'text.disabled', mr: 1 }} />
+                                <CircularProgress size={20} thickness={4} sx={{ color: 'primary.main', mr: 1 }} />
                             </Fade>
                         ) : searchValue ? (
                             <motion.div
@@ -208,7 +321,7 @@ const GlobalSearch: React.FC = () => {
                     </AnimatePresence>
                 </Paper>
 
-                {/* Suggestions Dropdown */}
+                {/* Enhanced Suggestions Dropdown */}
                 <Fade in={showSuggestions} timeout={200}>
                     <Paper
                         elevation={8}
@@ -217,78 +330,250 @@ const GlobalSearch: React.FC = () => {
                             top: 'calc(100% + 12px)',
                             left: 0,
                             right: 0,
-                            borderRadius: '16px',
-                            overflow: 'hidden',
+                            maxHeight: '70vh',
+                            overflow: 'auto',
+                            borderRadius: '20px',
+                            overflowX: 'hidden',
                             zIndex: 1400,
                             border: `1px solid ${alpha(theme.palette.divider, 0.5)}`,
                             background: theme.palette.mode === 'dark'
-                                ? 'rgba(30, 41, 59, 0.95)'
-                                : 'rgba(255, 255, 255, 0.95)',
-                            backdropFilter: 'blur(20px)',
-                            boxShadow: '0 20px 40px -10px rgba(0,0,0,0.15)'
+                                ? 'rgba(30, 41, 59, 0.98)'
+                                : 'rgba(255, 255, 255, 0.98)',
+                            backdropFilter: 'blur(24px)',
+                            boxShadow: '0 24px 60px -12px rgba(0,0,0,0.25)',
+                            '&::-webkit-scrollbar': {
+                                width: '8px',
+                            },
+                            '&::-webkit-scrollbar-thumb': {
+                                borderRadius: '4px',
+                                bgcolor: alpha(theme.palette.text.disabled, 0.3),
+                                '&:hover': {
+                                    bgcolor: alpha(theme.palette.text.disabled, 0.5),
+                                }
+                            }
                         }}
                     >
-                        {/* Live Product Suggestions */}
-                        {searchValue.length > 0 && suggestions.length > 0 && (
-                            <Box sx={{ py: 1 }}>
-                                <Typography variant="caption" fontWeight="700" color="primary" sx={{ px: 2, py: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
-                                    <TrendingUp fontSize="inherit" />
-                                    TOP SUGGESTIONS
+                        {/* Categories Section */}
+                        {debouncedSearchTerm.length > 0 && matchingCategories.length > 0 && (
+                            <Box sx={{ py: 1.5 }}>
+                                <Typography
+                                    variant="caption"
+                                    fontWeight="700"
+                                    color="primary"
+                                    sx={{
+                                        px: 2.5,
+                                        py: 1,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: 1,
+                                        textTransform: 'uppercase',
+                                        letterSpacing: '1px'
+                                    }}
+                                >
+                                    <CategoryIcon fontSize="inherit" />
+                                    CATEGORIES
                                 </Typography>
-                                {suggestions.map((product) => (
-                                    <Box
-                                        key={product._id}
-                                        onClick={() => handleSuggestionClick(product)}
-                                        sx={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: 2,
-                                            px: 2,
-                                            py: 1.5,
-                                            cursor: 'pointer',
-                                            transition: 'all 0.2s',
-                                            '&:hover': {
-                                                bgcolor: alpha(theme.palette.primary.main, 0.08),
-                                                pl: 2.5
-                                            }
-                                        }}
-                                    >
-                                        <Avatar
-                                            src={product.imageCover}
-                                            variant="rounded"
-                                            sx={{ width: 40, height: 40, borderRadius: '8px' }}
-                                        />
-                                        <Box sx={{ flex: 1, overflow: 'hidden' }}>
-                                            <Typography variant="body2" fontWeight="600" noWrap>
-                                                {product.title}
-                                            </Typography>
-                                            <Typography variant="caption" color="text.secondary">
-                                                {product.category.name}
-                                            </Typography>
+                                {matchingCategories.map((category: Category, index: number) => {
+                                    const itemIndex = index;
+                                    const isSelected = selectedSuggestionIndex === itemIndex;
+                                    return (
+                                        <Box
+                                            key={category._id}
+                                            onClick={() => handleCategoryClick(category._id, category.name)}
+                                            onMouseEnter={() => setSelectedSuggestionIndex(itemIndex)}
+                                            sx={{
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: 2,
+                                                px: 2.5,
+                                                py: 1.5,
+                                                cursor: 'pointer',
+                                                transition: 'all 0.2s',
+                                                bgcolor: isSelected ? alpha(theme.palette.primary.main, 0.12) : 'transparent',
+                                                '&:hover': {
+                                                    bgcolor: alpha(theme.palette.primary.main, 0.08),
+                                                    pl: 3,
+                                                }
+                                            }}
+                                        >
+                                            <Avatar
+                                                src={category.image}
+                                                variant="rounded"
+                                                sx={{
+                                                    width: 44,
+                                                    height: 44,
+                                                    borderRadius: '10px',
+                                                    bgcolor: alpha(theme.palette.primary.main, 0.1)
+                                                }}
+                                            >
+                                                <CategoryIcon />
+                                            </Avatar>
+                                            <Box sx={{ flex: 1, overflow: 'hidden' }}>
+                                                <Typography variant="body2" fontWeight="600" noWrap>
+                                                    {category.name}
+                                                </Typography>
+                                                <Typography variant="caption" color="text.secondary">
+                                                    Browse category
+                                                </Typography>
+                                            </Box>
+                                            <KeyboardArrowRight sx={{ color: 'text.disabled', fontSize: '1.2rem' }} />
                                         </Box>
-                                        <Typography variant="body2" fontWeight="700" color="primary">
-                                            ${product.price}
-                                        </Typography>
-                                    </Box>
-                                ))}
+                                    );
+                                })}
+                                {suggestions.length > 0 && <Divider sx={{ my: 1, mx: 2 }} />}
                             </Box>
                         )}
 
-                        {/* No Results Fallback */}
-                        {searchValue.length > 0 && suggestions.length === 0 && !isLoading && (
-                            <Box sx={{ p: 3, textAlign: 'center' }}>
+                        {/* Products Suggestions */}
+                        {debouncedSearchTerm.length > 0 && suggestions.length > 0 && (
+                            <Box sx={{ py: 1 }}>
+                                <Typography
+                                    variant="caption"
+                                    fontWeight="700"
+                                    color="primary"
+                                    sx={{
+                                        px: 2.5,
+                                        py: 1,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: 1,
+                                        textTransform: 'uppercase',
+                                        letterSpacing: '1px'
+                                    }}
+                                >
+                                    <TrendingUp fontSize="inherit" />
+                                    PRODUCTS
+                                </Typography>
+                                {suggestions.map((product: Product, index: number) => {
+                                    const itemIndex = matchingCategories.length + index;
+                                    const isSelected = selectedSuggestionIndex === itemIndex;
+                                    return (
+                                        <Box
+                                            key={product._id}
+                                            onClick={() => handleSuggestionClick(product)}
+                                            onMouseEnter={() => setSelectedSuggestionIndex(itemIndex)}
+                                            sx={{
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: 2,
+                                                px: 2.5,
+                                                py: 1.5,
+                                                cursor: 'pointer',
+                                                transition: 'all 0.2s',
+                                                bgcolor: isSelected ? alpha(theme.palette.primary.main, 0.12) : 'transparent',
+                                                '&:hover': {
+                                                    bgcolor: alpha(theme.palette.primary.main, 0.08),
+                                                    pl: 3,
+                                                }
+                                            }}
+                                        >
+                                            <Avatar
+                                                src={product.imageCover}
+                                                variant="rounded"
+                                                sx={{
+                                                    width: 48,
+                                                    height: 48,
+                                                    borderRadius: '10px',
+                                                    objectFit: 'cover'
+                                                }}
+                                            />
+                                            <Box sx={{ flex: 1, overflow: 'hidden', minWidth: 0 }}>
+                                                <Typography variant="body2" fontWeight="600" noWrap>
+                                                    {product.title}
+                                                </Typography>
+                                                <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 0.5 }}>
+                                                    <Typography variant="caption" color="text.secondary" noWrap>
+                                                        {product.category?.name || 'Uncategorized'}
+                                                    </Typography>
+                                                    {product.ratingsAverage > 0 && (
+                                                        <>
+                                                            <Typography variant="caption" color="text.disabled">•</Typography>
+                                                            <Typography variant="caption" color="text.secondary">
+                                                                ⭐ {product.ratingsAverage.toFixed(1)}
+                                                            </Typography>
+                                                        </>
+                                                    )}
+                                                </Stack>
+                                            </Box>
+                                            <Box sx={{ textAlign: 'right' }}>
+                                                {product.priceAfterDiscount ? (
+                                                    <Stack direction="row" spacing={0.5} alignItems="center">
+                                                        <Typography
+                                                            variant="body2"
+                                                            fontWeight="700"
+                                                            color="primary"
+                                                        >
+                                                            ${product.priceAfterDiscount}
+                                                        </Typography>
+                                                        <Typography
+                                                            variant="caption"
+                                                            sx={{
+                                                                textDecoration: 'line-through',
+                                                                color: 'text.disabled',
+                                                                fontSize: '0.7rem'
+                                                            }}
+                                                        >
+                                                            ${product.price}
+                                                        </Typography>
+                                                    </Stack>
+                                                ) : (
+                                                    <Typography variant="body2" fontWeight="700" color="primary">
+                                                        ${product.price}
+                                                    </Typography>
+                                                )}
+                                                {product.quantity === 0 && (
+                                                    <Chip
+                                                        label="Out of Stock"
+                                                        size="small"
+                                                        sx={{
+                                                            height: 18,
+                                                            fontSize: '0.65rem',
+                                                            mt: 0.5,
+                                                            bgcolor: alpha(theme.palette.error.main, 0.1),
+                                                            color: theme.palette.error.main
+                                                        }}
+                                                    />
+                                                )}
+                                            </Box>
+                                        </Box>
+                                    );
+                                })}
+                            </Box>
+                        )}
+
+                        {/* No Results */}
+                        {showNoResults && (
+                            <Box sx={{ p: 4, textAlign: 'center' }}>
+                                <Storefront sx={{ fontSize: '3rem', color: 'text.disabled', mb: 2, opacity: 0.5 }} />
+                                <Typography variant="body1" fontWeight="600" color="text.primary" gutterBottom>
+                                    No results found
+                                </Typography>
                                 <Typography variant="body2" color="text.secondary">
-                                    No products found for "{searchValue}"
+                                    Try searching with different keywords
                                 </Typography>
                             </Box>
                         )}
 
                         {/* Recent History (Only when input is empty) */}
                         {searchValue.length === 0 && recentSearches.length > 0 && (
-                            <Box sx={{ py: 1 }}>
-                                <Typography variant="caption" fontWeight="700" color="text.disabled" sx={{ px: 2, py: 1, display: 'block' }}>
-                                    RECENT SEARCHES
-                                </Typography>
+                            <Box sx={{ py: 1.5 }}>
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', px: 2.5, py: 1 }}>
+                                    <Typography variant="caption" fontWeight="700" color="text.disabled" sx={{ textTransform: 'uppercase', letterSpacing: '1px' }}>
+                                        RECENT SEARCHES
+                                    </Typography>
+                                    <Typography
+                                        variant="caption"
+                                        color="primary"
+                                        sx={{ cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setRecentSearches([]);
+                                            localStorage.removeItem("recent_searches");
+                                        }}
+                                    >
+                                        Clear all
+                                    </Typography>
+                                </Box>
                                 {recentSearches.map((term, idx) => (
                                     <Box
                                         key={idx}
@@ -296,25 +581,52 @@ const GlobalSearch: React.FC = () => {
                                         sx={{
                                             display: 'flex',
                                             alignItems: 'center',
+                                            justifyContent: 'space-between',
                                             gap: 1.5,
-                                            px: 2,
+                                            px: 2.5,
                                             py: 1.2,
                                             cursor: 'pointer',
+                                            transition: 'all 0.2s',
                                             '&:hover': {
                                                 bgcolor: 'action.hover',
-                                                '& svg': { color: 'primary.main' }
+                                                '& svg': { color: 'primary.main' },
+                                                '& .delete-icon': { opacity: 1 }
                                             }
                                         }}
                                     >
-                                        <HistoryIcon fontSize="small" sx={{ color: 'text.disabled', transition: 'color 0.2s' }} />
-                                        <Typography variant="body2">{term}</Typography>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flex: 1, minWidth: 0 }}>
+                                            <HistoryIcon fontSize="small" sx={{ color: 'text.disabled', transition: 'color 0.2s', flexShrink: 0 }} />
+                                            <Typography variant="body2" noWrap sx={{ flex: 1 }}>
+                                                {term}
+                                            </Typography>
+                                        </Box>
+                                        <IconButton
+                                            size="small"
+                                            className="delete-icon"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                removeFromHistory(term);
+                                            }}
+                                            sx={{
+                                                opacity: 0,
+                                                transition: 'opacity 0.2s',
+                                                p: 0.5,
+                                                color: 'text.disabled',
+                                                '&:hover': {
+                                                    bgcolor: alpha(theme.palette.error.main, 0.1),
+                                                    color: theme.palette.error.main
+                                                }
+                                            }}
+                                        >
+                                            <CloseIcon fontSize="small" />
+                                        </IconButton>
                                     </Box>
                                 ))}
                             </Box>
                         )}
 
                         {/* Footer Action */}
-                        {searchValue.length > 0 && (
+                        {searchValue.length > 0 && hasResults && (
                             <Box
                                 onClick={() => handleSearchSubmit(searchValue)}
                                 sx={{
@@ -323,13 +635,15 @@ const GlobalSearch: React.FC = () => {
                                     bgcolor: alpha(theme.palette.background.paper, 0.5),
                                     textAlign: 'center',
                                     cursor: 'pointer',
+                                    transition: 'all 0.2s',
                                     '&:hover': {
-                                        bgcolor: alpha(theme.palette.primary.main, 0.05)
+                                        bgcolor: alpha(theme.palette.primary.main, 0.08)
                                     }
                                 }}
                             >
                                 <Typography variant="body2" color="primary" fontWeight="600">
                                     View all results for "{searchValue}"
+                                    <KeyboardArrowRight sx={{ verticalAlign: 'middle', ml: 0.5, fontSize: '1.2rem' }} />
                                 </Typography>
                             </Box>
                         )}

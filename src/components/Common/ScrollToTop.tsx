@@ -43,7 +43,17 @@ const ScrollToTop = () => {
     return (
         <Zoom in={isVisible}>
             <Box
+                component="button"
                 onClick={scrollToTop}
+                aria-label="Scroll to top"
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        scrollToTop();
+                    }
+                }}
                 sx={{
                     position: "fixed",
                     bottom: 32,

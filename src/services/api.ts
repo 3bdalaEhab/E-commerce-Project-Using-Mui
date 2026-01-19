@@ -30,11 +30,31 @@ api.interceptors.request.use(
 api.interceptors.response.use(
     (response: AxiosResponse) => response,
     (error: AxiosError) => {
+        // Handle 401 Unauthorized
         if (error.response?.status === 401) {
             // Token expired or invalid
             localStorage.removeItem('userToken');
-            window.location.href = '/login';
+            // Only redirect if not already on login page
+            if (window.location.pathname !== '/login') {
+                window.location.href = '/login';
+            }
         }
+        
+        // Handle 403 Forbidden
+        if (error.response?.status === 403) {
+            console.error('Access forbidden:', error);
+        }
+        
+        // Handle 500 Server Error
+        if (error.response?.status === 500) {
+            console.error('Server error:', error);
+        }
+        
+        // Handle Network Error
+        if (!error.response) {
+            console.error('Network error:', error.message);
+        }
+        
         return Promise.reject(error);
     }
 );
