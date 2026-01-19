@@ -11,7 +11,11 @@ interface LogEntry {
     message: string;
     timestamp: string;
     context?: string;
-    data?: any;
+    data?: unknown;
+}
+
+interface ErrorWithResponse extends Error {
+    response?: unknown;
 }
 
 class Logger {
@@ -19,7 +23,7 @@ class Logger {
     private logHistory: LogEntry[] = [];
     private maxHistorySize = 100;
 
-    private formatMessage(level: LogLevel, message: string, context?: string, data?: any): LogEntry {
+    private formatMessage(level: LogLevel, message: string, context?: string, data?: unknown): LogEntry {
         return {
             level,
             message,
@@ -29,7 +33,7 @@ class Logger {
         };
     }
 
-    private log(level: LogLevel, message: string, context?: string, data?: any): void {
+    private log(level: LogLevel, message: string, context?: string, data?: unknown): void {
         const entry = this.formatMessage(level, message, context, data);
 
         // Store in history (for debugging)
@@ -66,27 +70,29 @@ class Logger {
         }
     }
 
-    debug(message: string, context?: string, data?: any): void {
+    debug(message: string, context?: string, data?: unknown): void {
         this.log('debug', message, context, data);
     }
 
-    info(message: string, context?: string, data?: any): void {
+    info(message: string, context?: string, data?: unknown): void {
         this.log('info', message, context, data);
     }
 
-    warn(message: string, context?: string, data?: any): void {
+    warn(message: string, context?: string, data?: unknown): void {
         this.log('warn', message, context, data);
     }
 
-    error(message: string, context?: string, error?: any): void {
-        const errorData = error instanceof Error
-            ? {
+    error(message: string, context?: string, error?: unknown): void {
+        let errorData: unknown = error;
+        if (error instanceof Error) {
+            const errorWithResponse = error as ErrorWithResponse;
+            errorData = {
                 name: error.name,
                 message: error.message,
                 stack: error.stack,
-                ...(error as any).response && { response: (error as any).response },
-            }
-            : error;
+                ...(errorWithResponse.response ? { response: errorWithResponse.response } : {}),
+            };
+        }
 
         this.log('error', message, context, errorData);
     }
@@ -94,7 +100,7 @@ class Logger {
     /**
      * Send critical errors to remote logging service
      */
-    private sendToRemoteService(entry: LogEntry): void {
+    private sendToRemoteService(_entry: LogEntry): void {
         // TODO: Implement remote logging
         // Example: Send to Sentry, LogRocket, or custom API
         // fetch('/api/logs', {

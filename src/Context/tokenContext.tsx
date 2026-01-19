@@ -16,6 +16,7 @@ interface TokenContextProviderProps {
 }
 
 // Create Context with proper typing
+// eslint-disable-next-line react-refresh/only-export-components
 export const tokenContext = createContext<TokenContextType>({
   userToken: null,
   setUserToken: () => { },
@@ -53,7 +54,7 @@ export default function TokenContextProvider({ children }: TokenContextProviderP
       isAuthenticated: !!userToken,
       logout,
     }),
-    [userToken]
+    [userToken, logout]
   );
 
   return (
@@ -64,6 +65,7 @@ export default function TokenContextProvider({ children }: TokenContextProviderP
 }
 
 // Custom hook for type-safe context usage
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = (): TokenContextType => {
   const context = useContext(tokenContext);
   if (!context) {

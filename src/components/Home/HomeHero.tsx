@@ -18,7 +18,7 @@ const HERO_IMAGE_URL = "https://images.unsplash.com/photo-1550745165-9bc0b252726
 const HomeHero: React.FC = () => {
     const theme = useTheme();
     const navigate = useNavigate();
-    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+    const _isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
     const containerVariants = {
         hidden: { opacity: 0 },

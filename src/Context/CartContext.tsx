@@ -1,18 +1,26 @@
 import React, { createContext, useEffect, useState, useCallback, useMemo, ReactNode, useContext } from 'react';
 import { cartService } from '../services';
-import { Cart, CartResponse } from '../types';
+import { Cart } from '../types';
 import { tokenContext } from './tokenContext';
 
 // Types
+interface CartActionResponse {
+    status?: string;
+    message?: string;
+    numOfCartItems?: number;
+    error?: string;
+    data?: Cart | null;
+}
+
 interface CartContextType {
     numOfCartItems: number;
     cartData: Cart | null;
     loading: boolean;
-    addToCart: (productId: string) => Promise<any>;
-    updateItem: (productId: string, count: number) => Promise<any>;
-    removeSpecificItem: (productId: string) => Promise<any>;
-    removeAllItems: () => Promise<any>;
-    getCart: () => Promise<any>;
+    addToCart: (productId: string) => Promise<CartActionResponse | null>;
+    updateItem: (productId: string, count: number) => Promise<CartActionResponse | null>;
+    removeSpecificItem: (productId: string) => Promise<CartActionResponse | null>;
+    removeAllItems: () => Promise<CartActionResponse | null>;
+    getCart: () => Promise<CartActionResponse | null>;
 }
 
 interface CartProviderProps {
@@ -20,15 +28,16 @@ interface CartProviderProps {
 }
 
 // Create Context with proper typing
+// eslint-disable-next-line react-refresh/only-export-components
 export const CartContext = createContext<CartContextType>({
     numOfCartItems: 0,
     cartData: null,
     loading: false,
-    addToCart: async () => { },
-    updateItem: async () => { },
-    removeSpecificItem: async () => { },
-    removeAllItems: async () => { },
-    getCart: async () => { },
+    addToCart: async () => null,
+    updateItem: async () => null,
+    removeSpecificItem: async () => null,
+    removeAllItems: async () => null,
+    getCart: async () => null,
 });
 
 export default function CartContextProvider({ children }: CartProviderProps) {
@@ -134,6 +143,7 @@ export default function CartContextProvider({ children }: CartProviderProps) {
 }
 
 // Custom hook for type-safe context usage
+// eslint-disable-next-line react-refresh/only-export-components
 export const useCart = () => {
     const context = React.useContext(CartContext);
     if (!context) {

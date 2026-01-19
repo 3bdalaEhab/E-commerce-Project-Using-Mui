@@ -4,7 +4,7 @@ import { TextField, InputAdornment, TextFieldProps, useTheme } from '@mui/materi
 interface CustomTextFieldProps extends Omit<TextFieldProps, 'error' | 'helperText'> {
     label: string;
     icon?: React.ElementType;
-    error?: boolean | string | any;
+    error?: boolean | string;
     helperText?: React.ReactNode;
 }
 
@@ -107,7 +107,7 @@ const CustomTextField = React.memo(React.forwardRef<HTMLDivElement, CustomTextFi
                         <Icon
                             sx={{
                                 fontSize: '1.2rem',
-                                color: !!error ? 'error.main' : 'primary.main',
+                                color: error ? 'error.main' : 'primary.main',
                                 opacity: disabled ? 0.3 : 0.8,
                                 transition: 'all 0.3s ease'
                             }}

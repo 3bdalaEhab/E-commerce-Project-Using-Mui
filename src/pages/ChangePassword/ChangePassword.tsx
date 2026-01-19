@@ -17,6 +17,7 @@ import AuthLayout from "../../components/Common/AuthLayout";
 import CustomTextField from "../../components/Common/CustomTextField";
 import { authService } from "../../services";
 import { ChangePasswordData } from "../../types";
+import { AxiosError } from "axios";
 import { storage } from "../../utils/storage";
 import { logger } from "../../utils/logger";
 
@@ -70,8 +71,9 @@ const ChangePassword: React.FC = () => {
             if (res.token) storage.set("userToken", res.token);
             showToast("✅ Password changed successfully!", "success");
             setTimeout(() => navigate("/login"), 1500);
-        } catch (err: any) {
-            const msg = err.response?.data?.message || err.response?.data?.error || "❌ Change failed.";
+        } catch (err) {
+            const error = err as AxiosError<{ message?: string; error?: string }>;
+            const msg = error.response?.data?.message || error.response?.data?.error || "❌ Change failed.";
             showToast(msg, "error");
         } finally {
             setLoading(false);
@@ -80,7 +82,6 @@ const ChangePassword: React.FC = () => {
 
     const logout = useCallback(() => {
         storage.remove("userToken");
-        storage.remove("userPhoto" as any);
         logger.info('User logged out', 'ChangePassword');
         navigate("/login");
     }, [navigate]);

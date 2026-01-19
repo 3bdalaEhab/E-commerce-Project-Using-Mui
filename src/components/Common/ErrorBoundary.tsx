@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import HomeIcon from "@mui/icons-material/Home";
+import { logger } from "../../utils/logger";
 
 interface Props {
     children?: ReactNode;

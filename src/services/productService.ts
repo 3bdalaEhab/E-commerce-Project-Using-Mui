@@ -1,5 +1,5 @@
 import api from './api';
-import { Product, ApiResponse } from '../types';
+import { Product } from '../types';
 
 interface ProductsResponse {
     results: number;

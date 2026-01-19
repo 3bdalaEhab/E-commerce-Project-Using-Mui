@@ -3,10 +3,8 @@ import { useForm } from "react-hook-form";
 import {
     Button,
     CircularProgress,
-    useTheme,
     Box,
-    Typography,
-    Stack
+    Typography
 } from "@mui/material";
 import { VerifiedUser, ArrowBack } from "@mui/icons-material";
 import { useNavigate, Link } from "react-router-dom";
@@ -15,11 +13,11 @@ import { useThemeContext } from "../../Context/ThemeContext";
 import AuthLayout from "../../components/Common/AuthLayout";
 import CustomTextField from "../../components/Common/CustomTextField";
 import { authService } from "../../services";
+import { AxiosError } from "axios";
 
 const VerifyResetCode: React.FC = () => {
     const navigate = useNavigate();
     const { primaryColor } = useThemeContext();
-    const theme = useTheme();
     const { showToast } = useToast();
     const [loading, setLoading] = useState(false);
 
@@ -34,14 +32,15 @@ const VerifyResetCode: React.FC = () => {
         try {
             const res = await authService.verifyResetCode({ resetCode: formData.resetCode.trim() });
 
-            if (res.status === "Success" || res.status === "success" || res.status === 200) {
+            if (res.status === "Success") {
                 showToast("✅ Code verified successfully! System unlocked.", "success");
                 setTimeout(() => navigate("/ResetPassword"), 1500);
             } else {
                 showToast("❌ Unexpected response from server. Please try again.", "error");
             }
-        } catch (err: any) {
-            const msg = err.response?.data?.message || err.response?.data?.error || "❌ Verification failed. Code may be invalid.";
+        } catch (err) {
+            const error = err as AxiosError<{ message?: string; error?: string }>;
+            const msg = error.response?.data?.message || error.response?.data?.error || "❌ Verification failed. Code may be invalid.";
             showToast(msg, "error");
         } finally {
             setLoading(false);

@@ -30,6 +30,7 @@ import { useToast, useAuth } from "../../Context";
 import PageMeta from "../../components/PageMeta/PageMeta";
 import { Address, User } from "../../types";
 import { motion, AnimatePresence } from "framer-motion";
+import { AxiosError } from "axios";
 
 interface TabPanelProps {
     children?: React.ReactNode;
@@ -104,7 +105,8 @@ const Profile: React.FC = () => {
                 phone: formData.phone
             });
             showToast("✅ تم حفظ التغييرات بنجاح", "success");
-        } catch (error: any) {
+        } catch (err) {
+            const error = err as AxiosError<{ message?: string }>;
             const msg = error.response?.data?.message || "❌ فشل في حفظ التغييرات";
             showToast(msg, "error");
         } finally {

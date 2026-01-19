@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Fab, useTheme, Zoom, Box } from "@mui/material";
+import { useTheme, Zoom, Box } from "@mui/material";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 
 const ScrollToTop = () => {

@@ -19,7 +19,7 @@ import {
     IconButton,
     Stack,
     Paper,
-    Grid,
+    Grid2,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import {
@@ -34,14 +34,14 @@ import Loading from "../../components/Loading/Loading";
 import EmptyState from "../../components/Common/EmptyState";
 import { orderService } from "../../services";
 import { Order, Product } from "../../types";
-import { getUserId } from "../../utils/security";
-import { logger } from "../../utils/logger";
+
 
 const AllOrders: React.FC = () => {
     const theme = useTheme();
     const navigate = useNavigate();
     const [userId, setUserId] = useState<string | null>(null);
     const [expandedRows, setExpandedRows] = useState<Record<string, boolean>>({});
+
 
     useEffect(() => {
         const userIdFromToken = getUserId();
@@ -52,13 +52,16 @@ const AllOrders: React.FC = () => {
         }
     }, []);
 
+
     const { data: ordersData, isLoading, isError, error } = useQuery<Order[]>({
         queryKey: ["orders", userId],
         queryFn: () => userId ? orderService.getUserOrders(userId) : Promise.resolve([]),
         enabled: !!userId,
     });
 
+
     if (isLoading) return <Loading />;
+
 
     if (isError) {
         return (
@@ -70,7 +73,9 @@ const AllOrders: React.FC = () => {
         );
     }
 
+
     const ordersList: Order[] = Array.isArray(ordersData) ? ordersData : [];
+
 
     if (ordersList.length === 0) {
         return (
@@ -87,6 +92,7 @@ const AllOrders: React.FC = () => {
         );
     }
 
+
     const toggleRowExpansion = (orderId: string) => {
         setExpandedRows((prev) => ({
             ...prev,
@@ -94,9 +100,11 @@ const AllOrders: React.FC = () => {
         }));
     };
 
+
     return (
         <Box sx={{ bgcolor: "background.default", minHeight: "100vh", pb: 10 }}>
             <PageMeta title="My Orders" description="View all your previous and current orders in one place." />
+
 
             <Box sx={{ pt: 10, pb: 6, textAlign: "center" }}>
                 <Typography variant="h3" fontWeight="1000" sx={{ mb: 1, letterSpacing: -1.5 }}>
@@ -107,12 +115,14 @@ const AllOrders: React.FC = () => {
                 </Typography>
             </Box>
 
+
             <Container maxWidth="lg">
                 <Stack spacing={4}>
                     <AnimatePresence>
                         {ordersList.map((order, idx) => {
                             const isExpanded = !!expandedRows[order._id];
                             const cartItems = Array.isArray(order?.cartItems) ? order.cartItems : [];
+
 
                             return (
                                 <motion.div
@@ -135,8 +145,8 @@ const AllOrders: React.FC = () => {
                                         }}
                                     >
                                         <CardContent sx={{ p: 4 }}>
-                                            <Grid container spacing={4} alignItems="center">
-                                                <Grid size={{ xs: 12, md: 6 }}>
+                                            <Grid2 container spacing={4} alignItems="center">
+                                                <Grid2 size={{ xs: 12, md: 6 }}>
                                                     <Stack direction="row" spacing={2} alignItems="center" mb={1}>
                                                         <Box sx={{ p: 1, bgcolor: 'primary.transparent', borderRadius: '12px', color: 'primary.main', display: 'flex' }}>
                                                             <ReceiptLong />
@@ -151,9 +161,10 @@ const AllOrders: React.FC = () => {
                                                             </Typography>
                                                         </Box>
                                                     </Stack>
-                                                </Grid>
+                                                </Grid2>
 
-                                                <Grid size={{ xs: 12, md: 6 }}>
+
+                                                <Grid2 size={{ xs: 12, md: 6 }}>
                                                     <Stack direction="row" spacing={2} justifyContent={{ xs: 'flex-start', md: 'flex-end' }}>
                                                         <Chip
                                                             icon={<Payments sx={{ fontSize: '1rem !important' }} />}
@@ -178,22 +189,25 @@ const AllOrders: React.FC = () => {
                                                             <KeyboardArrowDown />
                                                         </IconButton>
                                                     </Stack>
-                                                </Grid>
-                                            </Grid>
+                                                </Grid2>
+                                            </Grid2>
+
 
                                             <Divider sx={{ my: 3, opacity: 0.5 }} />
 
-                                            <Grid container spacing={4}>
-                                                <Grid size={{ xs: 12, sm: 4 }}>
+
+                                            <Grid2 container spacing={4}>
+                                                <Grid2 size={{ xs: 12, sm: 4 }}>
                                                     <Typography variant="caption" color="text.secondary" fontWeight="800" sx={{ textTransform: 'uppercase', mb: 0.5, display: 'block' }}>
                                                         Total Price
                                                     </Typography>
                                                     <Typography variant="h5" fontWeight="1000" color="primary.main">
                                                         {order.totalOrderPrice?.toFixed(2)} EGP
                                                     </Typography>
-                                                </Grid>
+                                                </Grid2>
 
-                                                <Grid size={{ xs: 12, sm: 8 }}>
+
+                                                <Grid2 size={{ xs: 12, sm: 8 }}>
                                                     <Paper elevation={0} sx={{ p: 2, bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)', borderRadius: '16px', border: `1px solid ${theme.palette.divider}` }}>
                                                         <Typography variant="caption" color="text.secondary" fontWeight="800" sx={{ textTransform: 'uppercase', mb: 1, display: 'block' }}>
                                                             Shipping to
@@ -205,16 +219,17 @@ const AllOrders: React.FC = () => {
                                                             📞 {order.shippingAddress?.phone}
                                                         </Typography>
                                                     </Paper>
-                                                </Grid>
-                                            </Grid>
+                                                </Grid2>
+                                            </Grid2>
                                         </CardContent>
+
 
                                         <Collapse in={isExpanded} timeout="auto" unmountOnExit>
                                             <Box sx={{ p: 4, pt: 0, bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.01)' : 'rgba(0,0,0,0.01)' }}>
                                                 <Typography variant="subtitle1" fontWeight="900" sx={{ mb: 3 }}>Order Items ({cartItems.length})</Typography>
-                                                <Grid container spacing={2}>
+                                                <Grid2 container spacing={2}>
                                                     {cartItems.map((item, i) => (
-                                                        <Grid size={12} key={item._id || i}>
+                                                        <Grid2 size={12} key={item._id || i}>
                                                             {(() => {
                                                                 const product = typeof item.product === 'string' ? null : (item.product as Product);
                                                                 if (!product) return null;
@@ -246,9 +261,9 @@ const AllOrders: React.FC = () => {
                                                                     </Card>
                                                                 );
                                                             })()}
-                                                        </Grid>
+                                                        </Grid2>
                                                     ))}
-                                                </Grid>
+                                                </Grid2>
                                             </Box>
                                         </Collapse>
                                     </Card>
@@ -261,5 +276,6 @@ const AllOrders: React.FC = () => {
         </Box>
     );
 };
+
 
 export default AllOrders;

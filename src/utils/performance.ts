@@ -18,11 +18,11 @@ export const createIntersectionObserver = (
 };
 
 // Debounce function for performance optimization
-export const debounce = <T extends (...args: any[]) => any>(
+export const debounce = <T extends (...args: unknown[]) => unknown>(
     func: T,
     wait: number
 ): ((...args: Parameters<T>) => void) => {
-    let timeout: NodeJS.Timeout | null = null;
+    let timeout: ReturnType<typeof setTimeout> | null = null;
 
     return function executedFunction(...args: Parameters<T>) {
         const later = () => {
@@ -38,7 +38,7 @@ export const debounce = <T extends (...args: any[]) => any>(
 };
 
 // Throttle function for performance optimization
-export const throttle = <T extends (...args: any[]) => any>(
+export const throttle = <T extends (...args: unknown[]) => unknown>(
     func: T,
     limit: number
 ): ((...args: Parameters<T>) => void) => {
@@ -67,7 +67,7 @@ export const preloadImage = (src: string): Promise<void> => {
 
 // Preload multiple images
 export const preloadImages = async (srcs: string[]): Promise<void> => {
-    await Promise.all(srcs.map(src => preloadImage(src).catch(() => {})));
+    await Promise.all(srcs.map(src => preloadImage(src).catch(() => { })));
 };
 
 // Get performance metrics
@@ -77,7 +77,7 @@ export const getPerformanceMetrics = () => {
     }
 
     const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
-    
+
     if (!navigation) {
         return null;
     }

@@ -19,6 +19,7 @@ interface WishlistProviderProps {
 }
 
 // Create Context with proper typing
+// eslint-disable-next-line react-refresh/only-export-components
 export const WishlistContext = createContext<WishlistContextType>({
     wishListItemId: [],
     numWishItemList: 0,
@@ -113,6 +114,7 @@ export function WishlistProvider({ children }: WishlistProviderProps) {
 }
 
 // Custom Hook for easy access to WishlistContext
+// eslint-disable-next-line react-refresh/only-export-components
 export const useWishlist = (): WishlistContextType => {
     const context = useContext(WishlistContext);
     if (!context) {

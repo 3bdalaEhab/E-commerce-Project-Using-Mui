@@ -1,5 +1,5 @@
-import { lazy, Suspense, useContext, useEffect } from 'react';
-import { createBrowserRouter, RouterProvider, Outlet } from 'react-router-dom';
+import React, { lazy, Suspense, useEffect } from 'react';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import './App.css';
 
 // Layout

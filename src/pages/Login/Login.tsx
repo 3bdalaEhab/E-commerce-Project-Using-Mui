@@ -1,4 +1,4 @@
-import React, { useState, useContext, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import {
     Button,
@@ -27,6 +27,7 @@ import AuthLayout from "../../components/Common/AuthLayout";
 import CustomTextField from "../../components/Common/CustomTextField";
 import { authService } from "../../services";
 import { LoginCredentials } from "../../types";
+import { AxiosError } from "axios";
 import storage from "@/utils/storage";
 
 const Login: React.FC = () => {
@@ -71,8 +72,9 @@ const Login: React.FC = () => {
                     navigate("/");
                 }, 1200);
             }
-        } catch (err: any) {
-            const msg = err.response?.data?.message || "❌ Login failed. Please check your credentials.";
+        } catch (err) {
+            const error = err as AxiosError<{ message?: string }>;
+            const msg = error.response?.data?.message || "❌ Login failed. Please check your credentials.";
             showToast(msg, "error");
         } finally {
             setLoading(false);

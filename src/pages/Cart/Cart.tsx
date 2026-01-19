@@ -10,7 +10,6 @@ import {
     Divider,
     Chip,
     Stack,
-    Paper,
     useTheme,
     Grid,
 } from "@mui/material";
@@ -22,7 +21,6 @@ import { useNavigate, Link } from "react-router-dom";
 import { CartContext, useToast } from "../../Context";
 import { CartSkeleton } from "../../components/Common/Skeletons";
 import ShoppingCartCheckoutIcon from "@mui/icons-material/ShoppingCartCheckout";
-import RemoveShoppingCartIcon from "@mui/icons-material/RemoveShoppingCart";
 import PageMeta from "../../components/PageMeta/PageMeta";
 import EmptyState from "../../components/Common/EmptyState";
 import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined';
@@ -163,7 +161,7 @@ export default function Cart() {
         try {
             await updateItem(productId, newCount);
             showToast("✅ Quantity updated", "success");
-        } catch (err) {
+        } catch {
             showToast("❌ Update failed", "error");
         }
     }, [updateItem, showToast]);
@@ -172,7 +170,7 @@ export default function Cart() {
         try {
             await removeSpecificItem(id);
             showToast("🗑️ Item removed", "success");
-        } catch (error) {
+        } catch {
             showToast("❌ Removal failed", "error");
         }
     }, [removeSpecificItem, showToast]);
@@ -183,7 +181,7 @@ export default function Cart() {
             if (res.message === "success" || res.status === "success" || !res.error) {
                 showToast("🧹 Cart cleared", "success");
             }
-        } catch (error) {
+        } catch {
             showToast("❌ Clear failed", "error");
         }
     }, [removeAllItems, showToast]);

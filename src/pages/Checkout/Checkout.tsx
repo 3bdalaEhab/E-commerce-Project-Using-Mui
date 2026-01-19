@@ -67,7 +67,7 @@ const Checkout: React.FC = () => {
                     navigate("/allOrders");
                 }
             }
-        } catch (error) {
+        } catch {
             showToast("❌ Checkout failed. Please try again.", "error");
         } finally {
             setLoading(false);

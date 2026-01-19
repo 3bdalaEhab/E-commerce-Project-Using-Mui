@@ -8,6 +8,7 @@ interface QuickViewContextType {
     closeQuickView: () => void;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const QuickViewContext = createContext<QuickViewContextType>({
     activeProduct: null,
     isOpen: false,
@@ -15,6 +16,7 @@ export const QuickViewContext = createContext<QuickViewContextType>({
     closeQuickView: () => { },
 });
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useQuickView = () => useContext(QuickViewContext);
 
 export const QuickViewProvider = ({ children }: { children: ReactNode }) => {

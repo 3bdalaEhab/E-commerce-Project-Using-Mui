@@ -26,7 +26,7 @@ export const validateToken = (token: string | null): boolean => {
 
     try {
         const decoded = jwtDecode<DecodedToken>(token);
-        
+
         // Check if token has required fields
         if (!decoded.exp || !decoded.iat) {
             return false;
@@ -39,7 +39,7 @@ export const validateToken = (token: string | null): boolean => {
         }
 
         return true;
-    } catch (error) {
+    } catch {
         return false;
     }
 };
@@ -49,7 +49,7 @@ export const validateToken = (token: string | null): boolean => {
  */
 export const getValidToken = (): string | null => {
     const token = storage.get<string>('userToken');
-    
+
     if (!token || !validateToken(token)) {
         // Token is invalid or expired, remove it
         storage.remove('userToken');
@@ -64,14 +64,14 @@ export const getValidToken = (): string | null => {
  */
 export const decodeToken = (): DecodedToken | null => {
     const token = getValidToken();
-    
+
     if (!token) {
         return null;
     }
 
     try {
         return jwtDecode<DecodedToken>(token);
-    } catch (error) {
+    } catch {
         return null;
     }
 };

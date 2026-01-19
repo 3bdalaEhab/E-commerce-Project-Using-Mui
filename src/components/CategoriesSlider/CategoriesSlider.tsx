@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Typography, Button, useTheme, alpha } from "@mui/material";
+import { Box, Typography, Button, useTheme } from "@mui/material";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Autoplay, EffectFade, Parallax } from "swiper/modules";
 import { motion } from "framer-motion";

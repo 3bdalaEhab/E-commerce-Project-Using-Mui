@@ -12,8 +12,7 @@ interface DesktopNavProps {
 const DesktopNav: React.FC<DesktopNavProps> = ({ navItems }) => {
     const theme = useTheme();
     const { mode } = useThemeContext();
-    const location = useLocation();
-    const isHomePage = location.pathname === '/';
+    const _location = useLocation();
 
     return (
         <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center", gap: 1 }}>

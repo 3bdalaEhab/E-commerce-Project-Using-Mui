@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Product } from '../types';
 import { storage } from '../utils/storage';
-import { logger } from '../utils/logger';
 
 export const useRecentlyViewed = (currentProduct: Product | null) => {
     const [recentProducts, setRecentProducts] = useState<Product[]>([]);
@@ -27,7 +26,7 @@ export const useRecentlyViewed = (currentProduct: Product | null) => {
             storage.set('recently_viewed', updated);
             return updated;
         });
-    }, [currentProduct?._id]); // Only run when Product ID changes
+    }, [currentProduct]); // Run when currentProduct changes
 
     return recentProducts;
 };

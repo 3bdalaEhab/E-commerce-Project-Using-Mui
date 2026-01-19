@@ -62,7 +62,7 @@ const Details: React.FC = () => {
                 await addToWishlist(id);
                 showToast("❤️ Added to your wishlist", "success");
             }
-        } catch (error) {
+        } catch {
             showToast("❌ An error occurred. Please try again.", "error");
         } finally {
             setWishlistLoading(false);
@@ -71,7 +71,7 @@ const Details: React.FC = () => {
 
     const { data, isLoading, isError, error } = useQuery({
         queryKey: ["productDetails", id],
-        queryFn: () => productService.getProductById(id!),
+        queryFn: () => productService.getProductById(id as string),
         enabled: !!id,
         select: (data) => data.data
     });
@@ -84,7 +84,7 @@ const Details: React.FC = () => {
             limit: 10
         }),
         enabled: !!data?.category?._id,
-        select: (data) => data.data.filter((p: any) => p._id !== id) // Client-side fallback exclusion
+        select: (data) => data.data.filter((p) => p._id !== id) // Client-side fallback exclusion
     });
 
     // Track History

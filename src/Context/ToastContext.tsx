@@ -26,6 +26,7 @@ function SlideTransition(props: SlideProps) {
 // Create Context with proper typing
 const ToastContext = createContext<ToastContextType | undefined>(undefined);
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useToast = (): ToastContextType => {
     const context = useContext(ToastContext);
     if (!context) {

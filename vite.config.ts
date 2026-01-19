@@ -1,9 +1,18 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import checker from "vite-plugin-checker";
 import path from "path";
 
 export default defineConfig({
-    plugins: [react()],
+    plugins: [
+        react(),
+        checker({
+            eslint: {
+                useFlatConfig: true,
+                lintCommand: 'eslint "./src/**/*.{ts,tsx}"',
+            },
+        }),
+    ],
     server: {
         port: 3000,
     },

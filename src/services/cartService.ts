@@ -18,7 +18,7 @@ interface AddToCartResponse {
     };
 }
 
-interface UpdateCartResponse extends AddToCartResponse { }
+type UpdateCartResponse = AddToCartResponse;
 
 export const cartService = {
     // Get user cart

@@ -19,6 +19,7 @@ import { useThemeContext } from "../../Context/ThemeContext";
 import AuthLayout from "../../components/Common/AuthLayout";
 import CustomTextField from "../../components/Common/CustomTextField";
 import { authService } from "../../services";
+import { AxiosError } from "axios";
 
 // Define ResetPasswordData if not in global types
 interface ResetPasswordData {
@@ -71,8 +72,9 @@ const ResetPassword: React.FC = () => {
 
             showToast("✅ Security protocols updated! Password reset successful.", "success");
             setTimeout(() => navigate("/login"), 1500);
-        } catch (err: any) {
-            const msg = err.response?.data?.message || err.response?.data?.error || "❌ Reset sequence failed.";
+        } catch (err) {
+            const error = err as AxiosError<{ message?: string; error?: string }>;
+            const msg = error.response?.data?.message || error.response?.data?.error || "❌ Reset sequence failed.";
             showToast(msg, "error");
         } finally {
             setLoading(false);

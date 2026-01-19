@@ -9,8 +9,7 @@ import {
     Container,
     useTheme,
 } from "@mui/material";
-import { motion, AnimatePresence } from "framer-motion";
-import Loading from "../../components/Loading/Loading";
+import { motion, AnimatePresence, Variants } from "framer-motion";
 import SkeletonLoader from "../../components/Common/SkeletonLoader";
 import PageMeta from "../../components/PageMeta/PageMeta";
 import { useNavigate } from "react-router-dom";
@@ -28,7 +27,7 @@ const containerVariants = {
     }
 };
 
-const itemVariants: any = {
+const itemVariants: Variants = {
     hidden: { opacity: 0, y: 30 },
     visible: {
         opacity: 1,

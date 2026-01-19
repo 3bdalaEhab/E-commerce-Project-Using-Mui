@@ -9,7 +9,6 @@ import {
     Divider,
     Box,
     Typography,
-    LinearProgress,
     Stack,
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
@@ -31,6 +30,7 @@ import AuthLayout from "../../components/Common/AuthLayout";
 import CustomTextField from "../../components/Common/CustomTextField";
 import { authService } from "../../services";
 import { RegisterCredentials } from "../../types";
+import { AxiosError } from "axios";
 
 const Register: React.FC = () => {
     const theme = useTheme();
@@ -72,8 +72,9 @@ const Register: React.FC = () => {
                 showToast("✅ Account created successfully! Welcome to the elite community.", "success");
                 setTimeout(() => navigate("/login"), 1500);
             }
-        } catch (err: any) {
-            const msg = err.response?.data?.message || err.response?.data?.error || "❌ Registration failed. Try again.";
+        } catch (err) {
+            const error = err as AxiosError<{ message?: string; error?: string }>;
+            const msg = error.response?.data?.message || error.response?.data?.error || "❌ Registration failed. Try again.";
             showToast(msg, "error");
         } finally {
             setLoading(false);
@@ -146,7 +147,7 @@ const Register: React.FC = () => {
                         </Grid>
 
                         {/* 📧 Email Field */}
-                        <Grid xs={12}>
+                        <Grid size={{ xs: 12 }}>
                             <CustomTextField
                                 label="Email Address"
                                 type="email"
@@ -165,7 +166,7 @@ const Register: React.FC = () => {
                         </Grid>
 
                         {/* 📞 Phone Field */}
-                        <Grid xs={12}>
+                        <Grid size={{ xs: 12 }}>
                             <CustomTextField
                                 label="Phone Number"
                                 icon={PhoneIcon}
@@ -183,7 +184,7 @@ const Register: React.FC = () => {
                         </Grid>
 
                         {/* 🔒 Password Field */}
-                        <Grid xs={12} sm={6}>
+                        <Grid size={{ xs: 12, sm: 6 }}>
                             <CustomTextField
                                 label="Password"
                                 type={showPassword ? "text" : "password"}
@@ -211,7 +212,7 @@ const Register: React.FC = () => {
                         </Grid>
 
                         {/* 🔒 Confirm Password Field */}
-                        <Grid xs={12} sm={6}>
+                        <Grid size={{ xs: 12, sm: 6 }}>
                             <CustomTextField
                                 label="Confirm"
                                 type={showPassword ? "text" : "password"}

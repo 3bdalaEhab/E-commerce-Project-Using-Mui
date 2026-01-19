@@ -1,5 +1,5 @@
 import api from './api';
-import { Product, WishlistResponse } from '../types';
+import { WishlistResponse } from '../types';
 
 interface WishlistActionResponse {
     status: string;

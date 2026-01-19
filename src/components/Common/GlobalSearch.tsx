@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import {
     Box,
     InputBase,
@@ -14,9 +14,7 @@ import {
     Avatar,
     CircularProgress,
     Stack,
-    Chip,
-    ListItemIcon,
-    ListItemText
+    Chip
 } from "@mui/material";
 import {
     Search as SearchIcon,
@@ -25,9 +23,7 @@ import {
     TrendingUp,
     Storefront,
     Category as CategoryIcon,
-    KeyboardArrowRight,
-    PriceCheck,
-    Inventory
+    KeyboardArrowRight
 } from "@mui/icons-material";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -35,7 +31,6 @@ import { productService, categoryService } from "../../services";
 import { Product, Category } from "../../types";
 import { useQuery } from "@tanstack/react-query";
 import { storage } from "../../utils/storage";
-import { logger } from "../../utils/logger";
 
 // Debounce hook for performance
 function useDebounce<T>(value: T, delay: number): T {
@@ -80,16 +75,16 @@ const GlobalSearch: React.FC = () => {
         staleTime: 1000 * 60 * 10, // 10 minutes cache
     });
 
-    const suggestions = productsData?.data || [];
-    const categories = categoriesData?.data || [];
+    const suggestions = useMemo(() => productsData?.data || [], [productsData?.data]);
+    const categories = useMemo(() => categoriesData?.data || [], [categoriesData?.data]);
     const isLoading = isLoadingProducts;
 
     // Filter matching categories
-    const matchingCategories = debouncedSearchTerm.length > 0
+    const matchingCategories = useMemo(() => debouncedSearchTerm.length > 0
         ? categories.filter((cat: Category) =>
             cat.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
         ).slice(0, 3)
-        : [];
+        : [], [categories, debouncedSearchTerm]);
 
     // Load recent searches on mount
     useEffect(() => {
@@ -128,42 +123,6 @@ const GlobalSearch: React.FC = () => {
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [isFocused]);
 
-    // Keyboard navigation in suggestions
-    useEffect(() => {
-        if (!isFocused || selectedSuggestionIndex < 0) return;
-
-        const handleKeyDown = (e: KeyboardEvent) => {
-            const totalItems = suggestions.length + matchingCategories.length;
-            if (e.key === 'ArrowDown') {
-                e.preventDefault();
-                setSelectedSuggestionIndex((prev) => (prev + 1) % Math.max(totalItems, 1));
-            } else if (e.key === 'ArrowUp') {
-                e.preventDefault();
-                setSelectedSuggestionIndex((prev) => (prev - 1 + totalItems) % Math.max(totalItems, 1));
-            } else if (e.key === 'Enter' && selectedSuggestionIndex >= 0) {
-                e.preventDefault();
-                const index = selectedSuggestionIndex;
-                if (index < suggestions.length) {
-                    handleSuggestionClick(suggestions[index]);
-                } else {
-                    const catIndex = index - suggestions.length;
-                    if (matchingCategories[catIndex]) {
-                        navigate(`/products?category=${matchingCategories[catIndex]._id}`);
-                        setIsFocused(false);
-                    }
-                }
-            }
-        };
-
-        window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [isFocused, selectedSuggestionIndex, suggestions, matchingCategories]);
-
-    // Reset selection when search changes
-    useEffect(() => {
-        setSelectedSuggestionIndex(-1);
-    }, [debouncedSearchTerm]);
-
     const addToHistory = useCallback((query: string) => {
         if (!query.trim()) return;
         const updatedRecent = [
@@ -195,6 +154,42 @@ const GlobalSearch: React.FC = () => {
         setIsFocused(false);
         setSearchValue("");
     }, [navigate, addToHistory]);
+
+    // Keyboard navigation in suggestions
+    useEffect(() => {
+        if (!isFocused || selectedSuggestionIndex < 0) return;
+
+        const handleKeyDown = (e: KeyboardEvent) => {
+            const totalItems = suggestions.length + matchingCategories.length;
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                setSelectedSuggestionIndex((prev) => (prev + 1) % Math.max(totalItems, 1));
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                setSelectedSuggestionIndex((prev) => (prev - 1 + totalItems) % Math.max(totalItems, 1));
+            } else if (e.key === 'Enter' && selectedSuggestionIndex >= 0) {
+                e.preventDefault();
+                const index = selectedSuggestionIndex;
+                if (index < suggestions.length) {
+                    handleSuggestionClick(suggestions[index]);
+                } else {
+                    const catIndex = index - suggestions.length;
+                    if (matchingCategories[catIndex]) {
+                        navigate(`/products?category=${matchingCategories[catIndex]._id}`);
+                        setIsFocused(false);
+                    }
+                }
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [isFocused, selectedSuggestionIndex, suggestions, matchingCategories, handleSuggestionClick, navigate]);
+
+    // Reset selection when search changes
+    useEffect(() => {
+        setSelectedSuggestionIndex(-1);
+    }, [debouncedSearchTerm]);
 
     const handleClear = useCallback(() => {
         setSearchValue("");

@@ -3,10 +3,8 @@ import { useForm } from "react-hook-form";
 import {
     Button,
     CircularProgress,
-    useTheme,
     Box,
-    Typography,
-    Stack
+    Typography
 } from "@mui/material";
 import { Email, ArrowBack } from "@mui/icons-material";
 import { Link, useNavigate } from "react-router-dom";
@@ -16,11 +14,11 @@ import AuthLayout from "../../components/Common/AuthLayout";
 import CustomTextField from "../../components/Common/CustomTextField";
 import { authService } from "../../services";
 import { ForgotPasswordCredentials } from "../../types";
+import { AxiosError } from "axios";
 
 const ForgotPass: React.FC = () => {
     const navigate = useNavigate();
     const { primaryColor } = useThemeContext();
-    const theme = useTheme();
     const { showToast } = useToast();
     const [loading, setLoading] = useState(false);
 
@@ -39,8 +37,9 @@ const ForgotPass: React.FC = () => {
                 showToast("✅ Secure code emitted! Check your inbox.", "success");
                 setTimeout(() => navigate("/VerifyResetCode"), 1500);
             }
-        } catch (err: any) {
-            const msg = err.response?.data?.message || err.response?.data?.error || "❌ Verification failed. Check your email.";
+        } catch (err) {
+            const error = err as AxiosError<{ message?: string; error?: string }>;
+            const msg = error.response?.data?.message || error.response?.data?.error || "❌ Verification failed. Check your email.";
             showToast(msg, "error");
         } finally {
             setLoading(false);

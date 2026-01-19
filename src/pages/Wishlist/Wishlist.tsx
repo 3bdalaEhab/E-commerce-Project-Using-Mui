@@ -9,15 +9,14 @@ import {
 } from "@mui/material";
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import { useNavigate } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 import { WishlistSkeleton } from "../../components/Common/Skeletons";
 import PageMeta from "../../components/PageMeta/PageMeta";
 import EmptyState from "../../components/Common/EmptyState";
-import { Product } from "../../types";
 
 
 export default function Wishlist() {
-    const { wishlist, removeFromWishlist, loading, getWishlist, wishListItemId } = useContext(WishlistContext);
+    const { wishlist, removeFromWishlist, loading, getWishlist } = useContext(WishlistContext);
     const { addToCart } = useContext(CartContext);
     const navigate = useNavigate();
     const { showToast } = useToast();

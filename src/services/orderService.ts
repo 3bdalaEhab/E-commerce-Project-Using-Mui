@@ -1,7 +1,8 @@
 import api from './api';
 import { Order } from '../types';
 
-interface OrdersResponse {
+// Note: This interface is kept for documentation purposes
+interface _OrdersResponse {
     results: number;
     data: Order[];
 }

@@ -13,7 +13,7 @@ class StorageService {
             localStorage.setItem(test, test);
             localStorage.removeItem(test);
             return true;
-        } catch (e) {
+        } catch {
             return false;
         }
     }
@@ -30,7 +30,7 @@ class StorageService {
         try {
             const item = localStorage.getItem(key);
             if (item === null) return defaultValue;
-            
+
             // Try to parse as JSON, fallback to string
             try {
                 return JSON.parse(item) as T;
@@ -58,7 +58,7 @@ class StorageService {
             return true;
         } catch (error) {
             console.error(`Error writing to localStorage key "${key}":`, error);
-            
+
             // If quota exceeded, try to clear old data
             if (error instanceof DOMException && error.code === 22) {
                 this.clearOldData();
@@ -117,13 +117,13 @@ class StorageService {
         try {
             // Clear old recently viewed items (keep only last 5)
             const recent = this.get<Product[]>('recently_viewed', []);
-            if (recent.length > 5) {
+            if (recent && recent.length > 5) {
                 this.set('recently_viewed', recent.slice(0, 5));
             }
 
             // Clear old search history (keep only last 5)
             const searches = this.get<string[]>('recent_searches', []);
-            if (searches.length > 5) {
+            if (searches && searches.length > 5) {
                 this.set('recent_searches', searches.slice(0, 5));
             }
         } catch (error) {
@@ -145,7 +145,7 @@ class StorageService {
 // Import Product type for type safety
 interface Product {
     _id: string;
-    [key: string]: any;
+    [key: string]: unknown;
 }
 
 export const storage = new StorageService();

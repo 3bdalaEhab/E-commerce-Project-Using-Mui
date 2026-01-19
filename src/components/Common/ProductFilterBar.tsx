@@ -2,15 +2,12 @@ import React, { useState } from "react";
 import {
     Box,
     Typography,
-    Stack,
-    IconButton,
     Paper,
     useTheme,
     Collapse,
     Slider,
     MenuItem,
     Menu,
-    Button,
     Fade
 } from "@mui/material";
 import FilterListIcon from "@mui/icons-material/FilterList";
