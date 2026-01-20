@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import {
-    Box,
     Tooltip,
     IconButton,
     Avatar,
@@ -46,55 +45,52 @@ const UserMenu: React.FC = () => {
         }
         setUserToken(null);
         handleMenuClose();
-        showToast("Logged out successfully 👋", "success");
+        showToast(t("toasts.loggedOut"), "success");
         setTimeout(() => navigate("/login"), 1500);
     };
 
     return (
         <>
-            <Box sx={{ ml: 1, display: "flex", alignItems: "center" }}>
-                <Divider
-                    orientation="vertical"
-                    flexItem
-                    sx={{ mx: 1, height: 24, alignSelf: "center" }}
-                />
-                <Tooltip title="Account settings">
-                    <IconButton
-                        onClick={handleProfileMenuOpen}
-                        size="small"
+            <Tooltip title={t("nav.settings")} arrow>
+                <IconButton
+                    onClick={handleProfileMenuOpen}
+                    size="small"
+                    sx={{
+                        border: `1.5px solid ${isMenuOpen ? theme.palette.primary.main : theme.palette.divider}`,
+                        transition: "all 0.3s ease",
+                        ml: { xs: 0.5, sm: 1 },
+                        p: 0.5,
+                        "&:hover": {
+                            bgcolor: mode === "light" ? "#f1f5f9" : "#1e293b",
+                            borderColor: theme.palette.primary.main,
+                            transform: "scale(1.05)",
+                        },
+                    }}
+                    aria-controls={isMenuOpen ? "account-menu" : undefined}
+                    aria-haspopup="true"
+                    aria-expanded={isMenuOpen ? "true" : undefined}
+                >
+                    <Avatar
                         sx={{
-                            ml: 1,
-                            border: `1px solid ${theme.palette.divider}`,
+                            width: { xs: 30, sm: 34 },
+                            height: { xs: 30, sm: 34 },
+                            bgcolor: theme.palette.primary.main,
+                            fontSize: { xs: "0.85rem", sm: "0.95rem" },
+                            fontWeight: 700,
                             transition: "all 0.3s ease",
-                            "&:hover": {
-                                bgcolor: mode === "light" ? "#f1f5f9" : "#1e293b",
-                                borderColor: theme.palette.primary.main,
-                            },
                         }}
-                        aria-controls={isMenuOpen ? "account-menu" : undefined}
-                        aria-haspopup="true"
-                        aria-expanded={isMenuOpen ? "true" : undefined}
                     >
-                        <Avatar
-                            sx={{
-                                width: 32,
-                                height: 32,
-                                bgcolor: theme.palette.primary.main,
-                                fontSize: "0.9rem",
-                                fontWeight: 700,
-                            }}
-                        >
-                            U
-                        </Avatar>
-                    </IconButton>
-                </Tooltip>
-            </Box>
+                        U
+                    </Avatar>
+                </IconButton>
+            </Tooltip>
 
             <Menu
                 anchorEl={anchorEl}
                 id="account-menu"
                 open={isMenuOpen}
                 onClose={handleMenuClose}
+                onClick={handleMenuClose}
                 PaperProps={{
                     elevation: 0,
                     sx: {
@@ -102,11 +98,11 @@ const UserMenu: React.FC = () => {
                         filter: "drop-shadow(0px 4px 20px rgba(0,0,0,0.15))",
                         mt: 1.5,
                         borderRadius: 3,
-                        minWidth: 200,
+                        minWidth: 220,
                         bgcolor: theme.palette.background.paper,
                         border: `1px solid ${theme.palette.divider}`,
                         p: 1,
-                        "&:before": {
+                        "&::before": {
                             content: '""',
                             display: "block",
                             position: "absolute",
@@ -125,19 +121,19 @@ const UserMenu: React.FC = () => {
                 transformOrigin={{ horizontal: "right", vertical: "top" }}
                 anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
             >
-
-
                 <MenuItem
                     component={Link}
                     to="/change-password"
-                    onClick={handleMenuClose}
                     sx={{
                         py: 1.2,
                         px: 2,
                         borderRadius: 1.5,
                         mb: 0.5,
                         transition: "all 0.2s",
-                        "&:hover": { bgcolor: mode === "light" ? "#f1f5f9" : "#334155" },
+                        "&:hover": { 
+                            bgcolor: mode === "light" ? "#f1f5f9" : "#334155",
+                            transform: "translateX(4px)"
+                        },
                     }}
                 >
                     <ListItemIcon>
@@ -160,6 +156,7 @@ const UserMenu: React.FC = () => {
                         transition: "all 0.2s",
                         "&:hover": {
                             bgcolor: mode === "light" ? "#fef2f2" : "rgba(239, 68, 68, 0.08)",
+                            transform: "translateX(4px)"
                         },
                     }}
                 >

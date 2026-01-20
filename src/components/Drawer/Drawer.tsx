@@ -98,30 +98,43 @@ const DrawerAppBar: React.FC<DrawerAppBarProps> = (props) => {
           boxShadow: "none",
         }}
       >
-        <Toolbar>
+        <Toolbar sx={{ 
+          gap: { xs: 0.5, sm: 1 },
+          px: { xs: 1, sm: 2, md: 2, lg: 3 },
+          minHeight: { xs: 56, sm: 64 },
+          justifyContent: "space-between"
+        }}>
+          {/* Mobile Menu Icon */}
           <IconButton
             color="inherit"
             aria-label="open drawer"
             edge="start"
             onClick={handleDrawerToggle}
-            sx={{ display: { xs: "block", md: "none" } }}
+            sx={{ 
+              display: { xs: "block", md: "none" },
+              mr: 0.5,
+              flexShrink: 0
+            }}
           >
             <MenuIcon />
           </IconButton>
 
+          {/* Logo - Fixed width, won't shrink */}
           <Typography
             variant="h6"
             component={Link}
             to="/"
             sx={{
-              flexGrow: 1,
+              flexShrink: 0,
               fontWeight: 900,
               background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
               letterSpacing: -1,
               textDecoration: "none",
-              fontSize: "1.5rem",
+              fontSize: { xs: "1rem", sm: "1.2rem", md: "1.3rem", lg: "1.5rem" },
+              whiteSpace: "nowrap",
+              mr: { xs: 0.5, md: 1, lg: 2 },
               transition: "transform 0.3s ease",
               "&:hover": {
                 transform: "scale(1.02)",
@@ -131,41 +144,58 @@ const DrawerAppBar: React.FC<DrawerAppBarProps> = (props) => {
             {t("footer.brandName")}
           </Typography>
 
-          <LanguageSwitcher />
+          {/* Desktop Navigation - Takes remaining space */}
+          <Box sx={{ 
+            flexGrow: 1, 
+            display: { xs: "none", md: "flex" },
+            justifyContent: "center",
+            minWidth: 0,
+            overflow: "visible",
+            mx: { md: 0.5, lg: 1 }
+          }}>
+            <DesktopNav navItems={navItems} />
+          </Box>
 
-          <Tooltip
-            title={mode === "light" ? t("auth.switchToDark") : t("auth.switchToLight")}
-          >
-            <IconButton
-              onClick={toggleTheme}
-              sx={{
-                bgcolor:
-                  mode === "light"
-                    ? "rgba(0,0,0,0.04)"
-                    : "rgba(255,255,255,0.05)",
-                ml: 1,
-                mr: 2,
-                transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
-                "&:hover": {
-                  transform: "rotate(20deg) scale(1.1)",
+          {/* Right Side Actions - Fixed, won't shrink */}
+          <Box sx={{ 
+            display: "flex", 
+            alignItems: "center", 
+            gap: { xs: 0.25, sm: 0.5, md: 1 },
+            flexShrink: 0
+          }}>
+            <LanguageSwitcher />
+
+            <Tooltip
+              title={mode === "light" ? t("auth.switchToDark") : t("auth.switchToLight")}
+            >
+              <IconButton
+                onClick={toggleTheme}
+                size="small"
+                sx={{
                   bgcolor:
                     mode === "light"
-                      ? "rgba(0,0,0,0.08)"
-                      : "rgba(255,255,255,0.1)",
-                },
-              }}
-            >
-              {mode === "light" ? (
-                <Nightlight sx={{ color: "#475569" }} />
-              ) : (
-                <LightMode sx={{ color: "#fbbf24" }} />
-              )}
-            </IconButton>
-          </Tooltip>
+                      ? "rgba(0,0,0,0.04)"
+                      : "rgba(255,255,255,0.05)",
+                  transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+                  "&:hover": {
+                    transform: "rotate(20deg) scale(1.1)",
+                    bgcolor:
+                      mode === "light"
+                        ? "rgba(0,0,0,0.08)"
+                        : "rgba(255,255,255,0.1)",
+                  },
+                }}
+              >
+                {mode === "light" ? (
+                  <Nightlight sx={{ color: "#475569", fontSize: { xs: "1.2rem", sm: "1.3rem" } }} />
+                ) : (
+                  <LightMode sx={{ color: "#fbbf24", fontSize: { xs: "1.2rem", sm: "1.3rem" } }} />
+                )}
+              </IconButton>
+            </Tooltip>
 
-          <DesktopNav navItems={navItems} />
-
-          {userToken && <UserMenu />}
+            {userToken && <UserMenu />}
+          </Box>
         </Toolbar>
       </AppBar>
 
