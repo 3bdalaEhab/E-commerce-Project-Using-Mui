@@ -46,8 +46,8 @@ const Login: React.FC = () => {
     } = useForm<LoginCredentials>({
         mode: 'onChange',
         defaultValues: {
-            email: "",
-            password: ""
+            email: "Abdalaehab3@gmail.com",
+            password: "123123Ae***"
         }
     });
 
@@ -68,11 +68,9 @@ const Login: React.FC = () => {
             if (res.message === "success" && res.token) {
                 showToast(t("auth.loginSuccess"), "success");
                 const token = res.token;
-                setTimeout(() => {
-                    storage.set("userToken", token);
-                    setUserToken(token);
-                    navigate("/");
-                }, 1200);
+                storage.set("userToken", token);
+                setUserToken(token);
+                navigate("/");
             }
         } catch (err) {
             const error = err as AxiosError<{ message?: string }>;
