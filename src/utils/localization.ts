@@ -34,9 +34,6 @@ export const translateAPIContent = (text: string | undefined, namespace: string)
     // If translation is the same as the key (i18next default behavior when key missing),
     // return the original API text.
     if (translation === fullKey) {
-        if (import.meta.env.DEV) {
-            console.warn(`[Localization] Missing key: ${fullKey} | Original: "${text}"`);
-        }
         return text;
     }
 

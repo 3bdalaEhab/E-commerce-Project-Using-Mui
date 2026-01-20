@@ -20,11 +20,9 @@ export default function LayOut() {
                 <ThemeCustomizer />
                 <Drawer />
                 <Box component="main" sx={{ flexGrow: 1, position: 'relative' }}>
-                    <AnimatePresence mode="wait">
-                        <Box key={location.pathname} sx={{ width: '100%' }}>
-                            <Outlet />
-                        </Box>
-                    </AnimatePresence>
+                    <Box sx={{ width: '100%' }}>
+                        <Outlet />
+                    </Box>
                 </Box>
                 <ScrollToTop />
                 <QuickViewModal />

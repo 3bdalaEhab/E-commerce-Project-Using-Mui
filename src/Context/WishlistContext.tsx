@@ -54,7 +54,6 @@ export function WishlistProvider({ children }: WishlistProviderProps) {
             setWishlist(data.data || []);
             extractWishlistIds(data.data || []);
         } catch (error) {
-            console.error('❌ Error fetching wishlist:', error);
         } finally {
             setLoading(false);
         }
@@ -68,7 +67,6 @@ export function WishlistProvider({ children }: WishlistProviderProps) {
             setNumWishItemList((prev) => prev + 1);
             setWishListItemId((prev) => [...prev, productId]);
         } catch (error) {
-            console.error('❌ Error adding to wishlist:', error);
             throw error;
         }
     }, [userToken]);
@@ -82,7 +80,6 @@ export function WishlistProvider({ children }: WishlistProviderProps) {
             setNumWishItemList((prev) => Math.max(prev - 1, 0));
             setWishListItemId((prev) => prev.filter((id) => id !== productId));
         } catch (error) {
-            console.error('❌ Error removing from wishlist:', error);
             throw error;
         }
     }, [userToken]);

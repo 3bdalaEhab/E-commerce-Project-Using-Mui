@@ -56,7 +56,6 @@ export default function CartContextProvider({ children }: CartProviderProps) {
             setCartData(data.data ?? null);
             return data;
         } catch (error) {
-            console.error('Error fetching cart:', error);
             throw error;
         } finally {
             setLoading(false);
@@ -73,7 +72,6 @@ export default function CartContextProvider({ children }: CartProviderProps) {
             await getCart();
             return data;
         } catch (error) {
-            console.error('Error adding to cart:', error);
             throw error;
         }
     }, [getCart]);
@@ -86,7 +84,6 @@ export default function CartContextProvider({ children }: CartProviderProps) {
             await getCart();
             return data;
         } catch (error) {
-            console.error('Error updating item:', error);
             throw error;
         }
     }, [getCart]);
@@ -99,7 +96,6 @@ export default function CartContextProvider({ children }: CartProviderProps) {
             await getCart();
             return data;
         } catch (error) {
-            console.error('Error removing item:', error);
             throw error;
         }
     }, [getCart]);
@@ -111,7 +107,6 @@ export default function CartContextProvider({ children }: CartProviderProps) {
             setCartData(null);
             return res;
         } catch (error) {
-            console.error('Error clearing cart:', error);
             throw error;
         }
     }, []);

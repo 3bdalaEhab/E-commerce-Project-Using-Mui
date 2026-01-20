@@ -23,7 +23,6 @@ class StorageService {
      */
     get<T>(key: StorageKey, defaultValue: T | null = null): T | null {
         if (!this.isAvailable()) {
-            console.warn('localStorage is not available');
             return defaultValue;
         }
 
@@ -38,7 +37,6 @@ class StorageService {
                 return item as unknown as T;
             }
         } catch (error) {
-            console.error(`Error reading from localStorage key "${key}":`, error);
             return defaultValue;
         }
     }
@@ -48,7 +46,6 @@ class StorageService {
      */
     set<T>(key: StorageKey, value: T): boolean {
         if (!this.isAvailable()) {
-            console.warn('localStorage is not available');
             return false;
         }
 
@@ -57,7 +54,6 @@ class StorageService {
             localStorage.setItem(key, serialized);
             return true;
         } catch (error) {
-            console.error(`Error writing to localStorage key "${key}":`, error);
 
             // If quota exceeded, try to clear old data
             if (error instanceof DOMException && error.code === 22) {
@@ -67,7 +63,6 @@ class StorageService {
                     localStorage.setItem(key, serialized);
                     return true;
                 } catch (retryError) {
-                    console.error('Failed to save after clearing old data:', retryError);
                     return false;
                 }
             }
@@ -87,7 +82,6 @@ class StorageService {
             localStorage.removeItem(key);
             return true;
         } catch (error) {
-            console.error(`Error removing localStorage key "${key}":`, error);
             return false;
         }
     }
@@ -105,7 +99,6 @@ class StorageService {
             keys.forEach(key => localStorage.removeItem(key));
             return true;
         } catch (error) {
-            console.error('Error clearing localStorage:', error);
             return false;
         }
     }
@@ -127,7 +120,6 @@ class StorageService {
                 this.set('recent_searches', searches.slice(0, 5));
             }
         } catch (error) {
-            console.error('Error clearing old data:', error);
         }
     }
 
