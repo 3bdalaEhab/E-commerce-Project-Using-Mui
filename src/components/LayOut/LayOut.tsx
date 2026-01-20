@@ -1,5 +1,5 @@
 import React from "react";
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import Drawer from "../Drawer/Drawer";
 import Footer from "../Footer/Footer";
 import { Box } from "@mui/material";
@@ -8,10 +8,8 @@ import ThemeCustomizer from "../Common/ThemeCustomizer";
 import ScrollToTop from "../Common/ScrollToTop";
 import { QuickViewProvider } from "../../Context/QuickViewContext";
 import QuickViewModal from "../Common/QuickViewModal";
-import { AnimatePresence } from "framer-motion";
 
 export default function LayOut() {
-    const location = useLocation();
 
     return (
         <QuickViewProvider>

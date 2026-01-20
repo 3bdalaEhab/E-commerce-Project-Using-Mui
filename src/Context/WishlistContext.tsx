@@ -53,7 +53,8 @@ export function WishlistProvider({ children }: WishlistProviderProps) {
             setNumWishItemList(data.count || data.data?.length || 0);
             setWishlist(data.data || []);
             extractWishlistIds(data.data || []);
-        } catch (error) {
+        } catch {
+            // Ignore error
         } finally {
             setLoading(false);
         }
@@ -62,26 +63,18 @@ export function WishlistProvider({ children }: WishlistProviderProps) {
     // Add product to wishlist
     const addToWishlist = useCallback(async (productId: string) => {
         if (!userToken) return;
-        try {
-            await wishlistService.addToWishlist(productId);
-            setNumWishItemList((prev) => prev + 1);
-            setWishListItemId((prev) => [...prev, productId]);
-        } catch (error) {
-            throw error;
-        }
+        await wishlistService.addToWishlist(productId);
+        setNumWishItemList((prev) => prev + 1);
+        setWishListItemId((prev) => [...prev, productId]);
     }, [userToken]);
 
     // Remove product from wishlist
     const removeFromWishlist = useCallback(async (productId: string) => {
         if (!userToken) return;
-        try {
-            await wishlistService.removeFromWishlist(productId);
-            setWishlist((prev) => prev.filter((item) => item._id !== productId));
-            setNumWishItemList((prev) => Math.max(prev - 1, 0));
-            setWishListItemId((prev) => prev.filter((id) => id !== productId));
-        } catch (error) {
-            throw error;
-        }
+        await wishlistService.removeFromWishlist(productId);
+        setWishlist((prev) => prev.filter((item) => item._id !== productId));
+        setNumWishItemList((prev) => Math.max(prev - 1, 0));
+        setWishListItemId((prev) => prev.filter((id) => id !== productId));
     }, [userToken]);
 
     // Fetch wishlist on mount or when token changes

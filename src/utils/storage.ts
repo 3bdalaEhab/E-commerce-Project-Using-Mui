@@ -36,7 +36,7 @@ class StorageService {
             } catch {
                 return item as unknown as T;
             }
-        } catch (error) {
+        } catch {
             return defaultValue;
         }
     }
@@ -62,7 +62,7 @@ class StorageService {
                     const serialized = typeof value === 'string' ? value : JSON.stringify(value);
                     localStorage.setItem(key, serialized);
                     return true;
-                } catch (retryError) {
+                } catch {
                     return false;
                 }
             }
@@ -81,7 +81,7 @@ class StorageService {
         try {
             localStorage.removeItem(key);
             return true;
-        } catch (error) {
+        } catch {
             return false;
         }
     }
@@ -98,7 +98,7 @@ class StorageService {
             const keys: StorageKey[] = ['userToken', 'recent_searches', 'recently_viewed', 'themeMode', 'primaryColor'];
             keys.forEach(key => localStorage.removeItem(key));
             return true;
-        } catch (error) {
+        } catch {
             return false;
         }
     }
@@ -119,7 +119,8 @@ class StorageService {
             if (searches && searches.length > 5) {
                 this.set('recent_searches', searches.slice(0, 5));
             }
-        } catch (error) {
+        } catch {
+            // Ignore errors during cleanup
         }
     }
 

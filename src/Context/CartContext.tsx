@@ -55,60 +55,42 @@ export default function CartContextProvider({ children }: CartProviderProps) {
             setNumOfCartItems(data.numOfCartItems ?? 0);
             setCartData(data.data ?? null);
             return data;
-        } catch (error) {
-            throw error;
         } finally {
             setLoading(false);
         }
     }, [userToken]);
 
     const addToCart = useCallback(async (productId: string) => {
-        try {
-            const data = await cartService.addToCart(productId);
-            setNumOfCartItems(data.numOfCartItems ?? 0);
-            // After adding, we might want to refresh the full cart data if needed, 
-            // but the response usually contains the basic info.
-            // For a better UX, we can trigger a full fetch or update the data.
-            await getCart();
-            return data;
-        } catch (error) {
-            throw error;
-        }
+        const data = await cartService.addToCart(productId);
+        setNumOfCartItems(data.numOfCartItems ?? 0);
+        // After adding, we might want to refresh the full cart data if needed, 
+        // but the response usually contains the basic info.
+        // For a better UX, we can trigger a full fetch or update the data.
+        await getCart();
+        return data;
     }, [getCart]);
 
     const updateItem = useCallback(async (productId: string, count: number) => {
-        try {
-            const data = await cartService.updateCartItem(productId, count);
-            setNumOfCartItems(data.numOfCartItems ?? 0);
-            // Refresh full cart data to ensure product objects are populated (not just IDs)
-            await getCart();
-            return data;
-        } catch (error) {
-            throw error;
-        }
+        const data = await cartService.updateCartItem(productId, count);
+        setNumOfCartItems(data.numOfCartItems ?? 0);
+        // Refresh full cart data to ensure product objects are populated (not just IDs)
+        await getCart();
+        return data;
     }, [getCart]);
 
     const removeSpecificItem = useCallback(async (productId: string) => {
-        try {
-            const data = await cartService.removeFromCart(productId);
-            setNumOfCartItems(data.numOfCartItems ?? 0);
-            // Refresh full cart data to ensure product objects are populated
-            await getCart();
-            return data;
-        } catch (error) {
-            throw error;
-        }
+        const data = await cartService.removeFromCart(productId);
+        setNumOfCartItems(data.numOfCartItems ?? 0);
+        // Refresh full cart data to ensure product objects are populated
+        await getCart();
+        return data;
     }, [getCart]);
 
     const removeAllItems = useCallback(async () => {
-        try {
-            const res = await cartService.clearCart();
-            setNumOfCartItems(0);
-            setCartData(null);
-            return res;
-        } catch (error) {
-            throw error;
-        }
+        const res = await cartService.clearCart();
+        setNumOfCartItems(0);
+        setCartData(null);
+        return res;
     }, []);
 
     useEffect(() => {
