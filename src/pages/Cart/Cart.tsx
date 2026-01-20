@@ -28,6 +28,7 @@ import { Product, CartItem as CartItemType } from "../../types";
 import { useTranslation } from "react-i18next";
 import { translateAPIContent } from "../../utils/localization";
 
+
 // 🔹 Memoized Cart Item Component
 interface CartItemProps {
     item: CartItemType;
@@ -35,15 +36,19 @@ interface CartItemProps {
     onRemove: (id: string) => void;
 }
 
+
 const CartItem = React.memo(({ item, onUpdateQuantity, onRemove }: CartItemProps) => {
     const theme = useTheme();
     const { t } = useTranslation();
+
 
     // Guard against cases where item.product might be a string ID due to API response differences
     const product = typeof item.product === 'string' ? null : (item.product as Product);
     const productId = typeof item.product === 'string' ? item.product : item.product._id;
 
+
     if (!product) return null; // Or a smaller skeleton if we're re-fetching
+
 
     return (
         <motion.div
@@ -76,36 +81,45 @@ const CartItem = React.memo(({ item, onUpdateQuantity, onRemove }: CartItemProps
                     sx={{ width: { xs: "100%", sm: 200 }, height: { xs: 180, sm: "auto" }, objectFit: "cover" }}
                 />
                 <CardContent sx={{ flex: 1, p: { xs: 2.5, sm: 3.5 } }}>
-                    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 2 }}>
-                        <Box>
+                    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 2, flexWrap: { xs: 'wrap', md: 'nowrap' } }}>
+                        <Box sx={{ flex: 1, minWidth: 0 }}>
                             <Typography
+                                component={Link}
+                                to={`/products/${productId}`}
                                 variant="h6"
                                 fontWeight="900"
-                                title={translateAPIContent(product.title, 'products')}
                                 sx={{
                                     mb: 1,
                                     letterSpacing: '-0.5px',
-                                    whiteSpace: 'nowrap',
+                                    display: '-webkit-box',
+                                    WebkitLineClamp: 2,
+                                    WebkitBoxOrient: 'vertical',
                                     overflow: 'hidden',
                                     textOverflow: 'ellipsis',
-                                    maxWidth: { xs: '200px', sm: '300px', md: '400px' }
+                                    wordBreak: 'break-word',
+                                    textDecoration: 'none',
+                                    color: 'inherit',
+                                    '&:hover': {
+                                        color: theme.palette.primary.main
+                                    }
                                 }}
                             >
                                 {translateAPIContent(product.title, 'products')}
                             </Typography>
-                            <Box sx={{ display: "flex", gap: 1, mb: 3 }}>
+                            <Box sx={{ display: "flex", gap: 1, mb: 2, flexWrap: 'wrap' }}>
                                 <Chip label={translateAPIContent(product.category?.name, 'categories')} size="small" variant="outlined" color="primary"
                                     sx={{ borderRadius: '8px', fontWeight: 700, fontSize: '0.7rem' }} />
                                 {product.brand && <Chip label={translateAPIContent(product.brand.name, 'brands')} size="small" variant="outlined"
                                     sx={{ borderRadius: '8px', fontWeight: 600, fontSize: '0.7rem' }} />}
                             </Box>
                         </Box>
-                        <Typography variant="h5" color="primary" fontWeight="900" sx={{ whiteSpace: 'nowrap' }}>
+                        <Typography variant="h5" color="primary" fontWeight="900" sx={{ whiteSpace: 'nowrap', flexShrink: 0 }}>
                             {item.price} <Box component="span" sx={{ fontSize: '0.9rem', color: 'text.secondary' }}>{t("common.egp")}</Box>
                         </Typography>
                     </Box>
 
-                    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mt: 1 }}>
+
+                    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mt: 2, flexWrap: { xs: 'wrap', sm: 'nowrap' }, gap: 2 }}>
                         <Box sx={{
                             display: "flex",
                             alignItems: "center",
@@ -132,6 +146,7 @@ const CartItem = React.memo(({ item, onUpdateQuantity, onRemove }: CartItemProps
                             </IconButton>
                         </Box>
 
+
                         <Button
                             startIcon={<DeleteIcon />}
                             color="error"
@@ -140,6 +155,7 @@ const CartItem = React.memo(({ item, onUpdateQuantity, onRemove }: CartItemProps
                                 textTransform: "none",
                                 fontWeight: "900",
                                 borderRadius: '12px',
+                                flexShrink: 0,
                                 "&:hover": { bgcolor: 'error.lighter' }
                             }}
                         >
@@ -152,7 +168,9 @@ const CartItem = React.memo(({ item, onUpdateQuantity, onRemove }: CartItemProps
     );
 });
 
+
 CartItem.displayName = "CartItem";
+
 
 export default function Cart() {
     const { cartData, loading, removeSpecificItem, removeAllItems, updateItem } = useContext(CartContext);
@@ -160,6 +178,7 @@ export default function Cart() {
     const navigate = useNavigate();
     const { showToast } = useToast();
     const { t } = useTranslation();
+
 
     const updateQuantity = useCallback(async (productId: string, newCount: number) => {
         try {
@@ -170,6 +189,7 @@ export default function Cart() {
         }
     }, [updateItem, showToast, t]);
 
+
     const removeItem = useCallback(async (id: string) => {
         try {
             await removeSpecificItem(id);
@@ -178,6 +198,7 @@ export default function Cart() {
             showToast(t("toasts.error"), "error");
         }
     }, [removeSpecificItem, showToast, t]);
+
 
     const handleClearAll = useCallback(async () => {
         try {
@@ -190,7 +211,9 @@ export default function Cart() {
         }
     }, [removeAllItems, showToast, t]);
 
+
     if (loading && !cartData) return <CartSkeleton />;
+
 
     if (!cartData || cartData.products.length === 0) return (
         <Box sx={{ bgcolor: "background.default", minHeight: "100vh" }}>
@@ -205,9 +228,11 @@ export default function Cart() {
         </Box>
     );
 
+
     return (
         <Box sx={{ bgcolor: "background.default", minHeight: "100vh", py: 8 }}>
             <PageMeta title={t("PageMeta.cartTitle")} description={t("PageMeta.cartDesc")} />
+
 
             <Box sx={{ maxWidth: 1000, mx: "auto", px: 2 }}>
                 <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", mb: 4 }}>
@@ -219,6 +244,7 @@ export default function Cart() {
                         {t("cart.clearAll")}
                     </Button>
                 </Box>
+
 
                 <Grid container spacing={4}>
                     <Grid size={{ xs: 12, md: 8 }}>
@@ -233,6 +259,7 @@ export default function Cart() {
                             ))}
                         </AnimatePresence>
                     </Grid>
+
 
                     <Grid size={{ xs: 12, md: 4 }}>
                         <Card
@@ -263,6 +290,7 @@ export default function Cart() {
                                     </Box>
                                 </Box>
 
+
                                 <Button
                                     component={Link}
                                     to={`/checkout/${cartData._id}`}
@@ -285,6 +313,7 @@ export default function Cart() {
                                 >
                                     {t("cart.checkout")}
                                 </Button>
+
 
                                 <Typography variant="caption" color="text.secondary" textAlign="center" display="block" sx={{ mt: 1 }}>
                                     🔒 {t("cart.secureTransaction")}
