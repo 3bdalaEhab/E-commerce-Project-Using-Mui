@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import React, { useContext, useState, useCallback } from "react";
-import { useParams } from "react-router-dom";
+import { AxiosError } from "axios";
+import { useParams, useNavigate } from "react-router-dom";
 import {
     Box,
     Typography,
@@ -30,7 +31,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { DetailsSkeleton } from "../../components/Common/Skeletons";
-import { CartContext, WishlistContext, useToast } from "../../Context";
+import { CartContext, WishlistContext, useToast, useAuth } from "../../Context";
 import PageMeta from "../../components/PageMeta/PageMeta";
 import { productService } from "../../services";
 import ProductSlider from "../../components/Common/ProductSlider";
@@ -41,10 +42,12 @@ import StickyBuyBar from "../../components/Common/StickyBuyBar";
 
 const Details: React.FC = () => {
     const { id } = useParams<{ id: string }>();
+    const navigate = useNavigate();
     const theme = useTheme();
     const { addToCart } = useContext(CartContext);
     const { addToWishlist, removeFromWishlist, wishListItemId } = useContext(WishlistContext);
     const { showToast } = useToast();
+    const { userToken } = useAuth();
     const [addingToCart, setAddingToCart] = useState(false);
     const [wishlistLoading, setWishlistLoading] = useState(false);
     const { t } = useTranslation();
@@ -56,6 +59,11 @@ const Details: React.FC = () => {
 
     const handleWishlistToggle = useCallback(async () => {
         if (!id) return;
+        if (!userToken) {
+            showToast(t("products.wishlistLoginWarning"), "warning");
+            setTimeout(() => navigate('/login'), 1500);
+            return;
+        }
         setWishlistLoading(true);
         try {
             if (isInWishlist) {
@@ -70,7 +78,7 @@ const Details: React.FC = () => {
         } finally {
             setWishlistLoading(false);
         }
-    }, [id, isInWishlist, removeFromWishlist, addToWishlist, showToast, t]);
+    }, [id, isInWishlist, removeFromWishlist, addToWishlist, showToast, t, userToken, navigate]);
 
     const { data, isLoading, isError, error } = useQuery({
         queryKey: ["productDetails", id],
@@ -95,6 +103,11 @@ const Details: React.FC = () => {
 
     const addCart = useCallback(async () => {
         if (!id) return;
+        if (!userToken) {
+            showToast(t("products.loginWarning"), "warning");
+            setTimeout(() => navigate('/login'), 1500);
+            return;
+        }
         try {
             setAddingToCart(true);
             const res = await addToCart(id);
@@ -108,7 +121,7 @@ const Details: React.FC = () => {
         } finally {
             setAddingToCart(false);
         }
-    }, [id, addToCart, showToast, t]);
+    }, [id, addToCart, showToast, t, userToken, navigate]);
 
     if (isLoading) return <DetailsSkeleton />;
 
@@ -118,6 +131,22 @@ const Details: React.FC = () => {
             <Container maxWidth="md" sx={{ py: 10 }}>
                 <Alert severity="error" sx={{ borderRadius: "16px" }}>
                     <strong>{t("common.error")}:</strong> {errorMessage}
+                    {!userToken && (error as AxiosError)?.response?.status === 404 && (
+                        <Box sx={{ mt: 2 }}>
+                            <Typography variant="body2" sx={{ mb: 1 }}>
+                                {t("products.loginToView")}
+                            </Typography>
+                            <Button
+                                variant="outlined"
+                                color="inherit"
+                                component={RouterLink}
+                                to="/login"
+                                size="small"
+                            >
+                                {t("nav.login")}
+                            </Button>
+                        </Box>
+                    )}
                 </Alert>
             </Container>
         );

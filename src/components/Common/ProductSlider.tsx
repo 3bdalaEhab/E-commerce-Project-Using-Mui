@@ -6,7 +6,8 @@ import ProductCard from './ProductCard';
 import { Product } from '../../types';
 import { useNavigate } from 'react-router-dom';
 import { useContext } from 'react';
-import { CartContext, WishlistContext } from '../../Context';
+import { CartContext, WishlistContext, useAuth, useToast } from '../../Context';
+import { useTranslation } from 'react-i18next';
 import 'swiper/css';
 import 'swiper/css/navigation';
 
@@ -18,8 +19,11 @@ interface ProductSliderProps {
 
 const ProductSlider: React.FC<ProductSliderProps> = ({ title, products, loading }) => {
     const navigate = useNavigate();
+    const { t } = useTranslation();
     const { addToCart } = useContext(CartContext);
     const { addToWishlist, removeFromWishlist, wishListItemId } = useContext(WishlistContext);
+    const { userToken } = useAuth();
+    const { showToast } = useToast();
 
     if (loading) {
         return (
@@ -27,7 +31,7 @@ const ProductSlider: React.FC<ProductSliderProps> = ({ title, products, loading 
                 <Skeleton variant="text" width={200} height={40} sx={{ mb: 4 }} />
                 <Grid container spacing={2}>
                     {[1, 2, 3, 4].map((item) => (
-                        <Grid item xs={12} sm={6} md={3} key={item}>
+                        <Grid size={{ xs: 12, sm: 6, md: 3 }} key={item}>
                             <Skeleton variant="rectangular" height={300} sx={{ borderRadius: '16px' }} />
                             <Skeleton variant="text" width="60%" sx={{ mt: 1 }} />
                             <Skeleton variant="text" width="40%" />
@@ -82,12 +86,24 @@ const ProductSlider: React.FC<ProductSliderProps> = ({ title, products, loading 
                             product={product}
                             index={index}
                             onNavigate={(id) => {
-                                navigate(`/products/${id}`);
+                                navigate(`/details/${id}`);
                                 window.scrollTo({ top: 0, behavior: 'smooth' });
                             }}
-                            onAddToCart={() => addToCart(product._id)}
+                            onAddToCart={() => {
+                                if (!userToken) {
+                                    showToast(t("products.loginWarning"), "warning");
+                                    setTimeout(() => navigate('/login'), 1500);
+                                    return;
+                                }
+                                addToCart(product._id);
+                            }}
                             onWishlistToggle={(e, id) => {
                                 e.stopPropagation();
+                                if (!userToken) {
+                                    showToast(t("products.wishlistLoginWarning"), "warning");
+                                    setTimeout(() => navigate('/login'), 1500);
+                                    return;
+                                }
                                 if (wishListItemId.includes(id)) {
                                     removeFromWishlist(id);
                                 } else {
