@@ -26,6 +26,8 @@ api.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
         // Use secure token validation
         const token = getValidToken();
+
+        // Always send token if available (backend sync is now mandatory)
         if (token && config.headers) {
             config.headers.token = token;
         }
@@ -34,7 +36,6 @@ api.interceptors.request.use(
         if (config.headers) {
             config.headers['lang'] = i18n.language;
         }
-
 
         return config;
     },
@@ -55,6 +56,7 @@ api.interceptors.response.use(
         if (status === 401) {
             logger.warn('Unauthorized access - token expired or invalid', 'API');
             storage.remove('userToken');
+            storage.remove('socialUser'); // Clean up any stale flags
 
             // Only redirect if not already on login page
             if (window.location.pathname !== '/login') {

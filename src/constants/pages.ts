@@ -14,5 +14,7 @@ export const pages = {
     VerifyResetCode: () => import('../pages/VerifyResetCode/VerifyResetCode'),
     ResetPassword: () => import('../pages/ResetPassword/ResetPassword'),
     ChangePassword: () => import('../pages/ChangePassword/ChangePassword'),
+    Profile: () => import('../pages/Profile/Profile'),
+    SubCategories: () => import('../pages/SubCategories/SubCategories'),
 
 } as const;

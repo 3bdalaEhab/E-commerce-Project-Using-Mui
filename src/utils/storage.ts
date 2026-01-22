@@ -4,7 +4,7 @@
  * with error handling and type safety
  */
 
-type StorageKey = 'userToken' | 'recent_searches' | 'recently_viewed' | 'themeMode' | 'primaryColor';
+type StorageKey = 'userToken' | 'recent_searches' | 'recently_viewed' | 'themeMode' | 'primaryColor' | 'socialUser' | 'profilePhoto' | 'userPhone' | 'userGender' | 'userEmail' | 'userName';
 
 class StorageService {
     private isAvailable(): boolean {

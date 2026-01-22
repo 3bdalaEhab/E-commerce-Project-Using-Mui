@@ -8,3 +8,4 @@ export { default as addressService } from './addressService';
 export { default as userService } from './userService';
 export { categoryService, brandService } from './categoryService';
 export { default as orderService } from './orderService';
+export { default as socialAuthService } from './socialAuthService';

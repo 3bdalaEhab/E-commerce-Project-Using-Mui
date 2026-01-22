@@ -34,8 +34,8 @@ const Checkout = lazy(pages.Checkout);
 const ForgotPass = lazy(pages.ForgotPass);
 const VerifyResetCode = lazy(pages.VerifyResetCode);
 const ResetPassword = lazy(pages.ResetPassword);
-const ChangePassword = lazy(pages.ChangePassword);
-
+const Profile = lazy(pages.Profile);
+const SubCategories = lazy(pages.SubCategories);
 
 // Suspense wrapper for lazy components with animations
 const SuspenseWrapper = ({ children }: { children: React.ReactNode }) => (
@@ -88,6 +88,14 @@ const router = createBrowserRouter([
                 ),
             },
             {
+                path: '/categories/:categoryId',
+                element: (
+                    <SuspenseWrapper>
+                        <SubCategories />
+                    </SuspenseWrapper>
+                ),
+            },
+            {
                 path: '/wishlist',
                 element: (
                     <ProtectedRoutes>
@@ -126,16 +134,15 @@ const router = createBrowserRouter([
                 ),
             },
             {
-                path: '/change-password',
+                path: '/profile',
                 element: (
                     <ProtectedRoutes>
                         <SuspenseWrapper>
-                            <ChangePassword />
+                            <Profile />
                         </SuspenseWrapper>
                     </ProtectedRoutes>
                 ),
             },
-
 
             // Authentication Routes (No Token Required)
             {

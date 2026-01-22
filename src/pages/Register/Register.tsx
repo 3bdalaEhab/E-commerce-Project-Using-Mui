@@ -1,4 +1,6 @@
 import React, { useState, useCallback } from "react";
+import PhoneInput from 'react-phone-input-2';
+import 'react-phone-input-2/lib/material.css';
 import { useForm } from "react-hook-form";
 import {
     Button,
@@ -11,6 +13,7 @@ import {
     Typography,
     Stack,
 } from "@mui/material";
+import { Controller } from "react-hook-form";
 import Grid from "@mui/material/Grid";
 import {
     Email,
@@ -18,10 +21,7 @@ import {
     Lock,
     Visibility,
     VisibilityOff,
-    Phone as PhoneIcon,
-    Google,
-    GitHub,
-    Apple
+    Google
 } from "@mui/icons-material";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -32,6 +32,8 @@ import CustomTextField from "../../components/Common/CustomTextField";
 import { authService } from "../../services";
 import { RegisterCredentials } from "../../types";
 import { AxiosError } from "axios";
+import storage from "../../utils/storage";
+import { useSocialAuth } from "../../hooks/useSocialAuth";
 
 const Register: React.FC = () => {
     const theme = useTheme();
@@ -40,11 +42,15 @@ const Register: React.FC = () => {
     const { showToast } = useToast();
     const { t } = useTranslation();
 
+    // Use the professional social auth hook
+    const { handleSocialLogin, socialLoading } = useSocialAuth();
+
     const {
         register,
         handleSubmit,
         formState: { errors, isValid },
         watch,
+        control,
     } = useForm<RegisterCredentials>({
         mode: "onChange",
         defaultValues: {
@@ -52,7 +58,8 @@ const Register: React.FC = () => {
             email: "",
             phone: "",
             password: "",
-            rePassword: ""
+            rePassword: "",
+            gender: "male"
         }
     });
 
@@ -61,9 +68,6 @@ const Register: React.FC = () => {
 
     const togglePassword = useCallback(() => setShowPassword((s) => !s), []);
 
-    const handleSocialLogin = (platform: string) => {
-        showToast(`🚀 ${platform} ${t("auth.socialComingSoon")}`, "info");
-    };
 
     const onSubmit = async (formData: RegisterCredentials) => {
         setLoading(true);
@@ -72,6 +76,8 @@ const Register: React.FC = () => {
 
             if (res.message === "success") {
                 showToast(t("auth.registerSuccess"), "success");
+                storage.set("userPhone", formData.phone);
+                storage.set("userGender", formData.gender);
                 setTimeout(() => navigate("/login"), 1500);
             }
         } catch (err) {
@@ -99,28 +105,37 @@ const Register: React.FC = () => {
                 {/* 🌐 Social Registration (Elite Aesthetics) */}
                 <Stack direction="row" spacing={2} sx={{ mb: 4 }}>
                     {[
-                        { icon: <Google />, name: 'Google' },
-                        { icon: <Apple />, name: 'Apple' },
-                        { icon: <GitHub />, name: 'GitHub' }
+                        { icon: <Google />, name: 'Google', id: 'google' as const, color: '#EA4335', label: "Google" },
                     ].map((platform) => (
                         <IconButton
                             key={platform.name}
                             type="button"
-                            onClick={() => handleSocialLogin(platform.name)}
+                            onClick={() => handleSocialLogin(platform.id)}
+                            disabled={socialLoading !== null}
                             sx={{
                                 flex: 1,
                                 py: 1.5,
                                 borderRadius: '16px',
                                 border: `1px solid ${theme.palette.divider}`,
                                 transition: 'all 0.3s ease',
+                                position: 'relative',
                                 '&:hover': {
-                                    bgcolor: `${primaryColor}10`,
-                                    borderColor: primaryColor,
+                                    bgcolor: `${platform.color}10`,
+                                    borderColor: platform.color,
                                     transform: 'translateY(-2px)'
                                 }
                             }}
                         >
-                            {platform.icon}
+                            {socialLoading === platform.id ? (
+                                <CircularProgress size={24} />
+                            ) : (
+                                <Stack direction="row" alignItems="center" gap={1}>
+                                    {React.cloneElement(platform.icon, { sx: { color: platform.color } })}
+                                    <Typography fontWeight={600} fontSize="0.95rem">
+                                        {platform.label}
+                                    </Typography>
+                                </Stack>
+                            )}
                         </IconButton>
                     ))}
                 </Stack>
@@ -140,7 +155,11 @@ const Register: React.FC = () => {
                                 icon={Person}
                                 {...register("name", {
                                     required: t("auth.nameReq"),
-                                    minLength: { value: 3, message: t("auth.min3Char") },
+                                    minLength: { value: 3, message: t("auth.nameMinLength") || "Name must be at least 3 characters" },
+                                    pattern: {
+                                        value: /^[a-zA-Z\s\u0600-\u06FF]+$/,
+                                        message: t("auth.nameInvalid") || "Enter a valid name (letters only)"
+                                    }
                                 })}
                                 error={!!errors.name}
                                 helperText={errors.name?.message}
@@ -167,26 +186,7 @@ const Register: React.FC = () => {
                             />
                         </Grid>
 
-                        {/* 📞 Phone Field */}
-                        <Grid size={{ xs: 12 }}>
-                            <CustomTextField
-                                label={t("auth.phoneLabel")}
-                                icon={PhoneIcon}
-                                {...register("phone", {
-                                    required: t("auth.phoneReq"),
-                                    pattern: {
-                                        value: /^01[0125][0-9]{8}$/,
-                                        message: t("auth.invalidPhone"),
-                                    },
-                                })}
-                                placeholder={t("auth.phonePlaceholder")}
-                                error={!!errors.phone}
-                                helperText={errors.phone?.message}
-                                disabled={loading}
-                            />
-                        </Grid>
-
-                        {/* 🔒 Password Field */}
+                        {/* � Password Field */}
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <CustomTextField
                                 label={t("auth.passwordLabel")}
@@ -227,6 +227,122 @@ const Register: React.FC = () => {
                                 error={!!errors.rePassword}
                                 helperText={errors.rePassword?.message}
                                 disabled={loading}
+                            />
+                        </Grid>
+
+                        {/* �📞 Phone Field */}
+                        <Grid size={{ xs: 12 }}>
+                            <Controller
+                                name="phone"
+                                control={control}
+                                rules={{
+                                    required: t("auth.phoneReq"),
+                                    validate: (val) => val?.length >= 10 || t("auth.phoneInvalid") || "Enter a valid phone number"
+                                }}
+                                render={({ field }) => (
+                                    <Box sx={{ position: 'relative', mb: 3 }}>
+                                        {/* Floating Label */}
+                                        <Typography
+                                            component="label"
+                                            sx={{
+                                                position: 'absolute',
+                                                top: -10,
+                                                left: 14,
+                                                px: 0.5,
+                                                fontSize: '0.75rem',
+                                                fontWeight: 600,
+                                                color: errors.phone ? 'error.main' : 'text.secondary',
+                                                bgcolor: theme.palette.mode === 'dark'
+                                                    ? 'rgba(15, 23, 42, 0.9)'
+                                                    : 'background.paper',
+                                                zIndex: 1,
+                                                borderRadius: 1,
+                                            }}
+                                        >
+                                            {t("auth.phoneLabel")}
+                                        </Typography>
+                                        <PhoneInput
+                                            country={'eg'}
+                                            value={field.value}
+                                            onChange={(value) => field.onChange(value)}
+                                            disabled={loading}
+                                            inputStyle={{ width: '100%' }}
+                                            containerStyle={{ width: '100%' }}
+                                            placeholder={t("auth.phonePlaceholder")}
+                                            enableSearch={true}
+                                            masks={{ eg: '.. ... ....' }}
+                                            specialLabel=""
+                                        />
+                                        {errors.phone && (
+                                            <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 2, display: 'block' }}>
+                                                {errors.phone.message}
+                                            </Typography>
+                                        )}
+                                    </Box>
+                                )}
+                            />
+                        </Grid>
+
+                        {/* 🚻 Gender Selection */}
+                        <Grid size={{ xs: 12 }}>
+                            <Controller
+                                name="gender"
+                                control={control}
+                                render={({ field }) => (
+                                    <Box sx={{ position: 'relative', mb: 3 }}>
+                                        {/* Floating Label */}
+                                        <Typography
+                                            component="label"
+                                            sx={{
+                                                position: 'absolute',
+                                                top: -10,
+                                                left: 14,
+                                                px: 0.5,
+                                                fontSize: '0.75rem',
+                                                fontWeight: 600,
+                                                color: 'text.secondary',
+                                                bgcolor: theme.palette.mode === 'dark'
+                                                    ? 'rgba(15, 23, 42, 0.9)'
+                                                    : 'background.paper',
+                                                zIndex: 1,
+                                                borderRadius: 1,
+                                            }}
+                                        >
+                                            {t("nav.gender")}
+                                        </Typography>
+                                        <Box sx={{
+                                            border: `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'}`,
+                                            borderRadius: '16px',
+                                            p: 1.5,
+                                            bgcolor: theme.palette.mode === 'dark' ? 'rgba(30, 41, 59, 0.5)' : 'rgba(248, 250, 252, 0.8)',
+                                        }}>
+                                            <Stack direction="row" spacing={2}>
+                                                {[
+                                                    { value: 'male', label: t("nav.male") },
+                                                    { value: 'female', label: t("nav.female") }
+                                                ].map((option) => {
+                                                    const active = field.value === option.value;
+                                                    return (
+                                                        <Box
+                                                            key={option.value}
+                                                            onClick={() => field.onChange(option.value)}
+                                                            sx={{
+                                                                flex: 1, py: 1.5, px: 2, cursor: 'pointer', borderRadius: '12px', textAlign: 'center',
+                                                                border: `2px solid ${active ? primaryColor : theme.palette.divider}`,
+                                                                bgcolor: active ? `${primaryColor}10` : 'transparent',
+                                                                transition: 'all 0.3s ease', fontWeight: 800,
+                                                                color: active ? primaryColor : 'text.secondary',
+                                                                '&:hover': { borderColor: active ? primaryColor : primaryColor + '40' }
+                                                            }}
+                                                        >
+                                                            {option.label}
+                                                        </Box>
+                                                    );
+                                                })}
+                                            </Stack>
+                                        </Box>
+                                    </Box>
+                                )}
                             />
                         </Grid>
                     </Grid>

@@ -104,6 +104,7 @@ export interface RegisterCredentials {
     password: string;
     rePassword: string;
     phone: string;
+    gender: 'male' | 'female';
 }
 
 export interface ForgotPasswordCredentials {
@@ -122,6 +123,19 @@ export interface AuthResponse {
     message: string;
     user?: User;
     token?: string;
+}
+
+export interface SocialAuthResult {
+    success: boolean;
+    user?: {
+        uid: string;
+        email: string | null;
+        displayName: string | null;
+        photoURL: string | null;
+        providerId: string;
+    };
+    token?: string;
+    error?: string;
 }
 
 // Order Types

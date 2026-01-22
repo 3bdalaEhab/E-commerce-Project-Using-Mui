@@ -16,9 +16,7 @@ import {
     Lock,
     Visibility,
     VisibilityOff,
-    Google,
-    GitHub,
-    Apple
+    Google
 } from "@mui/icons-material";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -30,6 +28,7 @@ import { authService } from "../../services";
 import { LoginCredentials } from "../../types";
 import { AxiosError } from "axios";
 import storage from "@/utils/storage";
+import { useSocialAuth } from "../../hooks/useSocialAuth";
 
 const Login: React.FC = () => {
     const { setUserToken } = useAuth();
@@ -38,6 +37,9 @@ const Login: React.FC = () => {
     const navigate = useNavigate();
     const { showToast } = useToast();
     const { t } = useTranslation();
+
+    // Use the professional social auth hook
+    const { handleSocialLogin, socialLoading } = useSocialAuth();
 
     const {
         register,
@@ -56,10 +58,6 @@ const Login: React.FC = () => {
 
     const togglePassword = useCallback(() => setShowPassword((s) => !s), []);
 
-    const handleSocialLogin = (platform: string) => {
-        showToast(`🚀 ${platform} ${t("auth.socialComingSoon")}`, "info");
-    };
-
     const onSubmit = async (formData: LoginCredentials) => {
         setLoading(true);
         try {
@@ -69,6 +67,9 @@ const Login: React.FC = () => {
                 showToast(t("auth.loginSuccess"), "success");
                 const token = res.token;
                 storage.set("userToken", token);
+                // Always save the email that the user typed in (API doesn't return user object)
+                storage.set("userEmail", formData.email.trim());
+                if (res.user?.name) storage.set("userName", res.user.name);
                 setUserToken(token);
                 navigate("/");
             }
@@ -97,28 +98,37 @@ const Login: React.FC = () => {
                 {/* 🌐 Social Logins (Enterprise Aesthetics) */}
                 <Stack direction="row" spacing={2} sx={{ mb: 4 }}>
                     {[
-                        { icon: <Google />, name: 'Google' },
-                        { icon: <Apple />, name: 'Apple' },
-                        { icon: <GitHub />, name: 'GitHub' }
+                        { icon: <Google />, name: 'Google', id: 'google' as const, color: '#EA4335', label: "Google" },
                     ].map((platform) => (
                         <IconButton
                             key={platform.name}
                             type="button"
-                            onClick={() => handleSocialLogin(platform.name)}
+                            onClick={() => handleSocialLogin(platform.id)}
+                            disabled={socialLoading !== null}
                             sx={{
                                 flex: 1,
                                 py: 1.5,
                                 borderRadius: '16px',
                                 border: `1px solid ${theme.palette.divider}`,
                                 transition: 'all 0.3s ease',
+                                position: 'relative',
                                 '&:hover': {
-                                    bgcolor: `${primaryColor}10`,
-                                    borderColor: primaryColor,
+                                    bgcolor: `${platform.color}10`,
+                                    borderColor: platform.color,
                                     transform: 'translateY(-2px)'
                                 }
                             }}
                         >
-                            {platform.icon}
+                            {socialLoading === platform.id ? (
+                                <CircularProgress size={24} />
+                            ) : (
+                                <Stack direction="row" alignItems="center" gap={1}>
+                                    {React.cloneElement(platform.icon, { sx: { color: platform.color } })}
+                                    <Typography fontWeight={600} fontSize="0.95rem">
+                                        {platform.label}
+                                    </Typography>
+                                </Stack>
+                            )}
                         </IconButton>
                     ))}
                 </Stack>

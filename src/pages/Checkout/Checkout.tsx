@@ -9,16 +9,17 @@ import {
     Paper,
     Container,
 } from "@mui/material";
+import PhoneInput from 'react-phone-input-2';
+import 'react-phone-input-2/lib/material.css';
 import PaymentIcon from "@mui/icons-material/Payment";
 import { motion } from "framer-motion";
 import { useForm, Controller } from "react-hook-form";
 import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import PageMeta from "../../components/PageMeta/PageMeta";
-import { useToast } from "../../Context";
+import { useToast, useCart } from "../../Context";
 import CustomTextField from "../../components/Common/CustomTextField";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
-import PhoneIphoneIcon from "@mui/icons-material/PhoneIphone";
 import LocationCityIcon from "@mui/icons-material/LocationCity";
 import { orderService } from "../../services";
 
@@ -45,6 +46,8 @@ const Checkout: React.FC = () => {
 
     const cities = ["Cairo", "Giza", "Alexandria", "Aswan", "Luxor", "Suez", "Ismailia", "Port Said", "Damietta", "Fayoum", "Minya", "Qena"];
 
+    const { removeAllItems } = useCart();
+
     const onSubmit = useCallback(async (formData: CheckoutFormData) => {
         if (!sessionId) return;
         try {
@@ -65,6 +68,7 @@ const Checkout: React.FC = () => {
             } else {
                 const res = await orderService.createCashOrder(sessionId, shippingData);
                 if (res.data) {
+                    await removeAllItems();
                     showToast(t("toasts.successCash"), "success");
                     navigate("/allOrders");
                 }
@@ -74,7 +78,7 @@ const Checkout: React.FC = () => {
         } finally {
             setLoading(false);
         }
-    }, [sessionId, showToast, navigate, t]);
+    }, [sessionId, showToast, navigate, t, removeAllItems]); // Added removeAllItems to dependencies
 
     return (
         <Box sx={{ bgcolor: "background.default", minHeight: "100vh", py: 10, display: "flex", alignItems: "center" }}>
@@ -124,24 +128,37 @@ const Checkout: React.FC = () => {
                                 )}
                             />
 
-                            <Controller
-                                name="phone"
-                                control={control}
-                                rules={{
-                                    required: t("checkout.phoneReq"),
-                                    pattern: { value: /^\d{11}$/, message: t("checkout.phoneInvalid") }
-                                }}
-                                render={({ field }) => (
-                                    <CustomTextField
-                                        {...field}
-                                        label={t("auth.phoneLabel")}
-                                        placeholder={t("auth.phonePlaceholder")}
-                                        icon={PhoneIphoneIcon}
-                                        error={!!errors.phone}
-                                        helperText={errors.phone?.message}
-                                    />
+                            <Box sx={{ mb: 3 }}>
+                                <Typography variant="subtitle2" fontWeight="800" sx={{ mb: 1, color: 'text.secondary', ml: 1 }}>
+                                    {t("auth.phoneLabel")}
+                                </Typography>
+                                <Controller
+                                    name="phone"
+                                    control={control}
+                                    rules={{
+                                        required: t("checkout.phoneReq"),
+                                    }}
+                                    render={({ field }) => (
+                                        <PhoneInput
+                                            country={'eg'}
+                                            value={field.value}
+                                            onChange={(value) => field.onChange(value)}
+                                            disabled={loading}
+                                            inputStyle={{ width: '100%' }}
+                                            containerStyle={{ width: '100%' }}
+                                            placeholder={t("auth.phonePlaceholder")}
+                                            enableSearch={true}
+                                            masks={{ eg: '.. ... ....' }}
+                                            specialLabel=""
+                                        />
+                                    )}
+                                />
+                                {errors.phone && (
+                                    <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 1, display: 'block' }}>
+                                        {errors.phone.message}
+                                    </Typography>
                                 )}
-                            />
+                            </Box>
 
                             <Controller
                                 name="city"

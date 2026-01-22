@@ -9,8 +9,12 @@
         "register": "Register",
         "logout": "Logout",
         "profile": "Profile",
-        "orders": "Orders",
-        "settings": "Settings"
+        "orders": "All Orders",
+        "settings": "Settings",
+        "account": "My Account",
+        "gender": "Gender",
+        "male": "Male",
+        "female": "Female"
     },
     "categories": {
         "title": "Product Categories",
@@ -39,6 +43,13 @@
         "dell": "Dell",
         "puma": "Puma",
         "zara": "Zara"
+    },
+    "subcategories": {
+        "title": "Subcategories",
+        "subtitle": "Explore specialized collections within this category",
+        "browseNow": "Browse Now",
+        "exploreProducts": "Explore products in this collection",
+        "noSubcategories": "No subcategories found in this category"
     },
     "PageMeta": {
         "homeTitle": "Elite Store | Premium Shopping Experience",
@@ -120,7 +131,10 @@
         "recentlyViewed": "Recently Viewed",
         "somethingWentWrong": "Something went wrong",
         "refreshPage": "Refresh Page",
-        "na": "N/A"
+        "na": "N/A",
+        "edit": "Edit",
+        "save": "Save",
+        "cancel": "Cancel"
     },
     "cart": {
         "title": "Cart",
@@ -190,10 +204,13 @@
         "failedToLoadDesc": "We encountered an error while fetching the products. Please check your connection and try again."
     },
     "profile": {
-        "title": "My Account",
+        "title": "Account Settings",
         "welcome": "Welcome back, {{name}}",
         "personalInfo": "Personal Information",
         "personalInfoDesc": "Update your personal details here.",
+        "security": "Security",
+        "orders": "Orders",
+        "addresses": "Addresses",
         "addressBook": "Address Book",
         "addressBookDesc": "Manage your shipping destinations",
         "orderHistory": "Order History",
@@ -202,11 +219,19 @@
         "aliasLabel": "Alias (e.g., Home, Work)",
         "detailedAddress": "Detailed Address",
         "city": "City",
-        "noAddresses": "No addresses saved yet.",
+        "noAddresses": "No saved addresses",
         "addAddress": "Add New",
         "saveAddress": "Save Address",
         "cancel": "Cancel",
-        "emailHelper": "Email cannot be changed"
+        "emailHelper": "Email cannot be changed",
+        "updateSuccess": "✅ Profile updated successfully!",
+        "updateError": "❌ Failed to update profile",
+        "photoUpdated": "✅ Profile photo updated!",
+        "passwordChanged": "✅ Password changed successfully!",
+        "passwordError": "❌ Failed to change password",
+        "changePassword": "Change Password",
+        "noOrders": "No orders yet",
+        "savedAddresses": "Saved Addresses"
     },
     "orders": {
         "title": "Order History",
@@ -301,6 +326,7 @@
         "welcomeBack": "Welcome Back",
         "enterDetails": "Please enter your details to continue.",
         "socialComingSoon": "integration is coming soon! This part of the elite experience is currently in development.",
+        "continueWithGoogle": "Continue with Google",
         "continueWithEmail": "OR CONTINUE WITH EMAIL",
         "fillDetails": "OR FILL IN YOUR DETAILS",
         "emailLabel": "Email Address",
@@ -382,7 +408,9 @@
         "fair": "Fair",
         "strong": "Strong",
         "changePassBtn": "Change Password",
-        "logoutSession": "Logout Session"
+        "logoutSession": "Logout Session",
+        "emailExistsUsePassword": "🔐 This email is already linked to an existing account. Please use your email and password to sign in, or use 'Forgot Password' to reset it.",
+        "syncFailed": "⚠️ Authentication sync failed. Please try again or use email login."
     },
     "toasts": {
         "loggedOut": "Logged out successfully 👋",
@@ -414,5 +442,65 @@
         "forgotError": "❌ Verification failed. Check your email.",
         "changeSuccess": "✅ Password changed successfully!",
         "changeError": "❌ Change failed."
+    },
+    "reviews": {
+        "customerReviews": "Customer Reviews",
+        "writeReview": "Write a Review",
+        "yourRating": "Your Rating",
+        "ratingRequired": "Please select a rating",
+        "reviewTitle": "Review Title",
+        "titleRequired": "Title is required",
+        "titlePlaceholder": "Sum up your experience in a few words",
+        "reviewContent": "Your Review",
+        "contentRequired": "Review content is required",
+        "contentPlaceholder": "Tell others about your experience with this product...",
+        "addPhotos": "Add Photos",
+        "maxPhotos": "Max 5 photos",
+        "submitReview": "Submit Review",
+        "submitted": "✅ Review submitted successfully!",
+        "verifiedPurchase": "Verified Purchase",
+        "wasHelpful": "Was this review helpful?",
+        "yes": "Yes",
+        "no": "No",
+        "markedHelpful": "✅ Marked as helpful",
+        "markedNotHelpful": "Feedback recorded",
+        "report": "Report",
+        "basedOn": "Based on {{count}} reviews",
+        "sortBy": "Sort By",
+        "mostRecent": "Most Recent",
+        "mostHelpful": "Most Helpful",
+        "highestRated": "Highest Rated",
+        "lowestRated": "Lowest Rated",
+        "stars": "Stars",
+        "showing": "Showing {{count}} of {{total}} reviews",
+        "noReviews": "No reviews yet",
+        "noReviewsForRating": "No reviews for this rating",
+        "beFirst": "Be the first to share your experience!",
+        "today": "Today",
+        "yesterday": "Yesterday",
+        "daysAgo": "days ago",
+        "weeksAgo": "weeks ago"
+    },
+    "comments": {
+        "title": "Comments",
+        "placeholder": "Add a comment...",
+        "post": "Post",
+        "posting": "Posting...",
+        "reply": "Reply",
+        "send": "Send",
+        "writeReply": "Write a reply...",
+        "noComments": "No comments yet",
+        "beFirst": "Be the first to share your thoughts!",
+        "loginToComment": "Please login to add a comment",
+        "newest": "Newest",
+        "oldest": "Oldest",
+        "mostLiked": "Most Liked",
+        "showReplies": "Show",
+        "hideReplies": "Hide replies",
+        "replies": "replies",
+        "justNow": "Just now",
+        "minutesAgo": "min ago",
+        "hoursAgo": "hours ago",
+        "daysAgo": "days ago"
     }
 }

@@ -52,6 +52,12 @@ export const authService = {
         const { data } = await api.put('/auth/resetPassword', resetData);
         return data;
     },
+
+    // Verify Token - Check if token is still valid
+    verifyToken: async (): Promise<{ message: string; user?: { name: string; email: string; role: string } }> => {
+        const { data } = await api.get('/auth/verifyToken');
+        return data;
+    },
 };
 
 export default authService;

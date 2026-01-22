@@ -39,6 +39,35 @@ import { useRecentlyViewed } from "../../hooks/useRecentlyViewed";
 import ImageZoom from "../../components/Common/ImageZoom";
 import { LocalFireDepartment } from "@mui/icons-material";
 import StickyBuyBar from "../../components/Common/StickyBuyBar";
+import { ReviewsSection, Review } from "../../components/Reviews";
+
+// Generate mock reviews for demonstration
+const generateMockReviews = (productId: string, count: number): Review[] => {
+    const reviewTemplates = [
+        { name: 'Ahmed Hassan', country: 'eg', rating: 5, title: 'Excellent product!', content: 'I absolutely love this product. The quality is amazing and it arrived quickly.' },
+        { name: 'Sara Mohamed', country: 'eg', rating: 4, title: 'Great value for money', content: 'Very satisfied with my purchase. The product matches the description perfectly.' },
+        { name: 'John Doe', country: 'us', rating: 5, title: 'Top quality', content: 'Surprised by the build quality. Truly a premium product.' },
+        { name: 'Maria Garcia', country: 'es', rating: 5, title: 'Increíble!', content: 'El producto es simplemente fantástico. Superó todas mis expectativas.' },
+        { name: 'Khaled Mansour', country: 'sa', rating: 5, title: 'Perfect purchase!', content: 'Exactly what I was looking for. Fast shipping and excellent quality.' },
+    ];
+
+    const numReviews = Math.min(Math.max(count, 3), 5);
+    return reviewTemplates.slice(0, numReviews).map((template, index) => {
+        const createdAt = new Date(Date.now() - (index * 3) * 24 * 60 * 60 * 1000).toISOString();
+        return {
+            _id: `review-${productId}-${index}`,
+            userId: { _id: `user-${index}`, name: template.name, country: template.country },
+            productId,
+            rating: template.rating,
+            title: template.title,
+            content: template.content,
+            verifiedPurchase: Math.random() > 0.3,
+            helpful: Math.floor(Math.random() * 50),
+            notHelpful: Math.floor(Math.random() * 5),
+            createdAt,
+        };
+    });
+};
 
 const Details: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -98,8 +127,10 @@ const Details: React.FC = () => {
         select: (data) => data.data.filter((p) => p._id !== id) // Client-side fallback exclusion
     });
 
+
     // Track History
     const recentProducts = useRecentlyViewed(data || null);
+
 
     const addCart = useCallback(async () => {
         if (!id) return;
@@ -309,6 +340,16 @@ const Details: React.FC = () => {
                         </Grid>
                     </Grid>
                 </Paper>
+
+                {/* Customer Reviews Section - Display Only */}
+                <Box sx={{ mt: 6 }}>
+                    <ReviewsSection
+                        reviews={generateMockReviews(id || '', data.ratingsQuantity || 5)}
+                        loading={false}
+                        averageRating={data.ratingsAverage}
+                        totalReviews={data.ratingsQuantity}
+                    />
+                </Box>
 
                 {/* Intelligent Discovery Section */}
                 <Box sx={{ mt: 10 }}>
