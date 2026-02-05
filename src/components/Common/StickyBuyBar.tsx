@@ -73,14 +73,20 @@ const StickyBuyBar: React.FC<StickyBuyBarProps> = ({ product, onAddToCart, loadi
                             startIcon={<ShoppingCartIcon />}
                             sx={{
                                 borderRadius: '12px',
-                                px: 4,
+                                px: { xs: 2, sm: 4 },
                                 py: 1,
                                 fontWeight: 800,
                                 background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-                                boxShadow: theme.shadows[4]
+                                boxShadow: theme.shadows[4],
+                                minWidth: { xs: '48px', sm: 'auto' },
+                                '& .MuiButton-startIcon': {
+                                    margin: { xs: 0, sm: '0 8px 0 -4px' }
+                                }
                             }}
                         >
-                            {t("common.addToCart")}
+                            <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
+                                {t("common.addToCart")}
+                            </Box>
                         </Button>
                     </Stack>
                 </Container>

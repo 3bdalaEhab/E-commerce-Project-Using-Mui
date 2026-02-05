@@ -254,13 +254,13 @@ const Details: React.FC = () => {
 
                         {/* Content */}
                         <Grid size={{ xs: 12, md: 6 }}>
-                            <Box sx={{ p: { xs: 4, md: 6 }, height: '100%', display: 'flex', flexDirection: 'column' }}>
+                            <Box sx={{ p: { xs: 2.5, sm: 4, md: 6 }, height: '100%', display: 'flex', flexDirection: 'column' }}>
                                 <Stack spacing={2} mb={4}>
                                     <Stack direction="row" spacing={1}>
                                         <Chip label={translateAPIContent(data.category?.name, 'categories')} size="small" variant="outlined" sx={{ fontWeight: 800, borderRadius: '8px' }} />
                                         {data.brand && <Chip label={translateAPIContent(data.brand.name, 'brands')} size="small" variant="outlined" sx={{ fontWeight: 800, borderRadius: '8px' }} />}
                                     </Stack>
-                                    <Typography variant="h3" fontWeight="1000" sx={{ letterSpacing: -1.5, lineHeight: 1.1, fontSize: { xs: '1.75rem', md: '3rem' } }}>
+                                    <Typography variant="h3" fontWeight="1000" sx={{ letterSpacing: -1.5, lineHeight: 1.1, fontSize: { xs: '1.6rem', sm: '2.2rem', md: '3rem' } }}>
                                         {translateAPIContent(data.title, 'products')}
                                     </Typography>
                                     <Stack direction="row" spacing={1} alignItems="center">
@@ -269,7 +269,7 @@ const Details: React.FC = () => {
                                     </Stack>
                                 </Stack>
 
-                                <Typography variant="body1" color="text.secondary" sx={{ mb: 4, lineHeight: 1.8, flex: 1 }}>
+                                <Typography variant="body1" color="text.secondary" sx={{ mb: 4, lineHeight: { xs: 1.6, md: 1.8 }, fontSize: { xs: '0.95rem', md: '1rem' }, opacity: 0.8, flex: 1 }}>
                                     {translateProductDescription(data.title, data.description)}
                                 </Typography>
 
@@ -277,8 +277,8 @@ const Details: React.FC = () => {
 
                                 <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3} alignItems={{ xs: 'flex-start', sm: 'center' }}>
                                     <Box>
-                                        <Typography variant="caption" color="text.secondary" fontWeight="800" sx={{ textTransform: 'uppercase' }}>{t("common.price")}</Typography>
-                                        <Typography variant="h3" fontWeight="1000" color="primary">
+                                        <Typography variant="caption" color="text.secondary" fontWeight="800" sx={{ textTransform: 'uppercase', letterSpacing: 1 }}>{t("common.price")}</Typography>
+                                        <Typography variant="h3" fontWeight="1000" color="primary" sx={{ fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' } }}>
                                             {data.price} {t("common.egp")}
                                         </Typography>
                                         {data.quantity <= 10 && (
@@ -306,9 +306,19 @@ const Details: React.FC = () => {
                                                 textTransform: "none",
                                                 fontSize: "1.1rem",
                                                 background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                                                minWidth: { xs: '60px', sm: 'auto' },
+                                                '& .MuiButton-startIcon': {
+                                                    margin: { xs: 0, sm: '0 8px 0 -4px' }
+                                                }
                                             }}
                                         >
-                                            {addingToCart ? <CircularProgress size={24} color="inherit" /> : t("common.addToCart")}
+                                            {addingToCart ? (
+                                                <CircularProgress size={24} color="inherit" />
+                                            ) : (
+                                                <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
+                                                    {t("common.addToCart")}
+                                                </Box>
+                                            )}
                                         </Button>
                                         <IconButton
                                             onClick={handleWishlistToggle}

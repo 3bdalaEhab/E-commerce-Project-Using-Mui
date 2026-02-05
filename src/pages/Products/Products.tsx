@@ -196,8 +196,8 @@ const Products: React.FC = () => {
                             viewport={{ once: true, margin: "-50px" }} // Adjusted margin for better visibility trigger
                             sx={{
                                 display: "grid",
-                                gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
-                                gap: { xs: 2, sm: 4 },
+                                gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
+                                gap: { xs: 2.5, sm: 4 },
                                 opacity: isFetching ? 0.5 : 1, // Subtle fade only
                                 transition: 'opacity 0.2s ease',
                                 pointerEvents: isFetching ? 'none' : 'auto'

@@ -86,7 +86,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
                     <Box sx={{
                         position: 'relative',
                         overflow: 'hidden',
-                        height: 280,
+                        height: { xs: 280, sm: 320 },
                         borderTopLeftRadius: '24px', // Explicit radius to match card
                         borderTopRightRadius: '24px',
                     }}>
@@ -199,7 +199,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
 
                         <Box sx={{ mt: "auto", display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <Box>
-                                <Typography variant="caption" color="text.secondary" fontWeight="800" sx={{ fontSize: '0.75rem', display: 'block', mb: -0.5 }}>{t("common.priceLabel")}</Typography>
+                                <Typography variant="caption" color="text.secondary" fontWeight="900" sx={{ fontSize: '0.65rem', display: 'block', mb: -0.2, textTransform: 'uppercase', opacity: 0.8, letterSpacing: 0.5 }}>{t("common.priceLabel")}</Typography>
                                 <Typography
                                     variant="h5"
                                     fontWeight="1000"
