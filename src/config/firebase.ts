@@ -22,11 +22,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 
-console.log("🔥 Firebase Config Loaded:", {
-    projectId: firebaseConfig.projectId,
-    authDomain: firebaseConfig.authDomain,
-    apiKeyPrefix: firebaseConfig.apiKey ? firebaseConfig.apiKey.substring(0, 5) + "..." : "MISSING"
-});
+// Firebase initialization complete
 
 // Initialize Firebase Authentication
 export const auth = getAuth(app);

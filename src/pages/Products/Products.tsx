@@ -155,7 +155,7 @@ const Products: React.FC = () => {
                 <Typography
                     variant="h3"
                     fontWeight="900"
-                    sx={{ mb: 1, letterSpacing: -1 }}
+                    sx={{ mb: 1, letterSpacing: -1, fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' } }}
                 >
                     Premium{" "}
                     <Box component="span" sx={{ color: "primary.main" }}>
@@ -196,8 +196,8 @@ const Products: React.FC = () => {
                             viewport={{ once: true, margin: "-50px" }} // Adjusted margin for better visibility trigger
                             sx={{
                                 display: "grid",
-                                gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-                                gap: 4,
+                                gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
+                                gap: { xs: 2, sm: 4 },
                                 opacity: isFetching ? 0.5 : 1, // Subtle fade only
                                 transition: 'opacity 0.2s ease',
                                 pointerEvents: isFetching ? 'none' : 'auto'

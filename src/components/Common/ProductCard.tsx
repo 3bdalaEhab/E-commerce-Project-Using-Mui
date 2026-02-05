@@ -140,7 +140,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
                                     sx={{
                                         fontWeight: 1000,
                                         textTransform: "uppercase",
-                                        fontSize: "0.65rem",
+                                        fontSize: "0.75rem",
                                         opacity: 0.8,
                                         whiteSpace: 'nowrap',
                                         overflow: 'hidden',
@@ -172,7 +172,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
                                     lineHeight: 1.1,
                                     mb: 1,
                                     letterSpacing: "-0.8px",
-                                    fontSize: '1.2rem',
+                                    fontSize: { xs: '1.1rem', sm: '1.2rem' },
                                     whiteSpace: 'nowrap',
                                     overflow: 'hidden',
                                     textOverflow: 'ellipsis'
@@ -199,7 +199,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
 
                         <Box sx={{ mt: "auto", display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <Box>
-                                <Typography variant="caption" color="text.secondary" fontWeight="800" sx={{ fontSize: '0.65rem', display: 'block', mb: -0.5 }}>{t("common.priceLabel")}</Typography>
+                                <Typography variant="caption" color="text.secondary" fontWeight="800" sx={{ fontSize: '0.75rem', display: 'block', mb: -0.5 }}>{t("common.priceLabel")}</Typography>
                                 <Typography
                                     variant="h5"
                                     fontWeight="1000"

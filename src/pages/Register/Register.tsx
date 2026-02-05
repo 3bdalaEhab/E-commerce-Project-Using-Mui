@@ -266,8 +266,21 @@ const Register: React.FC = () => {
                                             value={field.value}
                                             onChange={(value) => field.onChange(value)}
                                             disabled={loading}
-                                            inputStyle={{ width: '100%' }}
+                                            inputStyle={{
+                                                width: '100%',
+                                                height: '56px',
+                                                borderRadius: '16px',
+                                                fontSize: '1rem',
+                                                fontFamily: 'inherit',
+                                                background: theme.palette.mode === 'dark' ? 'rgba(30, 41, 59, 0.5)' : 'rgba(248, 250, 252, 0.8)',
+                                                border: `1px solid ${theme.palette.divider}`
+                                            }}
                                             containerStyle={{ width: '100%' }}
+                                            buttonStyle={{
+                                                borderRadius: '16px 0 0 16px',
+                                                border: `1px solid ${theme.palette.divider}`,
+                                                background: 'transparent'
+                                            }}
                                             placeholder={t("auth.phonePlaceholder")}
                                             enableSearch={true}
                                             masks={{ eg: '.. ... ....' }}
@@ -311,12 +324,12 @@ const Register: React.FC = () => {
                                             {t("nav.gender")}
                                         </Typography>
                                         <Box sx={{
-                                            border: `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'}`,
+                                            border: `1px solid ${theme.palette.divider}`,
                                             borderRadius: '16px',
-                                            p: 1.5,
+                                            p: 1,
                                             bgcolor: theme.palette.mode === 'dark' ? 'rgba(30, 41, 59, 0.5)' : 'rgba(248, 250, 252, 0.8)',
                                         }}>
-                                            <Stack direction="row" spacing={2}>
+                                            <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', gap: 1 }}>
                                                 {[
                                                     { value: 'male', label: t("nav.male") },
                                                     { value: 'female', label: t("nav.female") }

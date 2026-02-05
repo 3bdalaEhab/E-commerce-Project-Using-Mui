@@ -47,7 +47,7 @@ const HomeHero: React.FC = () => {
         <Box
             sx={{
                 position: 'relative',
-                minHeight: '80vh',
+                minHeight: { xs: '70vh', md: '80vh' },
                 display: 'flex',
                 alignItems: 'center',
                 overflow: 'hidden',
@@ -143,7 +143,7 @@ const HomeHero: React.FC = () => {
                             variant="h1"
                             sx={{
                                 fontWeight: 900,
-                                fontSize: { xs: '3rem', md: '5.5rem' },
+                                fontSize: { xs: '2.5rem', sm: '3.5rem', md: '5.5rem' },
                                 letterSpacing: '-0.03em',
                                 lineHeight: 1.1,
                                 color: 'text.primary',

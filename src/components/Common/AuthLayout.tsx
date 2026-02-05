@@ -106,7 +106,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({ children, title, subtitle, illu
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    p: { xs: 3, md: 6, lg: 10 },
+                    p: { xs: 2, sm: 4, md: 6, lg: 10 },
                     bgcolor: "background.default"
                 }}>
                     <Container maxWidth="sm">
@@ -125,7 +125,8 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({ children, title, subtitle, illu
                                     background: `linear-gradient(to right, ${primaryColor}, ${primaryColor}dd)`,
                                     WebkitBackgroundClip: "text",
                                     WebkitTextFillColor: "transparent",
-                                    mb: 1
+                                    mb: 1,
+                                    fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' }
                                 }}>
                                     {title}
                                 </Typography>

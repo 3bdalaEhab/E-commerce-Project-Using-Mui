@@ -236,7 +236,7 @@ const Details: React.FC = () => {
                                 >
                                     {allImages.map((img, index) => (
                                         <SwiperSlide key={index}>
-                                            <Box sx={{ height: { xs: 350, md: 500 }, bgcolor: 'white', borderRadius: '16px', overflow: 'hidden' }}>
+                                            <Box sx={{ height: { xs: 300, sm: 400, md: 500 }, bgcolor: 'white', borderRadius: '16px', overflow: 'hidden' }}>
                                                 <ImageZoom
                                                     src={img}
                                                     alt={translateAPIContent(data.title, 'products')}
@@ -260,7 +260,7 @@ const Details: React.FC = () => {
                                         <Chip label={translateAPIContent(data.category?.name, 'categories')} size="small" variant="outlined" sx={{ fontWeight: 800, borderRadius: '8px' }} />
                                         {data.brand && <Chip label={translateAPIContent(data.brand.name, 'brands')} size="small" variant="outlined" sx={{ fontWeight: 800, borderRadius: '8px' }} />}
                                     </Stack>
-                                    <Typography variant="h3" fontWeight="1000" sx={{ letterSpacing: -1.5, lineHeight: 1.1 }}>
+                                    <Typography variant="h3" fontWeight="1000" sx={{ letterSpacing: -1.5, lineHeight: 1.1, fontSize: { xs: '1.75rem', md: '3rem' } }}>
                                         {translateAPIContent(data.title, 'products')}
                                     </Typography>
                                     <Stack direction="row" spacing={1} alignItems="center">

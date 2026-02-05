@@ -72,7 +72,7 @@ export default React.memo(function CategoriesSlider() {
                     boxShadow: theme.palette.mode === 'dark'
                         ? "0 20px 80px rgba(0,0,0,0.5)"
                         : "0 20px 80px rgba(0,0,0,0.15)",
-                    height: { xs: "500px", md: "600px" },
+                    height: { xs: "400px", md: "600px" },
                 }}
             >
                 <Swiper
@@ -159,7 +159,7 @@ export default React.memo(function CategoriesSlider() {
                                         variant="h1"
                                         sx={{
                                             fontWeight: 900,
-                                            fontSize: { xs: "2.5rem", md: "5rem" },
+                                            fontSize: { xs: "2rem", md: "5rem" },
                                             lineHeight: 1,
                                             mb: 4,
                                             letterSpacing: "-2px",

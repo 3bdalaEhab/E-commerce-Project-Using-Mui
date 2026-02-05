@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useMemo, useState, useEffect, useCallback, ReactNode } from 'react';
-import { ThemeProvider, createTheme, Theme, PaletteMode } from '@mui/material/styles';
+import { ThemeProvider, createTheme, Theme, PaletteMode, responsiveFontSizes } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { storage } from '../utils/storage';
@@ -232,7 +232,11 @@ export default function ThemeContextProvider({ children }: ThemeContextProviderP
         key: 'muiltr',
     }), []);
 
-    const theme = useMemo<Theme>(() => createTheme(getDesignTokens(mode, primaryColor, direction)), [mode, primaryColor, direction]);
+    const theme = useMemo<Theme>(() => {
+        const createdTheme = createTheme(getDesignTokens(mode, primaryColor, direction));
+        // Automatically scale font sizes based on breakpoints for professional mobile responsiveness
+        return responsiveFontSizes(createdTheme);
+    }, [mode, primaryColor, direction]);
 
     // Memoize context value
     const contextValue = useMemo<ThemeContextType>(
