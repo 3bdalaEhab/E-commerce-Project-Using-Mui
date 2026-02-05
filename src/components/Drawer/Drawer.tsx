@@ -98,9 +98,9 @@ const DrawerAppBar: React.FC<DrawerAppBarProps> = (props) => {
           boxShadow: "none",
         }}
       >
-        <Toolbar sx={{ 
-          gap: { xs: 0.5, sm: 1 },
-          px: { xs: 1, sm: 2, md: 2, lg: 3 },
+        <Toolbar sx={{
+          gap: { xs: 0, sm: 0.5, md: 1 },
+          px: { xs: 0.5, sm: 1.5, md: 2, lg: 3 },
           minHeight: { xs: 56, sm: 64 },
           justifyContent: "space-between"
         }}>
@@ -110,7 +110,7 @@ const DrawerAppBar: React.FC<DrawerAppBarProps> = (props) => {
             aria-label="open drawer"
             edge="start"
             onClick={handleDrawerToggle}
-            sx={{ 
+            sx={{
               display: { xs: "block", md: "none" },
               mr: 0.5,
               flexShrink: 0
@@ -145,8 +145,8 @@ const DrawerAppBar: React.FC<DrawerAppBarProps> = (props) => {
           </Typography>
 
           {/* Desktop Navigation - Takes remaining space */}
-          <Box sx={{ 
-            flexGrow: 1, 
+          <Box sx={{
+            flexGrow: 1,
             display: { xs: "none", md: "flex" },
             justifyContent: "center",
             minWidth: 0,
@@ -157,9 +157,9 @@ const DrawerAppBar: React.FC<DrawerAppBarProps> = (props) => {
           </Box>
 
           {/* Right Side Actions - Fixed, won't shrink */}
-          <Box sx={{ 
-            display: "flex", 
-            alignItems: "center", 
+          <Box sx={{
+            display: "flex",
+            alignItems: "center",
             gap: { xs: 0.25, sm: 0.5, md: 1 },
             flexShrink: 0
           }}>

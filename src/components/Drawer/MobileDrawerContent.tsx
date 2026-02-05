@@ -54,8 +54,8 @@ const MobileDrawerContent: React.FC<MobileDrawerContentProps> = ({
     };
 
     return (
-        <Box 
-            sx={{ 
+        <Box
+            sx={{
                 height: "100%",
                 display: "flex",
                 flexDirection: "column",
@@ -63,10 +63,10 @@ const MobileDrawerContent: React.FC<MobileDrawerContentProps> = ({
             }}
         >
             {/* Header Section */}
-            <Box 
-                sx={{ 
-                    textAlign: "center", 
-                    p: 2,
+            <Box
+                sx={{
+                    textAlign: "center",
+                    p: { xs: 1.5, sm: 2 },
                     flexShrink: 0
                 }}
             >
@@ -93,8 +93,8 @@ const MobileDrawerContent: React.FC<MobileDrawerContentProps> = ({
             </Box>
 
             {/* Scrollable Navigation */}
-            <Box 
-                sx={{ 
+            <Box
+                sx={{
                     flexGrow: 1,
                     overflowY: "auto",
                     overflowX: "hidden",
@@ -143,9 +143,9 @@ const MobileDrawerContent: React.FC<MobileDrawerContentProps> = ({
                                     },
                                 }}
                             >
-                                <ListItemIcon sx={{ 
-                                    minWidth: "40px", 
-                                    color: theme.palette.primary.main 
+                                <ListItemIcon sx={{
+                                    minWidth: "40px",
+                                    color: theme.palette.primary.main
                                 }}>
                                     <Badge
                                         badgeContent={
@@ -169,7 +169,7 @@ const MobileDrawerContent: React.FC<MobileDrawerContentProps> = ({
                                 </ListItemIcon>
                                 <ListItemText
                                     primary={item.name}
-                                    primaryTypographyProps={{ 
+                                    primaryTypographyProps={{
                                         fontWeight: 600,
                                         fontSize: "0.95rem"
                                     }}
@@ -186,7 +186,7 @@ const MobileDrawerContent: React.FC<MobileDrawerContentProps> = ({
                                     component={Link}
                                     to="/change-password"
                                     onClick={handleDrawerToggle}
-                                    sx={{ 
+                                    sx={{
                                         borderRadius: 2,
                                         py: 1.5,
                                         transition: "all 0.2s ease",
@@ -199,15 +199,15 @@ const MobileDrawerContent: React.FC<MobileDrawerContentProps> = ({
                                         },
                                     }}
                                 >
-                                    <ListItemIcon sx={{ 
+                                    <ListItemIcon sx={{
                                         minWidth: "40px",
                                         color: theme.palette.text.secondary
                                     }}>
                                         <LockIcon />
                                     </ListItemIcon>
-                                    <ListItemText 
+                                    <ListItemText
                                         primary={t("nav.settings")}
-                                        primaryTypographyProps={{ 
+                                        primaryTypographyProps={{
                                             fontWeight: 600,
                                             fontSize: "0.95rem"
                                         }}
@@ -217,7 +217,7 @@ const MobileDrawerContent: React.FC<MobileDrawerContentProps> = ({
                             <ListItem disablePadding>
                                 <ListItemButton
                                     onClick={logOut}
-                                    sx={{ 
+                                    sx={{
                                         borderRadius: 2,
                                         py: 1.5,
                                         color: "error.main",
@@ -228,15 +228,15 @@ const MobileDrawerContent: React.FC<MobileDrawerContentProps> = ({
                                         },
                                     }}
                                 >
-                                    <ListItemIcon sx={{ 
-                                        minWidth: "40px", 
-                                        color: "inherit" 
+                                    <ListItemIcon sx={{
+                                        minWidth: "40px",
+                                        color: "inherit"
                                     }}>
                                         <Logout />
                                     </ListItemIcon>
-                                    <ListItemText 
+                                    <ListItemText
                                         primary={t("nav.logout")}
-                                        primaryTypographyProps={{ 
+                                        primaryTypographyProps={{
                                             fontWeight: 600,
                                             fontSize: "0.95rem"
                                         }}
@@ -249,17 +249,17 @@ const MobileDrawerContent: React.FC<MobileDrawerContentProps> = ({
             </Box>
 
             {/* Footer Section (optional) */}
-            <Box 
-                sx={{ 
+            <Box
+                sx={{
                     flexShrink: 0,
                     p: 2,
                     borderTop: `1px solid ${theme.palette.divider}`,
                     textAlign: "center"
                 }}
             >
-                <Typography 
-                    variant="caption" 
-                    sx={{ 
+                <Typography
+                    variant="caption"
+                    sx={{
                         color: theme.palette.text.secondary,
                         display: "block"
                     }}
